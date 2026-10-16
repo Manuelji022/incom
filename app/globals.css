@@ -1,26 +1,291 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light dark;
+
+  /* Surfaces */
+  --page: light-dark(#FFFFFF, #0B0B0B);
+  --shell: light-dark(#F6F6F6, #000000);
+  --container: light-dark(#ffffff, #111111);
+  --card: light-dark(#F6F6F6, #191919);
+  --sunken: light-dark(#EFEFEF, #0a0a0a);
+  --modal: light-dark(#ffffff, #222222);
+  --standout: light-dark(#202020, #222222);
+
+  /* Components */
+  --component: light-dark(#ECECEC, #222222);
+  --component-hover: light-dark(#E5E5E5, #2A2A2A);
+  --component-active: light-dark(#DDDDDD, #313131);  
+  --component-on-inverted: light-dark(#FCFCFC, #0F0F0F);
+  --component-on-container-subtle: light-dark(#FFFFFF, #191919);
+  --component-on-container-strong: light-dark(#FFFFFF, #222222);
+
+  /* Transparent component states */
+  --transparent-hover: light-dark(rgb(0 0 0 / 4%), rgb(255 255 255 / 6%));
+  --transparent-active: light-dark(rgb(0 0 0 / 8%), rgb(255 255 255 / 12%));
+
+  /* Foreground */
+  --primary-foreground: light-dark(#171717, #f2f2f2);
+  --secondary-foreground: light-dark(#5b5b5b, #b8b8b8);
+  --tertiary-foreground: light-dark(#858585, #858585);
+  --disabled-foreground: light-dark(#a3a3a3, #626262);
+
+  /* Brand */
+  --brand-solid: #3b82f6;
+  --brand-solid-hover: #5796f7;
+  --brand-solid-active: #83b4fa;
+  --brand-subtle: light-dark(#e8f1ff, #142a4b);
+  --brand-subtle-hover: light-dark(#d9e9ff, #1b3964);
+  --brand-foreground: light-dark(#2f78e8, #6da5f5);
+  --on-brand-solid-foreground: #ffffff;
+  --on-brand-subtle-foreground: light-dark(#1d5fb7, #91bcfb);
+
+  /* Positive */
+  --positive-solid: #53a274;
+  --positive-solid-hover: #60b080;
+  --positive-subtle: light-dark(#e8f5ec, #192c22);
+  --positive-foreground: light-dark(#2e8853, #61ad7e);
+  --on-positive-solid-foreground: #ffffff;
+  --on-positive-subtle-foreground: light-dark(#267449, #83d1a0);
+
+  /* Warning */
+  --warning-solid: #eb762f;
+  --warning-solid-hover: #f77d34;
+  --warning-subtle: light-dark(#fff1e5, #342110);
+  --warning-foreground: light-dark(#c85d1c, #f28a40);
+  --on-warning-solid-foreground: #ffffff;
+  --on-warning-subtle-foreground: light-dark(#a74916, #ffa15c);
+
+  /* Danger */
+  --danger-solid: #d8583d;
+  --danger-solid-hover: #df6a50;
+  --danger-solid-active: #fa987d;
+  --danger-subtle: light-dark(#fff0ec, #301b18);
+  --danger-subtle-hover: light-dark(#ffe3dc, #45231d);
+  --danger-foreground: light-dark(#c84d34, #df6952);
+  --on-danger-solid-foreground: #ffffff;
+  --on-danger-subtle-foreground: light-dark(#b6402b, #ff9e84);
+
+  /* Inverted */
+  --inverted-solid: light-dark(#171717, #f2f2f2);
+  --inverted-solid-hover: light-dark(#303030, #dadada);
+  --inverted-solid-active: light-dark(#454545, #c5c5c5);
+  --on-inverted-foreground: light-dark(#ffffff, #171717);
+  --on-standout-primary-foreground: light-dark(#171717, #f2f2f2);
+  --on-standout-secondary-foreground: light-dark(#737373, #b4b4b4);
+
+  /* Borders */
+  --border-default: light-dark(#e4e4e4, #343434);
+  --border-subtle: light-dark(#eeeeee, #252525);
+  --border-strong: light-dark(#c9c9c9, #4a4a4a);
+  --border-inverted: light-dark(#454545, #d8d8d8);
+  --brand-border-default: #3b82f6;
+  --brand-border-subtle: light-dark(#b8d4ff, #294a72);
+  --brand-border-focus: light-dark(#2563eb, #75aaf5);
+  --positive-border-default: light-dark(#8bc9a3, #365a44);
+  --warning-border-default: light-dark(#f2b47e, #694321);
+  --danger-border-default: light-dark(#e8a08e, #67372d);
+  --danger-border-subtle: light-dark(#f2d2c9, #472922);
+
+  /* Disabled */
+  --disabled: light-dark(#eeeeee, #252525);
+
+  /* Compatibility aliases for existing utility classes */
+  --background: var(--page);
+  --foreground: var(--primary-foreground);
+  --border: var(--border-default);
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+.light {
+  color-scheme: light;
 }
 
 @theme inline {
+  /* Surface colors */
+  --color-page: var(--page);
+  --color-shell: var(--shell);
+  --color-container: var(--container);
+  --color-card: var(--card);
+  --color-sunken: var(--sunken);
+  --color-modal: var(--modal);
+  --color-standout: var(--standout);
+
+  /* Component colors */
+  --color-component: var(--component);
+  --color-component-hover: var(--component-hover);
+  --color-component-active: var(--component-active);
+  --color-component-on-sunken: var(--component-on-sunken);
+  --color-component-on-inverted: var(--component-on-inverted);
+  --color-component-on-container-subtle: var(--component-on-container-subtle);
+  --color-component-on-container-strong: var(--component-on-container-strong);
+  --color-transparent-hover: var(--transparent-hover);
+  --color-transparent-active: var(--transparent-active);
+
+  /* Foreground colors */
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-tertiary-foreground: var(--tertiary-foreground);
+  --color-disabled-foreground: var(--disabled-foreground);
+
+  /* Brand and status colors */
+  --color-brand-solid: var(--brand-solid);
+  --color-brand-solid-hover: var(--brand-solid-hover);
+  --color-brand-solid-active: var(--brand-solid-active);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-brand-subtle-hover: var(--brand-subtle-hover);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-on-brand-solid-foreground: var(--on-brand-solid-foreground);
+  --color-on-brand-subtle-foreground: var(--on-brand-subtle-foreground);
+
+  --color-positive-solid: var(--positive-solid);
+  --color-positive-solid-hover: var(--positive-solid-hover);
+  --color-positive-subtle: var(--positive-subtle);
+  --color-positive-foreground: var(--positive-foreground);
+  --color-on-positive-solid-foreground: var(--on-positive-solid-foreground);
+  --color-on-positive-subtle-foreground: var(--on-positive-subtle-foreground);
+
+  --color-warning-solid: var(--warning-solid);
+  --color-warning-solid-hover: var(--warning-solid-hover);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-on-warning-solid-foreground: var(--on-warning-solid-foreground);
+  --color-on-warning-subtle-foreground: var(--on-warning-subtle-foreground);
+
+  --color-danger-solid: var(--danger-solid);
+  --color-danger-solid-hover: var(--danger-solid-hover);
+  --color-danger-solid-active: var(--danger-solid-active);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-danger-subtle-hover: var(--danger-subtle-hover);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-on-danger-solid-foreground: var(--on-danger-solid-foreground);
+  --color-on-danger-subtle-foreground: var(--on-danger-subtle-foreground);
+
+  --color-inverted-solid: var(--inverted-solid);
+  --color-inverted-solid-hover: var(--inverted-solid-hover);
+  --color-inverted-solid-active: var(--inverted-solid-active);
+  --color-on-inverted-foreground: var(--on-inverted-foreground);
+  --color-on-standout-primary-foreground: var(--on-standout-primary-foreground);
+  --color-on-standout-secondary-foreground: var(--on-standout-secondary-foreground);
+
+  /* Border and focus colors */
+  --color-border-default: var(--border-default);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-border-inverted: var(--border-inverted);
+  --color-brand-border-default: var(--brand-border-default);
+  --color-brand-border-subtle: var(--brand-border-subtle);
+  --color-brand-border-focus: var(--brand-border-focus);
+  --color-positive-border-default: var(--positive-border-default);
+  --color-warning-border-default: var(--warning-border-default);
+  --color-danger-border-default: var(--danger-border-default);
+  --color-danger-border-subtle: var(--danger-border-subtle);
+  --color-disabled: var(--disabled);
+  --color-ring: var(--brand-border-focus);
+  --color-ring-offset: var(--page);
+
+  /* Existing app aliases */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-border: var(--border);
+
+  /* Geist font families */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-weight-regular: 400;
+  --font-weight-semimedium: 450;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Interfere radius scale */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-3xl: 16px;
+  --radius-4xl: 20px;
+  --radius-5xl: 24px;
+  --radius-full: 9999px;
+
+  /* Type scale */
+  --text-heading-1: 70px;
+  --text-heading-1--line-height: 1.15;
+  --text-heading-1--letter-spacing: -0.035em;
+  --text-heading-2: 55px;
+  --text-heading-2--line-height: 1.2;
+  --text-heading-2--letter-spacing: -0.03em;
+  --text-heading-3: 45px;
+  --text-heading-3--line-height: 1.25;
+  --text-heading-3--letter-spacing: -0.02em;
+  --text-heading-4: 35px;
+  --text-heading-4--line-height: 1.35;
+  --text-heading-5: 30px;
+  --text-heading-5--line-height: 1.4;
+  --text-heading-6: 25px;
+  --text-heading-6--line-height: 1.4;
+
+  --text-body-lg: 23px;
+  --text-body-lg--line-height: 1.6;
+  --text-body: 19px;
+  --text-body--line-height: 1.5;
+  --text-body-sm: 16px;
+  --text-body-sm--line-height: 1.45;
+
+  --text-caption-lg: 0.875rem;
+  --text-caption-lg--line-height: 1.4;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.35;
+  --text-caption-sm: 0.6875rem;
+  --text-caption-sm--line-height: 1.35;
+  --text-caption-xs: 0.625rem;
+  --text-caption-xs--line-height: 1.3;
+
+  --text-code: 0.875rem;
+  --text-code--line-height: 1.5;
+  --text-code-sm: 0.75rem;
+  --text-code-sm--line-height: 1.5;
+  --text-code-xs: 0.6875rem;
+  --text-code-xs--line-height: 1.5;
+
+  /* Box shadows */
+  --shadow-border: 0 0 0 1px var(--border-default);
+  --shadow-default: 0 1px 2px 0 color-mix(in srgb, var(--primary-foreground) 8%, transparent);
+  --shadow-large:
+    0 8px 18px -6px color-mix(in srgb, var(--primary-foreground) 14%, transparent),
+    0 4px 8px -4px color-mix(in srgb, var(--primary-foreground) 8%, transparent);
+  --shadow-extra-large:
+    0 18px 44px -10px color-mix(in srgb, var(--primary-foreground) 20%, transparent),
+    0 8px 16px -8px color-mix(in srgb, var(--primary-foreground) 12%, transparent);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border-default);
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  html {
+    min-height: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    @apply bg-page font-sans text-primary-foreground antialiased;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  }
+
+  ::selection {
+    color: var(--on-brand-solid-foreground);
+    background-color: var(--brand-solid);
+  }
 }
