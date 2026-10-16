@@ -100,6 +100,14 @@ const dictionaries = {
       previous: "Previous",
       next: "Next",
     },
+    composition: {
+      title: "Portfolio composition",
+      subtitle: "Expected scenario, after {duration}",
+      listLabel: "Portfolio sources",
+      contributions: "Contributions",
+      growth: "Investment growth",
+      aria: "Portfolio sources after {duration}: {contributions} from contributions and {growth} from investment growth.",
+    },
   },
   es: {
     metadata: {
@@ -200,6 +208,14 @@ const dictionaries = {
       page: "Página {page} de {pages}",
       previous: "Anterior",
       next: "Siguiente",
+    },
+    composition: {
+      title: "Composición de la cartera",
+      subtitle: "Escenario esperado, después de {duration}",
+      listLabel: "Origen de la cartera",
+      contributions: "Aportaciones",
+      growth: "Crecimiento de la inversión",
+      aria: "Origen de la cartera después de {duration}: {contributions} de aportaciones y {growth} de crecimiento de la inversión.",
     },
   },
 } as const;

@@ -1,9 +1,10 @@
 import { Header } from "@/components/header";
 import { CompoundInputSidebar } from "@/components/compound-input-sidebar";
 import { Footer } from "@/components/footer";
+import { InvestmentSummary } from "@/components/investment-summary";
+import { PortfolioComposition } from "@/components/portfolio-composition";
 import { ProjectionHeader } from "@/components/projection-header";
 import { ProjectionChart } from "@/components/projection-chart";
-import { InvestmentSummary } from "@/components/investment-summary";
 import { ScenariosAtAGlance } from "@/components/scenarios-at-a-glance";
 import { fetchProjection } from "@/lib/compound-interest";
 import { notFound } from "next/navigation";
@@ -42,6 +43,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   const expected = projection?.scenarios.find(
     (scenario) => scenario.name === "expected",
   );
+  const expectedFinalPoint = expected?.annual_points.at(-1);
   return (
     <div className="flex min-h-svh flex-col bg-page">
       <Header
@@ -66,7 +68,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             text={text.header}
             locale={lang}
           />
-          {expected ? (
+          {expected && expectedFinalPoint ? (
             <>
               <ProjectionChart
                 points={expected.annual_points}
@@ -77,6 +79,11 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 points={expected.annual_points}
                 text={text.summary}
                 locale={lang}
+              />
+              <PortfolioComposition
+                point={expectedFinalPoint}
+                locale={lang}
+                text={text.composition}
               />
             </>
           ) : (
