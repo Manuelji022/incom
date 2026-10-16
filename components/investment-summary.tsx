@@ -4,26 +4,36 @@ import { useState } from "react";
 import type { ProjectionPoint } from "@/types/compound-interest";
 import { Button } from "@/components/ui/button";
 
+import type { Locale } from "@/lib/locales";
+type SummaryText = ReturnType<
+  typeof import("@/lib/i18n").getDictionary
+>["summary"];
 type InvestmentSummaryProps = {
   points: readonly ProjectionPoint[];
+  locale: Locale;
+  text: SummaryText;
 };
-
-const euro = new Intl.NumberFormat("en-IE", {
-  style: "currency",
-  currency: "EUR",
-  maximumFractionDigits: 0,
-});
 
 const PAGE_SIZE = 6;
 
 function getCheckpointPoints(points: readonly ProjectionPoint[]) {
   const finalYear = points.at(-1)?.year;
   return points.filter(
-    (point) => point.year === 0 || point.year === finalYear || point.year % 5 === 0,
+    (point) =>
+      point.year === 0 || point.year === finalYear || point.year % 5 === 0,
   );
 }
 
-export function InvestmentSummary({ points }: InvestmentSummaryProps) {
+export function InvestmentSummary({
+  points,
+  locale,
+  text,
+}: InvestmentSummaryProps) {
+  const euro = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  });
   const [showAllYears, setShowAllYears] = useState(false);
   const [page, setPage] = useState(0);
   const checkpoints = getCheckpointPoints(points);
@@ -42,13 +52,27 @@ export function InvestmentSummary({ points }: InvestmentSummaryProps) {
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 id="investment-summary-title" className="text-base font-semibold text-primary-foreground">
-            Yearly projection (expected scenario)
+          <h2
+            id="investment-summary-title"
+            className="text-base font-semibold text-primary-foreground"
+          >
+            {text.title}
           </h2>
-          <p aria-live="polite" className="mt-1 text-xs text-secondary-foreground">
-            {showAllYears && firstVisibleYear !== undefined && lastVisibleYear !== undefined
-              ? `Years ${firstVisibleYear}–${lastVisibleYear} · page ${currentPage + 1} of ${pageCount}`
-              : `${checkpoints.length} milestone years · ${points.length} annual results`}
+          <p
+            aria-live="polite"
+            className="mt-1 text-xs text-secondary-foreground"
+          >
+            {showAllYears &&
+            firstVisibleYear !== undefined &&
+            lastVisibleYear !== undefined
+              ? text.years
+                  .replace("{from}", String(firstVisibleYear))
+                  .replace("{to}", String(lastVisibleYear))
+                  .replace("{page}", String(currentPage + 1))
+                  .replace("{pages}", String(pageCount))
+              : text.milestones
+                  .replace("{milestones}", String(checkpoints.length))
+                  .replace("{total}", String(points.length))}
           </p>
         </div>
         {checkpoints.length < points.length ? (
@@ -62,23 +86,33 @@ export function InvestmentSummary({ points }: InvestmentSummaryProps) {
             size="sm"
             variant="outline"
           >
-            {showAllYears ? "Show milestone years" : "Show all years"}
+            {showAllYears ? text.milestonesButton : text.allButton}
           </Button>
         ) : null}
       </div>
       <div className="overflow-x-auto">
-        <table id="yearly-projection-table" className="w-full min-w-[660px] border-collapse text-left text-xs sm:text-sm">
-          <caption className="sr-only">
-            Yearly expected-scenario portfolio value, cumulative contributions,
-            investment growth, and inflation-adjusted value.
-          </caption>
+        <table
+          id="yearly-projection-table"
+          className="w-full min-w-[660px] border-collapse text-left text-xs sm:text-sm"
+        >
+          <caption className="sr-only">{text.caption}</caption>
           <thead>
             <tr className="border-b border-border-subtle text-xs text-secondary-foreground">
-              <th className="w-12 py-2 pr-3 font-medium" scope="col">Year</th>
-              <th className="px-3 py-2 text-right font-medium" scope="col">Portfolio value</th>
-              <th className="px-3 py-2 text-right font-medium" scope="col">Contributions (cumulative)</th>
-              <th className="px-3 py-2 text-right font-medium" scope="col">Investment growth</th>
-              <th className="py-2 pl-3 text-right font-medium" scope="col">Real value (today’s money)</th>
+              <th className="w-12 py-2 pr-3 font-medium" scope="col">
+                {text.year}
+              </th>
+              <th className="px-3 py-2 text-right font-medium" scope="col">
+                {text.portfolio}
+              </th>
+              <th className="px-3 py-2 text-right font-medium" scope="col">
+                {text.contributions}
+              </th>
+              <th className="px-3 py-2 text-right font-medium" scope="col">
+                {text.growth}
+              </th>
+              <th className="py-2 pl-3 text-right font-medium" scope="col">
+                {text.real}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -87,9 +121,16 @@ export function InvestmentSummary({ points }: InvestmentSummaryProps) {
               return (
                 <tr
                   key={point.year}
-                  className={isFinalYear ? "border-t border-border-subtle bg-card font-semibold" : "border-b border-border-subtle"}
+                  className={
+                    isFinalYear
+                      ? "border-t border-border-subtle bg-card font-semibold"
+                      : "border-b border-border-subtle"
+                  }
                 >
-                  <th className="py-3 pr-3 font-medium text-secondary-foreground" scope="row">
+                  <th
+                    className="py-3 pr-3 font-medium text-secondary-foreground"
+                    scope="row"
+                  >
                     {point.year}
                   </th>
                   <td className="whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums text-primary-foreground">
@@ -101,8 +142,12 @@ export function InvestmentSummary({ points }: InvestmentSummaryProps) {
                         Number(point.cumulative_contributions),
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-secondary-foreground">{euro.format(Number(point.cumulative_investment_growth))}</td>
-                  <td className="whitespace-nowrap py-3 pl-3 text-right tabular-nums text-secondary-foreground">{euro.format(Number(point.inflation_adjusted_balance))}</td>
+                  <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-secondary-foreground">
+                    {euro.format(Number(point.cumulative_investment_growth))}
+                  </td>
+                  <td className="whitespace-nowrap py-3 pl-3 text-right tabular-nums text-secondary-foreground">
+                    {euro.format(Number(point.inflation_adjusted_balance))}
+                  </td>
                 </tr>
               );
             })}
@@ -111,27 +156,35 @@ export function InvestmentSummary({ points }: InvestmentSummaryProps) {
       </div>
       {showAllYears && pageCount > 1 ? (
         <nav
-          aria-label="Yearly projection pagination"
+          aria-label={text.pagination}
           className="mt-4 flex items-center justify-between gap-3"
         >
           <Button
             disabled={currentPage === 0}
-            onClick={() => setPage((currentPageIndex) => Math.max(0, currentPageIndex - 1))}
+            onClick={() =>
+              setPage((currentPageIndex) => Math.max(0, currentPageIndex - 1))
+            }
             size="sm"
             variant="outline"
           >
-            Previous
+            {text.previous}
           </Button>
           <span className="text-xs tabular-nums text-secondary-foreground">
-            Page {currentPage + 1} of {pageCount}
+            {text.page
+              .replace("{page}", String(currentPage + 1))
+              .replace("{pages}", String(pageCount))}
           </span>
           <Button
             disabled={currentPage >= pageCount - 1}
-            onClick={() => setPage((currentPageIndex) => Math.min(pageCount - 1, currentPageIndex + 1))}
+            onClick={() =>
+              setPage((currentPageIndex) =>
+                Math.min(pageCount - 1, currentPageIndex + 1),
+              )
+            }
             size="sm"
             variant="outline"
           >
-            Next
+            {text.next}
           </Button>
         </nav>
       ) : null}

@@ -15,34 +15,62 @@ type ProjectionChartRow = {
   realBalance: number;
 };
 
-type ProjectionChartCanvasProps = { points: readonly ProjectionPoint[] };
+import type { Locale } from "@/lib/locales";
+type ChartText = {
+  years: string;
+  aria: string;
+  keys: string;
+  year: string;
+  total: string;
+  tipGrowth: string;
+  tipInvested: string;
+  tipToday: string;
+};
+type ProjectionChartCanvasProps = {
+  points: readonly ProjectionPoint[];
+  locale: Locale;
+  text: ChartText;
+};
 
-const euro = new Intl.NumberFormat("en-IE", {
-  style: "currency",
-  currency: "EUR",
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
-
-const euroFull = new Intl.NumberFormat("en-IE", {
-  style: "currency",
-  currency: "EUR",
-  maximumFractionDigits: 0,
-});
-
-function formatTooltip(row: ProjectionChartRow): string {
+function formatTooltip(
+  row: ProjectionChartRow,
+  text: ChartText,
+  euroFull: Intl.NumberFormat,
+): string {
   return [
-    `Year: ${row.year}`,
-    `Total value: ${euroFull.format(row.balance)}`,
-    `Growth: ${euroFull.format(row.growth)}`,
-    `Total invested: ${euroFull.format(row.invested)}`,
-    `Today's money: ${euroFull.format(row.realBalance)}`,
+    `${text.year}: ${row.year}`,
+    `${text.total}: ${euroFull.format(row.balance)}`,
+    `${text.tipGrowth}: ${euroFull.format(row.growth)}`,
+    `${text.tipInvested}: ${euroFull.format(row.invested)}`,
+    `${text.tipToday}: ${euroFull.format(row.realBalance)}`,
   ].join("\n");
 }
 
 export function ProjectionChartCanvas({
   points,
+  locale,
+  text,
 }: ProjectionChartCanvasProps) {
+  const currencyLocale = locale === "es" ? "es-ES" : "en-IE";
+  const compactEuro = useMemo(
+    () =>
+      new Intl.NumberFormat(currencyLocale, {
+        style: "currency",
+        currency: "EUR",
+        notation: "compact",
+        maximumFractionDigits: 1,
+      }),
+    [currencyLocale],
+  );
+  const fullEuro = useMemo(
+    () =>
+      new Intl.NumberFormat(currencyLocale, {
+        style: "currency",
+        currency: "EUR",
+        maximumFractionDigits: 0,
+      }),
+    [currencyLocale],
+  );
   const rows = useMemo(
     () =>
       points.map((point) => {
@@ -99,7 +127,7 @@ export function ProjectionChartCanvas({
             scale: scaleLinear,
             domain: [0, rows.at(-1)?.year ?? 1],
             axis: {
-              label: "Years",
+              label: text.years,
               ticks: { count: 6, format: (value) => `${value}` },
             },
           },
@@ -107,7 +135,9 @@ export function ProjectionChartCanvas({
             scale: scaleLinear,
             nice: true,
             grid: { stroke: "var(--border-subtle)", strokeOpacity: 0.8 },
-            axis: { ticks: { count: 5, format: (value) => euro.format(value) } },
+            axis: {
+              ticks: { count: 5, format: (value) => compactEuro.format(value) },
+            },
           },
         },
         margin: { left: 64, right: 18, top: 14, bottom: 54 },
@@ -122,11 +152,11 @@ export function ProjectionChartCanvas({
         tooltip: {
           use: tooltip,
           formatGroup: (focused) =>
-            focused[0] ? formatTooltip(focused[0].datum) : "",
+            focused[0] ? formatTooltip(focused[0].datum, text, fullEuro) : "",
           placement: ["top", "right", "left", "bottom"],
         },
       }),
-    [rows],
+    [rows, text, fullEuro, compactEuro],
   );
 
   return (
@@ -134,8 +164,8 @@ export function ProjectionChartCanvas({
       definition={definition}
       height={330}
       initialWidth={720}
-      ariaLabel="Expected portfolio projection showing balance, investment growth, contributions, and inflation adjusted value"
-      ariaDescription="Use the arrow keys to inspect annual values."
+      ariaLabel={text.aria}
+      ariaDescription={text.keys}
     />
   );
 }
