@@ -19,6 +19,7 @@ type SegmentedControlProps<Value extends string = string> = Omit<
   defaultValue?: Value;
   onValueChange?: (value: Value) => void;
   required?: boolean;
+  optional?: boolean;
 };
 
 function SegmentedControl<Value extends string = string>({
@@ -29,6 +30,7 @@ function SegmentedControl<Value extends string = string>({
   defaultValue,
   onValueChange,
   required,
+  optional = false,
   disabled,
   className = "",
   ...props
@@ -42,8 +44,11 @@ function SegmentedControl<Value extends string = string>({
       data-slot="segmented-control"
       className={`min-w-0 ${className}`.trim()}
     >
-      <legend className="mb-2.5 text-sm font-medium leading-5 text-primary-foreground">
-        {label}
+      <legend className="mb-2.5 w-full text-sm font-medium leading-5 text-primary-foreground">
+        <span className="flex items-center justify-between gap-3">
+          <span>{label}</span>
+          {optional ? <span className="shrink-0 text-xs font-normal text-tertiary-foreground">Optional</span> : null}
+        </span>
       </legend>
       <div className="grid auto-cols-fr grid-flow-col gap-2">
         {options.map((option) => (

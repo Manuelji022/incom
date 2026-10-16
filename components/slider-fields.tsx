@@ -17,13 +17,14 @@ export type SliderFieldProps = {
   step: number;
   description?: string;
   valueText?: (value: number) => string;
+  optional?: boolean;
 };
 
 function isStepAligned(value: number, min: number, step: number) {
   return Math.abs((value - min) / step - Math.round((value - min) / step)) < 1e-8;
 }
 
-export function SliderField({ id, name, label, unit, defaultValue, min, max, step, description, valueText }: SliderFieldProps) {
+export function SliderField({ id, name, label, unit, defaultValue, min, max, step, description, valueText, optional = false }: SliderFieldProps) {
   const [value, setValue] = useState(defaultValue);
   const [draft, setDraft] = useState(String(defaultValue));
   const descriptionId = description ? `${id}-description` : undefined;
@@ -32,7 +33,10 @@ export function SliderField({ id, name, label, unit, defaultValue, min, max, ste
   return (
     <Field>
       <div className="flex items-center justify-between gap-3">
-        <FieldLabel id={labelId} htmlFor={id}>{label}</FieldLabel>
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+          <FieldLabel id={labelId} htmlFor={id}>{label}</FieldLabel>
+          {optional ? <span className="shrink-0 text-xs font-normal text-tertiary-foreground">Optional</span> : null}
+        </div>
         <div className="relative w-28 shrink-0">
           <Input
             id={id}
@@ -89,6 +93,7 @@ export type ScenarioRangeFieldProps = {
   defaultUpperSpread?: number;
   step?: number;
   maxSpread?: number;
+  optional?: boolean;
 };
 
 export function ScenarioRangeField({
@@ -101,6 +106,7 @@ export function ScenarioRangeField({
   defaultUpperSpread = 2,
   step = 0.1,
   maxSpread = 10,
+  optional = false,
 }: ScenarioRangeFieldProps) {
   const [lowerSpread, setLowerSpread] = useState(defaultLowerSpread);
   const [upperSpread, setUpperSpread] = useState(defaultUpperSpread);
@@ -120,7 +126,10 @@ export function ScenarioRangeField({
   return (
     <Field>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <FieldLabel id={labelId}>{label}</FieldLabel>
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+          <FieldLabel id={labelId}>{label}</FieldLabel>
+          {optional ? <span className="shrink-0 text-xs font-normal text-tertiary-foreground">Optional</span> : null}
+        </div>
         <div className="flex flex-wrap justify-end gap-3">
           <div className="flex items-center gap-2">
             <label htmlFor={`${id}-lower`} className="text-xs text-tertiary-foreground">Below expected (− pp)</label>
@@ -244,7 +253,7 @@ export function ProjectionSliderFields() {
         </div>
         <FieldDescription id="expected-annual-return-description">Effective annual return before fees.</FieldDescription>
       </Field>
-      <ScenarioRangeField id="scenario-range" label="Scenario range" expectedReturn={expectedReturn} defaultLowerSpread={2} defaultUpperSpread={2} step={0.1} maxSpread={10} />
+      <ScenarioRangeField id="scenario-range" label="Scenario range" expectedReturn={expectedReturn} defaultLowerSpread={2} defaultUpperSpread={2} step={0.1} maxSpread={10} optional />
     </>
   );
 }
