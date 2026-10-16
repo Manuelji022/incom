@@ -3,6 +3,7 @@ import { CompoundInputSidebar } from "@/components/compound-input-sidebar";
 import { Footer } from "@/components/footer";
 import { ProjectionHeader } from "@/components/projection-header";
 import { ProjectionChart } from "@/components/projection-chart";
+import { ScenariosAtAGlance } from "@/components/scenarios-at-a-glance";
 import { fetchProjection } from "@/lib/compound-interest";
 import type { CompoundInterestProjectionResponse } from "@/types/compound-interest";
 
@@ -52,7 +53,10 @@ export default async function Home() {
             </div>
           )}
         </section>
-        <div aria-hidden="true" className="hidden min-h-full lg:block" />
+        <ScenariosAtAGlance
+          durationYears={projection?.resolved_inputs.duration_years ?? defaultInputs.duration_years}
+          scenarios={projection?.scenarios ?? []}
+        />
       </main>
       <Footer />
     </div>
