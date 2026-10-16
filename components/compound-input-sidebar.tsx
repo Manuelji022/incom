@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 
+import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
@@ -43,7 +44,7 @@ function NumericField({
           inputMode="decimal"
           defaultValue={defaultValue}
           aria-describedby={descriptionId}
-          className="pr-14 tabular-nums"
+          className="pr-14 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
         <span
           aria-hidden="true"
@@ -224,6 +225,12 @@ export function CompoundInputSidebar({
           </section>
         </div>
       </div>
+
+      <footer className="border-t border-border-subtle px-4 py-4">
+        <Button type="submit" className="w-full">
+          Calculate projection
+        </Button>
+      </footer>
     </aside>
   );
 }
