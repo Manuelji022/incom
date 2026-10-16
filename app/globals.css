@@ -16,6 +16,7 @@
   --component: light-dark(#ECECEC, #222222);
   --component-hover: light-dark(#E5E5E5, #2A2A2A);
   --component-active: light-dark(#DDDDDD, #313131);  
+  --component-on-sunken: light-dark(#FFFFFF, #2A2A2A);
   --component-on-inverted: light-dark(#FCFCFC, #0F0F0F);
   --component-on-container-subtle: light-dark(#FFFFFF, #191919);
   --component-on-container-strong: light-dark(#FFFFFF, #222222);
