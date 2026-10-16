@@ -1,10 +1,9 @@
 import type { ComponentProps } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { FieldGroup } from "@/components/ui/field";
 import { NumericField } from "@/components/ui/numeric-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
-import { Select } from "@/components/ui/select";
 import { ProjectionSliderFields } from "@/components/slider-fields";
 
 type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className">;
@@ -70,17 +69,15 @@ export function CompoundInputSidebar({
                 ]}
               />
 
-              <Field>
-                <FieldLabel htmlFor="recurring-contribution-timing">Timing</FieldLabel>
-                <Select
-                  id="recurring-contribution-timing"
-                  name="recurring_contribution.timing"
-                  defaultValue="end"
-                >
-                  <option value="beginning">Beginning</option>
-                  <option value="end">End of period</option>
-                </Select>
-              </Field>
+              <SegmentedControl
+                label="Timing"
+                name="recurring_contribution.timing"
+                defaultValue="end"
+                options={[
+                  { value: "beginning", label: "Beginning" },
+                  { value: "end", label: "End of period" },
+                ]}
+              />
 
               <NumericField
                 id="contribution-increase"
