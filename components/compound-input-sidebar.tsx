@@ -3,6 +3,7 @@ import type { ComponentProps } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { ProjectionSliderFields } from "@/components/slider-fields";
 
 type NumericFieldProps = {
   id: string;
@@ -161,27 +162,7 @@ export function CompoundInputSidebar({
               Projection
             </h3>
             <FieldGroup className="gap-4">
-              <NumericField
-                id="duration-years"
-                name="duration_years"
-                label="Investment horizon"
-                unit="years"
-                defaultValue="25"
-                min="1"
-                max="100"
-                step="1"
-                required
-              />
-              <NumericField
-                id="expected-annual-return"
-                name="expected_annual_return_percent"
-                label="Expected annual return"
-                unit="%"
-                defaultValue="7.8"
-                step="0.1"
-                required
-                description="Effective annual return before fees."
-              />
+              <ProjectionSliderFields />
             </FieldGroup>
           </section>
 
@@ -210,16 +191,6 @@ export function CompoundInputSidebar({
                 unit="%"
                 defaultValue="2"
                 step="0.1"
-              />
-              <NumericField
-                id="scenario-range"
-                name="scenario_range_percentage_points"
-                label="Scenario range"
-                unit="pp"
-                defaultValue="2"
-                min="0"
-                step="0.1"
-                description="Percentage points below and above the expected return."
               />
             </FieldGroup>
           </section>
