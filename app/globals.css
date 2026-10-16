@@ -105,6 +105,34 @@
   color-scheme: light;
 }
 
+.theme-toggle__icon {
+  display: inline-flex;
+}
+
+.theme-toggle__icon--moon {
+  display: none;
+}
+
+html.dark .theme-toggle__icon--sun,
+html.light .theme-toggle__icon--moon {
+  display: none;
+}
+
+html.dark .theme-toggle__icon--moon,
+html.light .theme-toggle__icon--sun {
+  display: inline-flex;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not(.light):not(.dark) .theme-toggle__icon--sun {
+    display: none;
+  }
+
+  html:not(.light):not(.dark) .theme-toggle__icon--moon {
+    display: inline-flex;
+  }
+}
+
 @theme inline {
   /* Surface colors */
   --color-page: var(--page);
