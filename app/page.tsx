@@ -3,6 +3,7 @@ import { CompoundInputSidebar } from "@/components/compound-input-sidebar";
 import { Footer } from "@/components/footer";
 import { ProjectionHeader } from "@/components/projection-header";
 import { ProjectionChart } from "@/components/projection-chart";
+import { InvestmentSummary } from "@/components/investment-summary";
 import { fetchProjection } from "@/lib/compound-interest";
 import type { CompoundInterestProjectionResponse } from "@/types/compound-interest";
 
@@ -32,6 +33,7 @@ async function getProjection(): Promise<CompoundInterestProjectionResponse | nul
 export default async function Home() {
   const projection = await getProjection();
   const expected = projection?.scenarios.find((scenario) => scenario.name === "expected");
+  const expectedFinalPoint = expected?.annual_points.at(-1);
   return (
     <div className="flex min-h-svh flex-col bg-page">
       <Header />
@@ -44,8 +46,11 @@ export default async function Home() {
             durationYears={projection?.resolved_inputs.duration_years ?? defaultInputs.duration_years}
             inflationPercent={projection?.resolved_inputs.expected_annual_inflation_percent.value ?? defaultInputs.expected_annual_inflation_percent}
           />
-          {expected ? (
-            <ProjectionChart points={expected.annual_points} />
+          {expected && expectedFinalPoint ? (
+            <>
+              <ProjectionChart points={expected.annual_points} />
+              <InvestmentSummary point={expectedFinalPoint} />
+            </>
           ) : (
             <div role="status" className="border-b border-border-subtle px-6 py-16 text-center text-sm text-secondary-foreground sm:px-8">
               Projection results are temporarily unavailable. Please try again shortly.
