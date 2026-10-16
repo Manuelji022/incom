@@ -1,9 +1,10 @@
 import { Header } from "@/components/header";
 import { CompoundInputSidebar } from "@/components/compound-input-sidebar";
 import { Footer } from "@/components/footer";
-import { ProjectionHeader } from "@/components/projection-header";
-import { ProjectionChart } from "@/components/projection-chart";
 import { InvestmentSummary } from "@/components/investment-summary";
+import { ProjectionChart } from "@/components/projection-chart";
+import { ProjectionHeader } from "@/components/projection-header";
+import { ScenariosAtAGlance } from "@/components/scenarios-at-a-glance";
 import { fetchProjection } from "@/lib/compound-interest";
 import type { CompoundInterestProjectionResponse } from "@/types/compound-interest";
 
@@ -33,7 +34,7 @@ async function getProjection(): Promise<CompoundInterestProjectionResponse | nul
 export default async function Home() {
   const projection = await getProjection();
   const expected = projection?.scenarios.find((scenario) => scenario.name === "expected");
-  const expectedFinalPoint = expected?.annual_points.at(-1);
+
   return (
     <div className="flex min-h-svh flex-col bg-page">
       <Header />
@@ -46,7 +47,7 @@ export default async function Home() {
             durationYears={projection?.resolved_inputs.duration_years ?? defaultInputs.duration_years}
             inflationPercent={projection?.resolved_inputs.expected_annual_inflation_percent.value ?? defaultInputs.expected_annual_inflation_percent}
           />
-          {expected && expectedFinalPoint ? (
+          {expected ? (
             <>
               <ProjectionChart points={expected.annual_points} />
               <InvestmentSummary points={expected.annual_points} />
@@ -57,7 +58,10 @@ export default async function Home() {
             </div>
           )}
         </section>
-        <div aria-hidden="true" className="hidden min-h-full lg:block" />
+        <ScenariosAtAGlance
+          durationYears={projection?.resolved_inputs.duration_years ?? defaultInputs.duration_years}
+          scenarios={projection?.scenarios ?? []}
+        />
       </main>
       <Footer />
     </div>
