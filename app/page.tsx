@@ -4,6 +4,7 @@ import { Footer } from "@/components/footer";
 import { ProjectionHeader } from "@/components/projection-header";
 import { ProjectionChart } from "@/components/projection-chart";
 import { InvestmentSummary } from "@/components/investment-summary";
+import { PortfolioComposition } from "@/components/portfolio-composition";
 import { fetchProjection } from "@/lib/compound-interest";
 import type { CompoundInterestProjectionResponse } from "@/types/compound-interest";
 
@@ -50,6 +51,7 @@ export default async function Home() {
             <>
               <ProjectionChart points={expected.annual_points} />
               <InvestmentSummary points={expected.annual_points} />
+              <PortfolioComposition point={expectedFinalPoint} />
             </>
           ) : (
             <div role="status" className="border-b border-border-subtle px-6 py-16 text-center text-sm text-secondary-foreground sm:px-8">
