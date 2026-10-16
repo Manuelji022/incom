@@ -1,63 +1,11 @@
 import type { ComponentProps } from "react";
 
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-
-type NumericFieldProps = {
-  id: string;
-  label: string;
-  name: string;
-  unit: string;
-  defaultValue: string;
-  description?: string;
-} & Omit<
-  ComponentProps<typeof Input>,
-  "aria-describedby" | "className" | "defaultValue" | "id" | "name" | "type"
->;
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { NumericField } from "@/components/ui/numeric-field";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { Select } from "@/components/ui/select";
 
 type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className">;
-
-const selectClassName =
-  "h-10 w-full min-w-0 rounded-md border border-border-default bg-container px-3 py-2 text-sm text-primary-foreground outline-none transition-colors focus-visible:border-brand-border-focus focus-visible:ring-2 focus-visible:ring-brand-border-focus/30";
-
-function NumericField({
-  id,
-  label,
-  name,
-  unit,
-  defaultValue,
-  description,
-  ...inputProps
-}: NumericFieldProps) {
-  const descriptionId = description ? `${id}-description` : undefined;
-
-  return (
-    <Field>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <div className="relative">
-        <Input
-          {...inputProps}
-          id={id}
-          name={name}
-          type="number"
-          inputMode="decimal"
-          defaultValue={defaultValue}
-          aria-describedby={descriptionId}
-          className="pr-14 tabular-nums"
-        />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-tertiary-foreground"
-        >
-          {unit}
-        </span>
-      </div>
-      {description ? (
-        <FieldDescription id={descriptionId}>{description}</FieldDescription>
-      ) : null}
-    </Field>
-  );
-}
 
 export function CompoundInputSidebar({
   className = "",
@@ -110,35 +58,28 @@ export function CompoundInputSidebar({
                 description="Leave blank to invest only the initial amount."
               />
 
-              <div className="grid grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel htmlFor="recurring-contribution-frequency">
-                    Frequency
-                  </FieldLabel>
-                  <select
-                    id="recurring-contribution-frequency"
-                    name="recurring_contribution.frequency"
-                    defaultValue="monthly"
-                    className={selectClassName}
-                  >
-                    <option value="monthly">Monthly</option>
-                    <option value="quarterly">Quarterly</option>
-                    <option value="annual">Annual</option>
-                  </select>
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="recurring-contribution-timing">Timing</FieldLabel>
-                  <select
-                    id="recurring-contribution-timing"
-                    name="recurring_contribution.timing"
-                    defaultValue="end"
-                    className={selectClassName}
-                  >
-                    <option value="beginning">Beginning</option>
-                    <option value="end">End of period</option>
-                  </select>
-                </Field>
-              </div>
+              <SegmentedControl
+                label="Contribution frequency"
+                name="recurring_contribution.frequency"
+                defaultValue="monthly"
+                options={[
+                  { value: "monthly", label: "Monthly" },
+                  { value: "quarterly", label: "Quarterly" },
+                  { value: "annual", label: "Annual" },
+                ]}
+              />
+
+              <Field>
+                <FieldLabel htmlFor="recurring-contribution-timing">Timing</FieldLabel>
+                <Select
+                  id="recurring-contribution-timing"
+                  name="recurring_contribution.timing"
+                  defaultValue="end"
+                >
+                  <option value="beginning">Beginning</option>
+                  <option value="end">End of period</option>
+                </Select>
+              </Field>
 
               <NumericField
                 id="contribution-increase"
