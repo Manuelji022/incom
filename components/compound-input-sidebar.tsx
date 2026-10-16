@@ -5,8 +5,24 @@ import { FieldGroup } from "@/components/ui/field";
 import { NumericField } from "@/components/ui/numeric-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { ProjectionSliderFields } from "@/components/slider-fields";
+import type {
+  ContributionFrequency,
+  ContributionTiming,
+} from "@/types/compound-interest";
 
 type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className">;
+
+const contributionFrequencies: { value: ContributionFrequency; label: string }[] = [
+  { value: "monthly", label: "Monthly" },
+  { value: "quarterly", label: "Quarterly" },
+  { value: "annual", label: "Annual" },
+];
+
+const contributionTimings: { value: ContributionTiming; label: string }[] = [
+  { value: "beginning", label: "Beginning" },
+  { value: "end", label: "End of period" },
+];
+
 export function CompoundInputSidebar({
   className = "",
 }: CompoundInputSidebarProps) {
@@ -56,27 +72,23 @@ export function CompoundInputSidebar({
                 min="0"
                 step="0.01"
                 description="Leave blank to invest only the initial amount."
+                optional
               />
 
               <SegmentedControl
                 label="Contribution frequency"
                 name="recurring_contribution.frequency"
                 defaultValue="monthly"
-                options={[
-                  { value: "monthly", label: "Monthly" },
-                  { value: "quarterly", label: "Quarterly" },
-                  { value: "annual", label: "Annual" },
-                ]}
+                optional
+                options={contributionFrequencies}
               />
 
               <SegmentedControl
                 label="Timing"
                 name="recurring_contribution.timing"
                 defaultValue="end"
-                options={[
-                  { value: "beginning", label: "Beginning" },
-                  { value: "end", label: "End of period" },
-                ]}
+                optional
+                options={contributionTimings}
               />
 
               <NumericField
@@ -87,6 +99,7 @@ export function CompoundInputSidebar({
                 defaultValue="2"
                 min="0"
                 step="0.1"
+                optional
               />
             </FieldGroup>
           </section>
@@ -120,6 +133,7 @@ export function CompoundInputSidebar({
                 min="0"
                 step="0.01"
                 description="0.08 means 0.08% per year."
+                optional
               />
               <NumericField
                 id="expected-inflation"
@@ -128,6 +142,7 @@ export function CompoundInputSidebar({
                 unit="%"
                 defaultValue="2"
                 step="0.1"
+                optional
               />
             </FieldGroup>
           </section>
