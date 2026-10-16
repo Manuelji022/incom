@@ -95,22 +95,18 @@ export function SliderField({
         </div>
       </div>
       <Slider
+        id={`${id}-slider`}
         aria-labelledby={labelId}
+        aria-describedby={descriptionId}
         min={min}
         max={max}
         step={step}
         value={value}
         onValueChange={(next) => {
-          if (typeof next === "number") {
-            setValue(next);
-            setDraft(String(next));
-          }
+          setValue(next);
+          setDraft(String(next));
         }}
-        thumbLabels={[label]}
-        thumbDescriptionId={descriptionId}
-        thumbValueTexts={
-          valueText ? [(current) => valueText(current)] : undefined
-        }
+        aria-valuetext={valueText ? valueText(value) : undefined}
         className="mt-2 w-full"
       />
       <div className="flex justify-between text-xs text-tertiary-foreground">
@@ -264,44 +260,41 @@ export function ScenarioRangeField({
           </div>
         </div>
       </div>
-      <div className="relative mt-2 px-2">
-        <Slider
-          min={-maxSpread}
-          max={maxSpread}
-          step={step}
-          value={[-lowerSpread, upperSpread]}
-          thumbLabels={[text.lowShort, text.highShort]}
-          aria-labelledby={labelId}
-          thumbDescriptionId={descriptionId}
-          thumbValueTexts={[
-            (value) => format(expectedReturn + value),
-            (value) => format(expectedReturn + value),
-          ]}
-          thumbCollisionBehavior="none"
-          onValueChange={(next, details) => {
-            if (!Array.isArray(next)) return;
-            if (details.activeThumbIndex === 0) {
-              const nextSpread = Math.min(
-                maxSpread,
-                Math.max(0, Number((-(next[0] ?? 0)).toFixed(6))),
-              );
+      <div className="mt-2 grid gap-2">
+        <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2">
+          <label htmlFor={`${id}-lower-slider`} className="text-xs text-tertiary-foreground">{text.lowShort}</label>
+          <Slider
+            id={`${id}-lower-slider`}
+            min={0}
+            max={maxSpread}
+            step={step}
+            value={lowerSpread}
+            aria-valuetext={format(expectedReturn - lowerSpread)}
+            aria-describedby={descriptionId}
+            onValueChange={(next) => {
+              const nextSpread = Number(next.toFixed(6));
               setLowerSpread(nextSpread);
               setLowerDraft(String(nextSpread));
-            } else {
-              const nextSpread = Math.min(
-                maxSpread,
-                Math.max(0, Number((next[1] ?? 0).toFixed(6))),
-              );
+            }}
+          />
+        </div>
+        <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2">
+          <label htmlFor={`${id}-upper-slider`} className="text-xs text-tertiary-foreground">{text.highShort}</label>
+          <Slider
+            id={`${id}-upper-slider`}
+            min={0}
+            max={maxSpread}
+            step={step}
+            value={upperSpread}
+            aria-valuetext={format(expectedReturn + upperSpread)}
+            aria-describedby={descriptionId}
+            onValueChange={(next) => {
+              const nextSpread = Number(next.toFixed(6));
               setUpperSpread(nextSpread);
               setUpperDraft(String(nextSpread));
-            }
-          }}
-          className="w-full"
-        />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-3 w-px -translate-y-1/2 bg-secondary-foreground/60"
-        />
+            }}
+          />
+        </div>
       </div>
       <div className="grid grid-cols-3 text-xs tabular-nums text-tertiary-foreground">
         <span className="text-left">
