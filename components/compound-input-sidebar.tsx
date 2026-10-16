@@ -10,9 +10,15 @@ import type {
   ContributionTiming,
 } from "@/types/compound-interest";
 
-type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className">;
+type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className"> & {
+  text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];
+  locale: "en" | "es";
+};
 
-const contributionFrequencies: { value: ContributionFrequency; label: string }[] = [
+const contributionFrequencies: {
+  value: ContributionFrequency;
+  label: string;
+}[] = [
   { value: "monthly", label: "Monthly" },
   { value: "quarterly", label: "Quarterly" },
   { value: "annual", label: "Annual" },
@@ -25,6 +31,8 @@ const contributionTimings: { value: ContributionTiming; label: string }[] = [
 
 export function CompoundInputSidebar({
   className = "",
+  text,
+  locale,
 }: CompoundInputSidebarProps) {
   return (
     <aside
@@ -36,27 +44,30 @@ export function CompoundInputSidebar({
           id="compound-input-sidebar-title"
           className="text-base font-semibold leading-6 text-primary-foreground"
         >
-          Projection inputs
+          {text.title}
         </h2>
         <p className="mt-1 text-sm leading-5 text-secondary-foreground">
-          Set the assumptions for your projection.
+          {text.intro}
         </p>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
         <div className="space-y-6">
-          <section aria-labelledby="contribution-fields-title" className="space-y-4">
+          <section
+            aria-labelledby="contribution-fields-title"
+            className="space-y-4"
+          >
             <h3
               id="contribution-fields-title"
               className="text-sm font-semibold leading-5 text-primary-foreground"
             >
-              Contributions
+              {text.contributions}
             </h3>
             <FieldGroup className="gap-4">
               <NumericField
                 id="initial-principal"
                 name="initial_principal"
-                label="Initial investment"
+                label={text.initial}
                 unit="€"
                 defaultValue="40000"
                 min="0"
@@ -66,83 +77,107 @@ export function CompoundInputSidebar({
               <NumericField
                 id="recurring-contribution-amount"
                 name="recurring_contribution.amount"
-                label="Recurring contribution"
+                label={text.recurring}
                 unit="€"
                 defaultValue="1000"
                 min="0"
                 step="0.01"
-                description="Leave blank to invest only the initial amount."
+                description={text.blank}
                 optional
+                optionalLabel={text.optional}
               />
 
               <SegmentedControl
-                label="Contribution frequency"
+                label={text.frequency}
                 name="recurring_contribution.frequency"
                 defaultValue="monthly"
                 optional
-                options={contributionFrequencies}
+                optionalLabel={text.optional}
+                options={contributionFrequencies.map((option) => ({
+                  ...option,
+                  label:
+                    option.value === "monthly"
+                      ? text.monthly
+                      : option.value === "quarterly"
+                        ? text.quarterly
+                        : text.annual,
+                }))}
               />
 
               <SegmentedControl
-                label="Timing"
+                label={text.timing}
                 name="recurring_contribution.timing"
                 defaultValue="end"
                 optional
-                options={contributionTimings}
+                optionalLabel={text.optional}
+                options={contributionTimings.map((option) => ({
+                  ...option,
+                  label:
+                    option.value === "beginning" ? text.beginning : text.end,
+                }))}
               />
 
               <NumericField
                 id="contribution-increase"
                 name="recurring_contribution.annual_increase_percent"
-                label="Annual contribution increase"
+                label={text.increase}
                 unit="%"
                 defaultValue="2"
                 min="0"
                 step="0.1"
                 optional
+                optionalLabel={text.optional}
               />
             </FieldGroup>
           </section>
 
-          <section aria-labelledby="projection-fields-title" className="space-y-4 border-t border-border-subtle pt-5">
+          <section
+            aria-labelledby="projection-fields-title"
+            className="space-y-4 border-t border-border-subtle pt-5"
+          >
             <h3
               id="projection-fields-title"
               className="text-sm font-semibold leading-5 text-primary-foreground"
             >
-              Projection
+              {text.projection}
             </h3>
             <FieldGroup className="gap-4">
-              <ProjectionSliderFields />
+              <ProjectionSliderFields text={text} locale={locale} />
             </FieldGroup>
           </section>
 
-          <section aria-labelledby="additional-fields-title" className="space-y-4 border-t border-border-subtle pt-5">
+          <section
+            aria-labelledby="additional-fields-title"
+            className="space-y-4 border-t border-border-subtle pt-5"
+          >
             <h3
               id="additional-fields-title"
               className="text-sm font-semibold leading-5 text-primary-foreground"
             >
-              Other assumptions
+              {text.other}
             </h3>
             <FieldGroup className="gap-4">
               <NumericField
                 id="annual-fee"
                 name="annual_fee_percent"
-                label="Annual fee"
+                label={text.fee}
                 unit="%"
                 defaultValue="0.05"
                 min="0"
                 step="0.01"
-                description="0.08 means 0.08% per year."
+                description={text.feeDescription}
                 optional
+                optionalLabel={text.optional}
               />
               <NumericField
                 id="expected-inflation"
                 name="expected_annual_inflation_percent"
-                label="Expected inflation"
+                label={text.inflation}
                 unit="%"
                 defaultValue="2"
                 step="0.1"
                 optional
+                optionalLabel={text.optional}
               />
             </FieldGroup>
           </section>
@@ -151,7 +186,7 @@ export function CompoundInputSidebar({
 
       <footer className="border-t border-border-subtle px-4 py-4">
         <Button type="submit" className="w-full">
-          Calculate projection
+          {text.calculate}
         </Button>
       </footer>
     </aside>

@@ -1,20 +1,46 @@
+import type { Locale } from "@/lib/locales";
+
+type ProjectionHeaderText = {
+  portfolio: string;
+  unavailable: string;
+  projected: string;
+  today: string;
+  adjusted: string;
+};
+
 type ProjectionHeaderProps = {
   nominalBalance?: string;
   realBalance?: string;
   durationYears?: number;
   inflationPercent?: string;
+  locale: Locale;
+  text: ProjectionHeaderText;
 };
-
-const euro = new Intl.NumberFormat("en-IE", {
-  style: "currency", currency: "EUR", maximumFractionDigits: 0,
-});
 
 export function ProjectionHeader({
   nominalBalance,
   realBalance,
   durationYears = 25,
   inflationPercent = "2",
+  locale,
+  text,
 }: ProjectionHeaderProps) {
+  const formattingLocale = locale === "es" ? "es-ES" : "en-IE";
+  const euro = new Intl.NumberFormat(formattingLocale, {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  });
+  const duration = new Intl.NumberFormat(formattingLocale, {
+    style: "unit",
+    unit: "year",
+    unitDisplay: "long",
+  }).format(durationYears);
+  const inflation = new Intl.NumberFormat(formattingLocale, {
+    style: "percent",
+    maximumFractionDigits: 2,
+  }).format(Number(inflationPercent) / 100);
+
   return (
     <section
       aria-labelledby="portfolio-value-title"
@@ -26,25 +52,27 @@ export function ProjectionHeader({
             id="portfolio-value-title"
             className="text-sm font-semibold leading-5 text-primary-foreground"
           >
-            Portfolio value
+            {text.portfolio}
           </h2>
           <p className="mt-2 whitespace-nowrap text-[clamp(2rem,4vw,3.25rem)] leading-none font-semibold tracking-[-0.055em] tabular-nums text-primary-foreground">
-            {nominalBalance ? euro.format(Number(nominalBalance)) : "Unavailable"}
+            {nominalBalance
+              ? euro.format(Number(nominalBalance))
+              : text.unavailable}
           </p>
           <p className="mt-3 text-sm leading-5 text-secondary-foreground">
-            Projected value in {durationYears} years
+            {text.projected.replace("{duration}", duration)}
           </p>
         </div>
 
         <div className="min-w-0 sm:border-l sm:border-border-subtle sm:pl-6 lg:pl-8">
           <p className="text-sm font-semibold leading-5 text-secondary-foreground">
-            In today’s money
+            {text.today}
           </p>
           <p className="mt-2 whitespace-nowrap text-[clamp(2rem,4vw,3.25rem)] leading-none font-semibold tracking-[-0.055em] tabular-nums text-secondary-foreground">
-            {realBalance ? euro.format(Number(realBalance)) : "Unavailable"}
+            {realBalance ? euro.format(Number(realBalance)) : text.unavailable}
           </p>
           <p className="mt-3 text-sm leading-5 text-secondary-foreground">
-            Adjusted for {inflationPercent}% annual inflation
+            {text.adjusted.replace("{inflation}", inflation)}
           </p>
         </div>
       </div>

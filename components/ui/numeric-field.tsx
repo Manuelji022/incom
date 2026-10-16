@@ -10,10 +10,8 @@ type NumericFieldProps = {
   unit: string;
   description?: string;
   optional?: boolean;
-} & Omit<
-  ComponentProps<typeof Input>,
-  "id" | "name" | "type"
->;
+  optionalLabel?: string;
+} & Omit<ComponentProps<typeof Input>, "id" | "name" | "type">;
 
 function NumericField({
   id,
@@ -23,19 +21,25 @@ function NumericField({
   defaultValue,
   description,
   optional = false,
+  optionalLabel = "Optional",
   className = "",
   disabled,
   "aria-describedby": ariaDescribedBy,
   ...inputProps
 }: NumericFieldProps) {
   const descriptionId = description ? `${id}-description` : undefined;
-  const describedBy = [ariaDescribedBy, descriptionId].filter(Boolean).join(" ") || undefined;
+  const describedBy =
+    [ariaDescribedBy, descriptionId].filter(Boolean).join(" ") || undefined;
 
   return (
     <Field disabled={disabled}>
       <div className="flex items-center justify-between gap-3">
         <FieldLabel htmlFor={id}>{label}</FieldLabel>
-        {optional ? <span className="shrink-0 text-xs font-normal text-tertiary-foreground">Optional</span> : null}
+        {optional ? (
+          <span className="shrink-0 text-xs font-normal text-tertiary-foreground">
+            {optionalLabel}
+          </span>
+        ) : null}
       </div>
       <div className="relative">
         <Input

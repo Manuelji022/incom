@@ -57,7 +57,7 @@ function getActiveTheme(): Theme {
   return getSystemTheme();
 }
 
-export function ThemeToggle() {
+export function ThemeToggle({ label }: { label: string }) {
   useEffect(() => {
     applyTheme(readSavedTheme());
   }, []);
@@ -72,11 +72,11 @@ export function ThemeToggle() {
 
   return (
     <Button
-      aria-label="Toggle light and dark theme"
+      aria-label={label}
       className="theme-toggle"
       onClick={toggleTheme}
       size="icon-sm"
-      title="Toggle light and dark theme"
+      title={label}
       variant="ghost"
     >
       <span className="theme-toggle__icon theme-toggle__icon--sun">
@@ -87,7 +87,13 @@ export function ThemeToggle() {
           focusable="false"
           viewBox="0 0 24 24"
         >
-          <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
+          <circle
+            cx="12"
+            cy="12"
+            r="4"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
           <path
             d="M12 2v2m0 16v2m10-10h-2M4 12H2m17.07 7.07-1.42-1.42M6.35 6.35 4.93 4.93m14.14 0-1.42 1.42m-11.3 11.3-1.42 1.42"
             stroke="currentColor"
