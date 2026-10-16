@@ -5,9 +5,10 @@ import type { ProjectionPoint } from "@/types/compound-interest";
 import { Button } from "@/components/ui/button";
 
 import type { Locale } from "@/lib/locales";
-type SummaryText = ReturnType<
+type SummaryDictionary = ReturnType<
   typeof import("@/lib/i18n").getDictionary
 >["summary"];
+type SummaryText = { [Key in keyof SummaryDictionary]: string };
 type InvestmentSummaryProps = {
   points: readonly ProjectionPoint[];
   locale: Locale;

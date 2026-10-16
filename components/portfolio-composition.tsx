@@ -1,7 +1,8 @@
 import type { ProjectionPoint } from "@/types/compound-interest";
 import type { Locale } from "@/lib/locales";
 
-type CompositionText = ReturnType<typeof import("@/lib/i18n").getDictionary>["composition"];
+type CompositionDictionary = ReturnType<typeof import("@/lib/i18n").getDictionary>["composition"];
+type CompositionText = { [Key in keyof CompositionDictionary]: string };
 
 type PortfolioCompositionProps = {
   point?: ProjectionPoint;
@@ -46,7 +47,7 @@ export function PortfolioComposition({ point, locale, text }: PortfolioCompositi
   return (
     <section
       aria-labelledby="portfolio-composition-title"
-      className="border-b border-border-subtle px-5 py-8 sm:px-8 sm:py-10"
+      className="border-b border-border-subtle px-3 py-8 sm:px-3 sm:py-8"
     >
       <div>
         <h2
@@ -73,7 +74,7 @@ export function PortfolioComposition({ point, locale, text }: PortfolioCompositi
       </div>
 
       <ul className="mt-4 space-y-3" aria-label={text.listLabel}>
-        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-4 text-sm leading-5">
+        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 text-sm leading-5">
           <span className="flex min-w-0 items-center gap-2.5 text-primary-foreground">
             <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-secondary-foreground" />
             {text.contributions}
@@ -83,7 +84,7 @@ export function PortfolioComposition({ point, locale, text }: PortfolioCompositi
             {percent.format(contributionShare)}
           </span>
         </li>
-        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-4 text-sm leading-5">
+        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 text-sm leading-5">
           <span className="flex min-w-0 items-center gap-2.5 text-primary-foreground">
             <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-brand-subtle" />
             {text.growth}
