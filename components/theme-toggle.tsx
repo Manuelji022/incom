@@ -75,9 +75,9 @@ export function ThemeToggle() {
       aria-label="Toggle light and dark theme"
       className="theme-toggle"
       onClick={toggleTheme}
-      size="icon"
+      size="icon-sm"
       title="Toggle light and dark theme"
-      variant="outline"
+      variant="ghost"
     >
       <span className="theme-toggle__icon theme-toggle__icon--sun">
         <svg

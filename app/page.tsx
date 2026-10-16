@@ -1,9 +1,5 @@
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Header } from "@/components/header";
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <ThemeToggle />
-    </main>
-  );
+  return <Header />;
 }
