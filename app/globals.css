@@ -193,9 +193,9 @@
   --color-foreground: var(--foreground);
   --color-border: var(--border);
 
-  /* Geist font families */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  /* Font families */
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
   --font-weight-regular: 400;
   --font-weight-semimedium: 450;
   --font-weight-medium: 500;
@@ -282,7 +282,7 @@
   kbd,
   samp,
   pre {
-    font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+    font-family: ui-monospace, SFMono-Regular, monospace;
   }
 
   ::selection {
