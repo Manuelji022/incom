@@ -49,7 +49,7 @@ export default async function Home() {
           {expected && expectedFinalPoint ? (
             <>
               <ProjectionChart points={expected.annual_points} />
-              <InvestmentSummary point={expectedFinalPoint} />
+              <InvestmentSummary points={expected.annual_points} />
             </>
           ) : (
             <div role="status" className="border-b border-border-subtle px-6 py-16 text-center text-sm text-secondary-foreground sm:px-8">
