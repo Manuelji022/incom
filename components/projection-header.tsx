@@ -1,4 +1,20 @@
-export function ProjectionHeader() {
+type ProjectionHeaderProps = {
+  nominalBalance?: string;
+  realBalance?: string;
+  durationYears?: number;
+  inflationPercent?: string;
+};
+
+const euro = new Intl.NumberFormat("en-IE", {
+  style: "currency", currency: "EUR", maximumFractionDigits: 0,
+});
+
+export function ProjectionHeader({
+  nominalBalance,
+  realBalance,
+  durationYears = 25,
+  inflationPercent = "2",
+}: ProjectionHeaderProps) {
   return (
     <section
       aria-labelledby="portfolio-value-title"
@@ -13,10 +29,10 @@ export function ProjectionHeader() {
             Portfolio value
           </h2>
           <p className="mt-2 whitespace-nowrap text-[clamp(2rem,4vw,3.25rem)] leading-none font-semibold tracking-[-0.055em] tabular-nums text-primary-foreground">
-            €1,044,000
+            {nominalBalance ? euro.format(Number(nominalBalance)) : "Unavailable"}
           </p>
           <p className="mt-3 text-sm leading-5 text-secondary-foreground">
-            Projected value in 25 years
+            Projected value in {durationYears} years
           </p>
         </div>
 
@@ -25,10 +41,10 @@ export function ProjectionHeader() {
             In today’s money
           </p>
           <p className="mt-2 whitespace-nowrap text-[clamp(2rem,4vw,3.25rem)] leading-none font-semibold tracking-[-0.055em] tabular-nums text-secondary-foreground">
-            €639,000
+            {realBalance ? euro.format(Number(realBalance)) : "Unavailable"}
           </p>
           <p className="mt-3 text-sm leading-5 text-secondary-foreground">
-            Adjusted for 2% annual inflation
+            Adjusted for {inflationPercent}% annual inflation
           </p>
         </div>
       </div>
