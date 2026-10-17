@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, use, useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type SyntheticEvent } from "react";
+import { CalculatorModeToggle } from "@/components/calculator-mode-toggle";
 import { Header } from "@/components/header";
 import { InsightsSidebar } from "@/components/insights-sidebar";
 import { ProjectionResults } from "@/components/projection-results";
@@ -240,6 +241,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   return (
     <>
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} onBeforeLanguageChange={saveBeforeLocaleChange} submitting={submitting} />
+    <CalculatorModeToggle locale={locale} mode="projection" onBeforeSwitch={() => saveBeforeLocaleChange(locale)} />
     <main id="main-content" tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)_19.5rem]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]"}`}>
     <form key={formVersion} ref={formRef} noValidate onSubmit={handleSubmit} onInput={(event) => {
       const target = event.target;
