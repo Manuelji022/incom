@@ -1,4 +1,5 @@
 import { InvestmentSummary } from "@/components/investment-summary";
+import { InvestmentSummaryCards } from "@/components/investment-summary-cards";
 import { ProjectionChart } from "@/components/projection-chart";
 import { ProjectionHeader } from "@/components/projection-header";
 import type { Locale } from "@/lib/locales";
@@ -47,6 +48,11 @@ export function ProjectionResults({
           aria: text.chart.aria.replace("{scenario}", text.scenarioLabel),
         }}
         locale={locale}
+      />
+      <InvestmentSummaryCards
+        point={selectedScenario.annual_points.at(-1)}
+        locale={locale}
+        text={text.summary}
       />
       <InvestmentSummary
         points={selectedScenario.annual_points}
