@@ -1,0 +1,16 @@
+name: PR Policy
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    uses: Manuelji022/github-workflows/.github/workflows/pr-policy.yml@0da6d232cebc072d75c51306e8e0fef3c0487907

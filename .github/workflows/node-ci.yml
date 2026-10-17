@@ -1,0 +1,21 @@
+name: Node CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node-ci:
+    uses: Manuelji022/github-workflows/.github/workflows/node-ci.yml@0da6d232cebc072d75c51306e8e0fef3c0487907
+    with:
+      node-version: "22"
+      package-manager: pnpm
+      run-tests: false
