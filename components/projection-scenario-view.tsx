@@ -16,7 +16,7 @@ type CompositionDictionary = Dictionary["composition"];
 type CompositionText = { [Key in keyof CompositionDictionary]: string };
 type ProjectionScenarioViewProps = {
   locale: Locale;
-  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady" | "disclosure"> & {
+  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady"> & {
     composition: CompositionText;
   };
 };
@@ -173,7 +173,6 @@ export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewP
       <CompoundInputSidebar text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} />
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className="min-w-0 border-e border-border-subtle bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
-        <p className="px-5 pt-4 text-sm text-secondary-foreground">{text.disclosure}</p>
         {sample ? <p className="px-5 pt-2 text-xs text-secondary-foreground">{locale === "es" ? "Datos de ejemplo" : "Sample data"}</p> : null}
         {stale ? <p role="status" className="mx-5 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{text.staleResults}</p> : null}
         {error ? <div role="alert" className="mx-5 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{status} <button type="submit" className="ms-2 underline">{text.retry}</button></div> : null}

@@ -33,7 +33,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             retry: text.retry,
             validation: text.validation,
             resultsReady: text.resultsReady,
-            disclosure: text.disclosure,
           }}
         />
       </main>
