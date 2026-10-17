@@ -189,7 +189,7 @@ export function CompoundInputSidebar({
       </fieldset>
 
       <footer className="border-t border-border-subtle px-4 py-4">
-        <Button type="submit" aria-disabled={submitting} className="w-full">
+        <Button type="submit" disabled={submitting} className="w-full">
           {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
         </Button>
       </footer>

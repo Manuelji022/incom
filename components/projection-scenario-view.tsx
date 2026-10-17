@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState, type FormEvent, type SyntheticEvent } from "react";
+import { Suspense, use, useRef, useState, type FormEvent, type SyntheticEvent } from "react";
 import { InsightsSidebar } from "@/components/insights-sidebar";
 import { ProjectionResults } from "@/components/projection-results";
 import { CompoundInputSidebar } from "@/components/compound-input-sidebar";
 import { fetchProjection } from "@/lib/compound-interest";
+import { mockProjection } from "@/lib/mock-projection";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
 import type { CompoundInterestProjectionInput, CompoundInterestProjectionResponse, ProjectionScenario } from "@/types/compound-interest";
@@ -19,6 +20,37 @@ type ProjectionScenarioViewProps = {
     composition: CompositionText;
   };
 };
+
+function RequestGate({ promise }: { promise: Promise<void> | null }) {
+  if (promise) use(promise);
+  return null;
+}
+
+function ProjectionSkeleton() {
+  return <div aria-hidden="true" className="motion-safe:animate-pulse">
+    <div className="grid grid-cols-1 gap-4 px-5 py-5 sm:grid-cols-2">
+      {[0, 1].map((item) => <div key={item} className="h-24 rounded-md bg-container" />)}
+    </div>
+    <div className="px-5 py-4"><div className="h-[330px] rounded-md bg-container" /></div>
+    <div className="space-y-3 px-5 pb-6 pt-4">
+      <div className="h-6 w-1/3 rounded bg-container" />
+      {[0, 1, 2, 3].map((item) => <div key={item} className="h-12 rounded-md bg-container" />)}
+    </div>
+  </div>;
+}
+
+function InsightsSkeleton() {
+  return <aside aria-hidden="true" className="[container-type:inline-size] border-t border-border-subtle bg-container motion-safe:animate-pulse lg:min-h-full lg:border-t-0 lg:border-s">
+    <div className="space-y-4 p-5">
+      <div className="h-6 w-2/3 rounded bg-page" />
+      <div className="grid grid-cols-3 gap-2">{[0, 1, 2].map((item) => <div key={item} className="h-24 rounded-md bg-page" />)}</div>
+    </div>
+    <div className="space-y-4 border-t border-border-subtle p-5">
+      <div className="h-6 w-1/2 rounded bg-page" />
+      <div className="h-44 rounded-md bg-page" />
+    </div>
+  </aside>;
+}
 
 function inputFromForm(form: HTMLFormElement): CompoundInterestProjectionInput {
   const values = new FormData(form);
@@ -50,7 +82,9 @@ function inputFromForm(form: HTMLFormElement): CompoundInterestProjectionInput {
 }
 
 export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewProps) {
-  const [projection, setProjection] = useState<CompoundInterestProjectionResponse | null>(null);
+  const [projection, setProjection] = useState<CompoundInterestProjectionResponse>(mockProjection);
+  const [sample, setSample] = useState(true);
+  const [pendingPromise, setPendingPromise] = useState<Promise<void> | null>(null);
   const [selectedName, setSelectedName] = useState<ScenarioName>("expected");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
@@ -105,9 +139,12 @@ export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewP
     setSubmitting(true);
     setError(false);
     setStatus(text.sidebar.calculating);
+    const request = fetchProjection(inputFromForm(form));
+    setPendingPromise(request.then(() => undefined, () => undefined));
     try {
-      const result = await fetchProjection(inputFromForm(form));
+      const result = await request;
       setProjection(result);
+      setSample(false);
       setSelectedName("expected");
       setStale(false);
       setStatus(text.resultsReady);
@@ -123,6 +160,7 @@ export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewP
       const rejected = caught instanceof Error && caught.message === "invalid-input";
       setStatus(rejected ? text.invalidInputs : text.unavailable);
     } finally {
+      setPendingPromise(null);
       setSubmitting(false);
     }
   };
@@ -136,24 +174,31 @@ export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewP
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className="min-w-0 border-e border-border-subtle bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
         <p className="px-5 pt-4 text-sm text-secondary-foreground">{text.disclosure}</p>
-        {stale && projection ? <p role="status" className="mx-5 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{text.staleResults}</p> : null}
+        {sample ? <p className="px-5 pt-2 text-xs text-secondary-foreground">{locale === "es" ? "Datos de ejemplo" : "Sample data"}</p> : null}
+        {stale ? <p role="status" className="mx-5 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{text.staleResults}</p> : null}
         {error ? <div role="alert" className="mx-5 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{status} <button type="submit" className="ms-2 underline">{text.retry}</button></div> : null}
-        {selectedScenario && projection ? <ProjectionResults
-          selectedScenario={selectedScenario}
-          durationYears={projection.resolved_inputs.duration_years}
-          inflationPercent={projection.resolved_inputs.expected_annual_inflation_percent.value}
-          locale={locale}
-          text={{ header: text.header, chart: text.chart, summary: text.summary, scenarioLabel: text.scenarios[selectedName] }}
-        /> : !error ? <div className="flex min-h-80 items-center justify-center p-8 text-center text-secondary-foreground"><p>{locale === "es" ? "Introduce tus supuestos y calcula una proyección para ver los resultados." : "Enter your assumptions and calculate a projection to see results."}</p></div> : null}
+        <Suspense fallback={<ProjectionSkeleton />}>
+          <RequestGate promise={pendingPromise} />
+          {selectedScenario ? <ProjectionResults
+            selectedScenario={selectedScenario}
+            durationYears={projection.resolved_inputs.duration_years}
+            inflationPercent={projection.resolved_inputs.expected_annual_inflation_percent.value}
+            locale={locale}
+            text={{ header: text.header, chart: text.chart, summary: text.summary, scenarioLabel: text.scenarios[selectedName] }}
+          /> : null}
+        </Suspense>
       </section>
-      {projection ? <InsightsSidebar
-        scenarios={projection.scenarios}
-        selectedScenario={selectedName}
-        onSelectScenario={setSelectedName}
-        durationYears={projection.resolved_inputs.duration_years}
-        locale={locale}
-        text={{ scenarios: text.scenarios, composition: text.composition }}
-      /> : <div className="hidden lg:block" aria-hidden="true" />}
+      <Suspense fallback={<InsightsSkeleton />}>
+        <RequestGate promise={pendingPromise} />
+        <InsightsSidebar
+          scenarios={projection.scenarios}
+          selectedScenario={selectedName}
+          onSelectScenario={setSelectedName}
+          durationYears={projection.resolved_inputs.duration_years}
+          locale={locale}
+          text={{ scenarios: text.scenarios, composition: text.composition }}
+        />
+      </Suspense>
     </form>
   );
 }
