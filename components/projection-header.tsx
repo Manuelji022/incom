@@ -46,8 +46,8 @@ export function ProjectionHeader({
       aria-labelledby="portfolio-value-title"
       className="[container-type:inline-size] border-b border-border-subtle px-6 py-8 sm:px-8 sm:py-10"
     >
-      <div className="grid gap-8 @[46rem]:grid-cols-2 @[46rem]:gap-6 lg:gap-10">
-        <div className="min-w-0">
+      <div className="flex flex-row gap-6 lg:gap-10">
+        <div className="min-w-0 flex-1">
           <h2
             id="portfolio-value-title"
             className="text-sm font-semibold leading-5 text-primary-foreground"
@@ -64,7 +64,7 @@ export function ProjectionHeader({
           </p>
         </div>
 
-        <div className="min-w-0 @[46rem]:border-s @[46rem]:border-border-subtle @[46rem]:ps-6 @[62rem]:ps-8">
+        <div className="min-w-0 flex-1 border-s border-border-subtle ps-6 @[62rem]:ps-8">
           <p className="text-sm font-semibold leading-5 text-secondary-foreground">
             {text.today}
           </p>
