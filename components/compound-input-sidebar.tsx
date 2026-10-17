@@ -75,9 +75,10 @@ export function CompoundInputSidebar({
           onClick={onToggleCollapsed}
           className={`shrink-0 ${collapsed ? "lg:absolute lg:start-0 lg:top-0 lg:z-20" : ""}`}
         >
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="size-4">
-            <path d={collapsed ? "M9 5l7 7-7 7" : "M15 5l-7 7 7 7"} strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <span
+            aria-hidden="true"
+            className={`size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`}
+          />
         </Button>
       </header>
 
