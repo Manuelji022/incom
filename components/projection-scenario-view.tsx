@@ -89,6 +89,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   const [sample, setSample] = useState(true);
   const [pendingPromise, setPendingPromise] = useState<Promise<void> | null>(null);
   const [selectedName, setSelectedName] = useState<ScenarioName>("expected");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
   const [stale, setStale] = useState(false);
@@ -171,12 +172,12 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   return (
     <>
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} />
-    <main id="main-content" tabIndex={-1} className="grid flex-1 grid-cols-1 lg:min-h-[65.125rem] lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]">
+    <main id="main-content" tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[0_minmax(0,1fr)_19.5rem]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]"}`}>
     <form noValidate onSubmit={handleSubmit} onInput={(event) => {
       clearValidation(event);
       if (projection) setStale(true);
     }} className="contents">
-      <CompoundInputSidebar text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} />
+      <CompoundInputSidebar text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed((value) => !value)} />
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className="min-w-0 border-e border-border-subtle bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
         {sample ? <p className="px-5 pt-2 text-xs text-secondary-foreground">{locale === "es" ? "Datos de ejemplo" : "Sample data"}</p> : null}

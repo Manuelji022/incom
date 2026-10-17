@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, type ComponentProps } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +17,8 @@ type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className"> & {
   locale: "en" | "es";
   submitting: boolean;
   calculatingLabel: string;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 };
 
 const contributionFrequencies: {
@@ -37,27 +41,47 @@ export function CompoundInputSidebar({
   locale,
   submitting,
   calculatingLabel,
+  collapsed,
+  onToggleCollapsed,
 }: CompoundInputSidebarProps) {
   const [recurringAmount, setRecurringAmount] = useState("1000");
-
+  const toggleLabel = locale === "es"
+    ? (collapsed ? "Abrir supuestos" : "Cerrar supuestos")
+    : (collapsed ? "Open assumptions" : "Close assumptions");
   return (
     <aside
       aria-labelledby="compound-input-sidebar-title"
-      className={`flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container lg:max-w-[18.25rem] ${className}`.trim()}
+      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-0 lg:min-w-0 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
     >
-      <header className="border-b border-border-subtle px-4 py-5">
-        <h2
-          id="compound-input-sidebar-title"
-          className="text-base font-semibold leading-6 text-primary-foreground"
+      <header className={`flex items-start justify-between gap-2 border-b border-border-subtle px-4 py-5 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
+        <div className={collapsed ? "lg:hidden" : ""}>
+          <h2
+            id="compound-input-sidebar-title"
+            className="text-base font-semibold leading-6 text-primary-foreground"
+          >
+            {text.title}
+          </h2>
+          <p className="mt-1 text-sm leading-5 text-secondary-foreground">
+            {text.intro}
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={toggleLabel}
+          aria-expanded={!collapsed}
+          aria-controls="compound-input-sidebar-fields"
+          onClick={onToggleCollapsed}
+          className={`shrink-0 ${collapsed ? "lg:absolute lg:start-0 lg:top-0 lg:z-20" : ""}`}
         >
-          {text.title}
-        </h2>
-        <p className="mt-1 text-sm leading-5 text-secondary-foreground">
-          {text.intro}
-        </p>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="size-4">
+            <path d={collapsed ? "M9 5l7 7-7 7" : "M15 5l-7 7 7 7"} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Button>
       </header>
 
-      <fieldset disabled={submitting} className="m-0 min-h-0 min-w-0 flex-1 overflow-y-auto border-0 px-4 py-5 disabled:opacity-100">
+      <fieldset id="compound-input-sidebar-fields" disabled={submitting || collapsed} className={`m-0 min-h-0 min-w-0 flex-1 overflow-y-auto border-0 px-4 py-5 disabled:opacity-100 ${collapsed ? "hidden" : ""}`}>
         <div className="space-y-6">
           <section
             aria-labelledby="contribution-fields-title"
@@ -189,8 +213,8 @@ export function CompoundInputSidebar({
         </div>
       </fieldset>
 
-      <footer className="border-t border-border-subtle px-4 py-4">
-        <Button type="submit" disabled={submitting} className="w-full">
+      <footer className={`border-t border-border-subtle px-4 py-4 ${collapsed ? "hidden" : ""}`}>
+        <Button type="submit" disabled={submitting || collapsed} className="w-full">
           {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
         </Button>
       </footer>
