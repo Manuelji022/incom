@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, use, useRef, useState, type FormEvent, type SyntheticEvent } from "react";
+import { Header } from "@/components/header";
 import { InsightsSidebar } from "@/components/insights-sidebar";
 import { ProjectionResults } from "@/components/projection-results";
 import { CompoundInputSidebar } from "@/components/compound-input-sidebar";
@@ -16,6 +17,8 @@ type CompositionDictionary = Dictionary["composition"];
 type CompositionText = { [Key in keyof CompositionDictionary]: string };
 type ProjectionScenarioViewProps = {
   locale: Locale;
+  languageLabel: string;
+  themeLabel: string;
   text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady"> & {
     composition: CompositionText;
   };
@@ -81,7 +84,7 @@ function inputFromForm(form: HTMLFormElement): CompoundInterestProjectionInput {
   return input;
 }
 
-export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewProps) {
+export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text }: ProjectionScenarioViewProps) {
   const [projection, setProjection] = useState<CompoundInterestProjectionResponse>(mockProjection);
   const [sample, setSample] = useState(true);
   const [pendingPromise, setPendingPromise] = useState<Promise<void> | null>(null);
@@ -166,6 +169,9 @@ export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewP
   };
 
   return (
+    <>
+    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} />
+    <main id="main-content" tabIndex={-1} className="grid flex-1 grid-cols-1 lg:min-h-[65.125rem] lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]">
     <form noValidate onSubmit={handleSubmit} onInput={(event) => {
       clearValidation(event);
       if (projection) setStale(true);
@@ -174,7 +180,6 @@ export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewP
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className="min-w-0 border-e border-border-subtle bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
         {sample ? <p className="px-5 pt-2 text-xs text-secondary-foreground">{locale === "es" ? "Datos de ejemplo" : "Sample data"}</p> : null}
-        {stale ? <p role="status" className="mx-5 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{text.staleResults}</p> : null}
         {error ? <div role="alert" className="mx-5 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{status} <button type="submit" className="ms-2 underline">{text.retry}</button></div> : null}
         <Suspense fallback={<ProjectionSkeleton />}>
           <RequestGate promise={pendingPromise} />
@@ -199,5 +204,7 @@ export function ProjectionScenarioView({ locale, text }: ProjectionScenarioViewP
         />
       </Suspense>
     </form>
+    </main>
+    </>
   );
 }
