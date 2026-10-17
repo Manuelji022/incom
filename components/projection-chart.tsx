@@ -60,7 +60,7 @@ export function ProjectionChart({
   }
 
   return (
-    <div className="border-b border-border-subtle px-5 py-6 sm:px-8 sm:py-8">
+    <div className="border-b border-border-subtle px-3 py-6 sm:px-3 sm:py-8">
       <div className="mb-2 flex items-center justify-between gap-4">
         <h2 className="text-base font-semibold text-primary-foreground">
           {text.title}

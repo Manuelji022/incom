@@ -187,7 +187,6 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
           {selectedScenario ? <ProjectionResults
             selectedScenario={selectedScenario}
             durationYears={projection.resolved_inputs.duration_years}
-            inflationPercent={projection.resolved_inputs.expected_annual_inflation_percent.value}
             locale={locale}
             text={{ header: text.header, chart: text.chart, summary: text.summary, scenarioLabel: text.scenarios[selectedName] }}
           /> : null}
