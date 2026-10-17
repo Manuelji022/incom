@@ -3,44 +3,50 @@
 :root {
   color-scheme: light dark;
 
+  /* Reference palette primitives */
+  --cream: #f2f0e3;
+  --charcoal: #242424;
+  --coral: #f76f53;
+  --coral-ink: #b43f2a;
+
   /* Surfaces */
-  --page: light-dark(#FFFFFF, #0B0B0B);
-  --shell: light-dark(#F6F6F6, #000000);
-  --container: light-dark(#ffffff, #111111);
-  --card: light-dark(#F6F6F6, #191919);
-  --sunken: light-dark(#EFEFEF, #0a0a0a);
-  --modal: light-dark(#ffffff, #222222);
-  --standout: light-dark(#202020, #222222);
+  --page: light-dark(var(--cream), var(--charcoal));
+  --shell: light-dark(color-mix(in srgb, var(--cream) 97%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 95%, black));
+  --container: light-dark(color-mix(in srgb, var(--cream) 94%, white), color-mix(in srgb, var(--charcoal) 97%, var(--cream)));
+  --card: light-dark(color-mix(in srgb, var(--cream) 97%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 94%, var(--cream)));
+  --sunken: light-dark(color-mix(in srgb, var(--cream) 94%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 95%, black));
+  --modal: light-dark(color-mix(in srgb, var(--cream) 88%, white), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
+  --standout: light-dark(var(--charcoal), var(--cream));
 
   /* Components */
-  --component: light-dark(#ECECEC, #222222);
-  --component-hover: light-dark(#E5E5E5, #2A2A2A);
-  --component-active: light-dark(#DDDDDD, #313131);  
-  --component-on-sunken: light-dark(#FFFFFF, #2A2A2A);
-  --component-on-inverted: light-dark(#FCFCFC, #0F0F0F);
-  --component-on-container-subtle: light-dark(#FFFFFF, #191919);
-  --component-on-container-strong: light-dark(#FFFFFF, #222222);
+  --component: light-dark(color-mix(in srgb, var(--cream) 92%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
+  --component-hover: light-dark(color-mix(in srgb, var(--cream) 88%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 88%, var(--cream)));
+  --component-active: light-dark(color-mix(in srgb, var(--cream) 84%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 84%, var(--cream)));
+  --component-on-sunken: light-dark(color-mix(in srgb, var(--cream) 88%, white), color-mix(in srgb, var(--charcoal) 76%, white));
+  --component-on-inverted: light-dark(color-mix(in srgb, var(--cream) 90%, white), color-mix(in srgb, var(--charcoal) 90%, black));
+  --component-on-container-subtle: light-dark(color-mix(in srgb, var(--cream) 90%, white), color-mix(in srgb, var(--charcoal) 90%, white));
+  --component-on-container-strong: light-dark(color-mix(in srgb, var(--cream) 86%, white), color-mix(in srgb, var(--charcoal) 84%, white));
 
   /* Transparent component states */
   --transparent-hover: light-dark(rgb(0 0 0 / 4%), rgb(255 255 255 / 6%));
   --transparent-active: light-dark(rgb(0 0 0 / 8%), rgb(255 255 255 / 12%));
 
   /* Foreground */
-  --primary-foreground: light-dark(#171717, #f2f2f2);
-  --secondary-foreground: light-dark(#5b5b5b, #b8b8b8);
-  --tertiary-foreground: light-dark(#666666, #a3a3a3);
-  --disabled-foreground: light-dark(#a3a3a3, #626262);
+  --primary-foreground: light-dark(var(--charcoal), var(--cream));
+  --secondary-foreground: light-dark(color-mix(in srgb, var(--charcoal) 74%, var(--cream)), color-mix(in srgb, var(--cream) 70%, var(--charcoal)));
+  --tertiary-foreground: light-dark(color-mix(in srgb, var(--charcoal) 66%, var(--cream)), color-mix(in srgb, var(--cream) 62%, var(--charcoal)));
+  --disabled-foreground: light-dark(color-mix(in srgb, var(--charcoal) 38%, var(--cream)), color-mix(in srgb, var(--cream) 42%, var(--charcoal)));
 
   /* Brand */
-  --brand-solid: #1d4ed8;
-  --brand-solid-hover: #1e40af;
-  --brand-solid-active: #1e3a8a;
-  --chart-balance: light-dark(#1d4ed8, #75aaf5);
-  --brand-subtle: light-dark(#e8f1ff, #142a4b);
-  --brand-subtle-hover: light-dark(#d9e9ff, #1b3964);
-  --brand-foreground: light-dark(#2f78e8, #6da5f5);
-  --on-brand-solid-foreground: #ffffff;
-  --on-brand-subtle-foreground: light-dark(#1d5fb7, #91bcfb);
+  --brand-solid: var(--coral);
+  --brand-solid-hover: color-mix(in srgb, var(--coral) 75%, var(--coral-ink));
+  --brand-solid-active: color-mix(in srgb, var(--coral) 74%, var(--coral-ink));
+  --chart-balance: light-dark(var(--coral-ink), var(--coral));
+  --brand-subtle: light-dark(color-mix(in srgb, var(--cream) 88%, var(--coral)), color-mix(in srgb, var(--charcoal) 78%, var(--coral)));
+  --brand-subtle-hover: light-dark(color-mix(in srgb, var(--cream) 78%, var(--coral)), color-mix(in srgb, var(--charcoal) 68%, var(--coral)));
+  --brand-foreground: light-dark(var(--coral-ink), var(--coral));
+  --on-brand-solid-foreground: var(--charcoal);
+  --on-brand-subtle-foreground: light-dark(color-mix(in srgb, var(--coral-ink) 90%, var(--charcoal)), color-mix(in srgb, var(--coral) 50%, var(--cream)));
 
   /* Positive */
   --positive-solid: #53a274;
@@ -64,34 +70,34 @@
   --danger-solid-active: #fa987d;
   --danger-subtle: light-dark(#fff0ec, #301b18);
   --danger-subtle-hover: light-dark(#ffe3dc, #45231d);
-  --danger-foreground: light-dark(#c84d34, #df6952);
+  --danger-foreground: light-dark(color-mix(in srgb, #c84d34 88%, var(--charcoal)), color-mix(in srgb, #df6952 90%, var(--cream)));
   --on-danger-solid-foreground: #ffffff;
   --on-danger-subtle-foreground: light-dark(#b6402b, #ff9e84);
 
   /* Inverted */
-  --inverted-solid: light-dark(#171717, #f2f2f2);
-  --inverted-solid-hover: light-dark(#303030, #dadada);
-  --inverted-solid-active: light-dark(#454545, #c5c5c5);
-  --on-inverted-foreground: light-dark(#ffffff, #171717);
-  --on-standout-primary-foreground: light-dark(#171717, #f2f2f2);
-  --on-standout-secondary-foreground: light-dark(#737373, #b4b4b4);
+  --inverted-solid: light-dark(var(--charcoal), var(--cream));
+  --inverted-solid-hover: light-dark(color-mix(in srgb, var(--charcoal) 88%, var(--cream)), color-mix(in srgb, var(--cream) 88%, var(--charcoal)));
+  --inverted-solid-active: light-dark(color-mix(in srgb, var(--charcoal) 78%, var(--cream)), color-mix(in srgb, var(--cream) 78%, var(--charcoal)));
+  --on-inverted-foreground: light-dark(var(--cream), var(--charcoal));
+  --on-standout-primary-foreground: light-dark(var(--cream), var(--charcoal));
+  --on-standout-secondary-foreground: light-dark(color-mix(in srgb, var(--cream) 72%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 72%, var(--cream)));
 
   /* Borders */
-  --border-default: light-dark(#e4e4e4, #343434);
-  --control-border: light-dark(#767676, #757575);
-  --border-subtle: light-dark(#eeeeee, #252525);
-  --border-strong: light-dark(#c9c9c9, #4a4a4a);
-  --border-inverted: light-dark(#454545, #d8d8d8);
-  --brand-border-default: #3b82f6;
-  --brand-border-subtle: light-dark(#b8d4ff, #294a72);
-  --brand-border-focus: light-dark(#2563eb, #75aaf5);
+  --border-default: light-dark(color-mix(in srgb, var(--cream) 86%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 86%, var(--cream)));
+  --control-border: light-dark(color-mix(in srgb, var(--cream) 38%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 42%, var(--cream)));
+  --border-subtle: light-dark(color-mix(in srgb, var(--cream) 92%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
+  --border-strong: light-dark(color-mix(in srgb, var(--cream) 76%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 76%, var(--cream)));
+  --border-inverted: light-dark(var(--cream), var(--charcoal));
+  --brand-border-default: var(--coral-ink);
+  --brand-border-subtle: light-dark(color-mix(in srgb, var(--cream) 62%, var(--coral)), color-mix(in srgb, var(--charcoal) 58%, var(--coral)));
+  --brand-border-focus: light-dark(var(--coral-ink), var(--coral));
   --positive-border-default: light-dark(#8bc9a3, #365a44);
   --warning-border-default: light-dark(#f2b47e, #694321);
   --danger-border-default: light-dark(#e8a08e, #67372d);
   --danger-border-subtle: light-dark(#f2d2c9, #472922);
 
   /* Disabled */
-  --disabled: light-dark(#eeeeee, #252525);
+  --disabled: light-dark(color-mix(in srgb, var(--cream) 92%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
 
   /* Compatibility aliases for existing utility classes */
   --background: var(--page);
