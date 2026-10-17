@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Skill resources include standalone CommonJS tools, not application code.
+    ".agents/skills/**",
   ]),
 ]);
 
