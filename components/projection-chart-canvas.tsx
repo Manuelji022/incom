@@ -105,6 +105,7 @@ export function ProjectionChartCanvas({
             y: "invested",
             stroke: "var(--tertiary-foreground)",
             strokeWidth: 1.75,
+            strokeDasharray: "2 3",
           }),
           lineY(rows, {
             id: "today-money",
@@ -118,7 +119,7 @@ export function ProjectionChartCanvas({
             id: "portfolio-balance",
             x: "year",
             y: "balance",
-            stroke: "var(--brand-solid)",
+            stroke: "var(--chart-balance)",
             strokeWidth: 3,
           }),
         ],

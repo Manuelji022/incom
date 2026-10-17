@@ -28,13 +28,14 @@
   /* Foreground */
   --primary-foreground: light-dark(#171717, #f2f2f2);
   --secondary-foreground: light-dark(#5b5b5b, #b8b8b8);
-  --tertiary-foreground: light-dark(#858585, #858585);
+  --tertiary-foreground: light-dark(#666666, #a3a3a3);
   --disabled-foreground: light-dark(#a3a3a3, #626262);
 
   /* Brand */
-  --brand-solid: #3b82f6;
-  --brand-solid-hover: #5796f7;
-  --brand-solid-active: #83b4fa;
+  --brand-solid: #1d4ed8;
+  --brand-solid-hover: #1e40af;
+  --brand-solid-active: #1e3a8a;
+  --chart-balance: light-dark(#1d4ed8, #75aaf5);
   --brand-subtle: light-dark(#e8f1ff, #142a4b);
   --brand-subtle-hover: light-dark(#d9e9ff, #1b3964);
   --brand-foreground: light-dark(#2f78e8, #6da5f5);
@@ -77,6 +78,7 @@
 
   /* Borders */
   --border-default: light-dark(#e4e4e4, #343434);
+  --control-border: light-dark(#767676, #757575);
   --border-subtle: light-dark(#eeeeee, #252525);
   --border-strong: light-dark(#c9c9c9, #4a4a4a);
   --border-inverted: light-dark(#454545, #d8d8d8);
@@ -103,6 +105,24 @@
 
 .light {
   color-scheme: light;
+}
+
+html.theme-changing,
+html.theme-changing *,
+html.theme-changing *::before,
+html.theme-changing *::after {
+  transition: none !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-border-focus);
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
 }
 
 .theme-toggle__icon {
@@ -132,7 +152,7 @@
   height: 20px;
   margin-top: -8px;
   appearance: none;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--control-border);
   border-radius: 9999px;
   background: var(--container);
   box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
@@ -141,7 +161,7 @@
 .native-slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--control-border);
   border-radius: 9999px;
   background: var(--container);
   box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
@@ -209,6 +229,7 @@ html.light .theme-toggle__icon--sun {
   --color-brand-solid: var(--brand-solid);
   --color-brand-solid-hover: var(--brand-solid-hover);
   --color-brand-solid-active: var(--brand-solid-active);
+  --color-chart-balance: var(--chart-balance);
   --color-brand-subtle: var(--brand-subtle);
   --color-brand-subtle-hover: var(--brand-subtle-hover);
   --color-brand-foreground: var(--brand-foreground);
@@ -247,6 +268,7 @@ html.light .theme-toggle__icon--sun {
 
   /* Border and focus colors */
   --color-border-default: var(--border-default);
+  --color-control-border: var(--control-border);
   --color-border-subtle: var(--border-subtle);
   --color-border-strong: var(--border-strong);
   --color-border-inverted: var(--border-inverted);

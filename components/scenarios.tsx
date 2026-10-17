@@ -52,7 +52,7 @@ export function Scenarios({
       <section className="pt-2">
         <h2
           id="scenarios-at-a-glance-title"
-          className="text-sm font-semibold leading-5 text-primary-foreground"
+          className="text-base font-semibold leading-6 text-primary-foreground"
         >
           {text.title}
         </h2>
@@ -85,7 +85,7 @@ export function Scenarios({
                     type="button"
                     aria-pressed={scenario.name === selectedScenario}
                     onClick={() => onSelectScenario(scenario.name)}
-                    className={`flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-l-2 px-[0.6875rem] py-2 text-left transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-solid ${
+                    className={`flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-s-2 px-[0.6875rem] py-2 text-start transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
                       scenario.name === selectedScenario
                         ? "border-brand-solid bg-brand-subtle"
                         : "border-transparent hover:bg-card"
@@ -95,16 +95,16 @@ export function Scenarios({
                       <span className="block text-xs font-semibold leading-4 text-primary-foreground">
                         {scenarioLabels[scenario.name]}
                       </span>
-                      <span className="block text-[11px] leading-4 text-secondary-foreground">
+                      <span className="block text-xs leading-4 text-secondary-foreground">
                         {text.return.replace("{percent}", annualReturn)}
                       </span>
                     </span>
 
-                    <span className="shrink-0 text-right tabular-nums">
-                      <span className="block text-xs font-semibold leading-4 text-primary-foreground">
+                    <span className="min-w-0 text-end tabular-nums">
+                      <span className="block break-words text-xs font-semibold leading-4 text-primary-foreground">
                         {nominalBalance}
                       </span>
-                      <span className="block text-[11px] leading-4 text-secondary-foreground">
+                      <span className="block break-words text-xs leading-4 text-secondary-foreground">
                         {text.real.replace("{amount}", realBalance)}
                       </span>
                     </span>

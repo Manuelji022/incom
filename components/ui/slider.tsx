@@ -20,7 +20,7 @@ export function Slider({
       {...props}
       type="range"
       data-slot="slider"
-      className={`native-slider h-11 w-full cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-border-focus disabled:cursor-not-allowed disabled:opacity-50 ${className}`.trim()}
+      className={`native-slider h-11 w-full cursor-pointer rounded-md focus-visible:ring-2 focus-visible:ring-brand-border-focus disabled:cursor-not-allowed disabled:opacity-50 ${className}`.trim()}
       onChange={(event) => onValueChange(event.currentTarget.valueAsNumber)}
     />
   );

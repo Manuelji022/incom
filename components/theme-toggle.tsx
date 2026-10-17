@@ -30,11 +30,14 @@ function saveTheme(theme: Theme) {
 
 function applyTheme(theme: Theme | null) {
   const root = document.documentElement;
+  root.classList.add("theme-changing");
   root.classList.remove("light", "dark");
 
   if (theme) {
     root.classList.add(theme);
   }
+  void root.offsetHeight;
+  requestAnimationFrame(() => root.classList.remove("theme-changing"));
 }
 
 function getSystemTheme(): Theme {

@@ -44,9 +44,9 @@ export function ProjectionHeader({
   return (
     <section
       aria-labelledby="portfolio-value-title"
-      className="border-b border-border-subtle px-6 py-8 sm:px-8 sm:py-10"
+      className="[container-type:inline-size] border-b border-border-subtle px-6 py-8 sm:px-8 sm:py-10"
     >
-      <div className="grid gap-8 sm:grid-cols-2 sm:gap-6 lg:gap-10">
+      <div className="grid gap-8 @[46rem]:grid-cols-2 @[46rem]:gap-6 lg:gap-10">
         <div className="min-w-0">
           <h2
             id="portfolio-value-title"
@@ -54,7 +54,7 @@ export function ProjectionHeader({
           >
             {text.portfolio}
           </h2>
-          <p className="mt-2 whitespace-nowrap text-[clamp(2rem,4vw,3.25rem)] leading-none font-semibold tracking-[-0.055em] tabular-nums text-primary-foreground">
+          <p className="mt-2 whitespace-normal [overflow-wrap:anywhere] text-[clamp(2rem,7cqi,3.25rem)] leading-tight font-semibold tracking-[-0.055em] tabular-nums text-primary-foreground">
             {nominalBalance
               ? euro.format(Number(nominalBalance))
               : text.unavailable}
@@ -64,11 +64,11 @@ export function ProjectionHeader({
           </p>
         </div>
 
-        <div className="min-w-0 sm:border-l sm:border-border-subtle sm:pl-6 lg:pl-8">
+        <div className="min-w-0 @[46rem]:border-s @[46rem]:border-border-subtle @[46rem]:ps-6 @[62rem]:ps-8">
           <p className="text-sm font-semibold leading-5 text-secondary-foreground">
             {text.today}
           </p>
-          <p className="mt-2 whitespace-nowrap text-[clamp(2rem,4vw,3.25rem)] leading-none font-semibold tracking-[-0.055em] tabular-nums text-secondary-foreground">
+          <p className="mt-2 whitespace-normal [overflow-wrap:anywhere] text-[clamp(2rem,7cqi,3.25rem)] leading-tight font-semibold tracking-[-0.055em] tabular-nums text-secondary-foreground">
             {realBalance ? euro.format(Number(realBalance)) : text.unavailable}
           </p>
           <p className="mt-3 text-sm leading-5 text-secondary-foreground">

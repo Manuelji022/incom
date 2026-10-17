@@ -23,10 +23,10 @@ const variantClasses: Record<ButtonVariant, string> = {
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  default: "h-10 gap-2 rounded-md px-4 text-sm font-medium",
-  xs: "h-7 gap-1 rounded-sm px-2 text-xs font-medium",
-  sm: "h-8 gap-1.5 rounded-md px-3 text-sm font-medium",
-  lg: "h-12 gap-2 rounded-lg px-6 text-base font-medium",
+  default: "min-h-10 gap-2 rounded-md px-4 py-2 text-sm font-medium",
+  xs: "min-h-7 gap-1 rounded-sm px-2 py-1 text-xs font-medium",
+  sm: "min-h-8 gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium",
+  lg: "min-h-12 gap-2 rounded-lg px-6 py-3 text-base font-medium",
   icon: "size-10 rounded-md",
   "icon-xs": "size-7 rounded-sm",
   "icon-sm": "size-8 rounded-md",
@@ -43,8 +43,8 @@ function buttonVariants({
   className?: string;
 } = {}) {
   return [
-    "group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap border border-transparent outline-none transition-colors select-none",
-    "focus-visible:ring-2 focus-visible:ring-brand-border-focus/40 focus-visible:ring-offset-2 focus-visible:ring-offset-page",
+    "group/button inline-flex min-w-0 shrink-0 items-center justify-center whitespace-normal border border-transparent transition-colors",
+    "focus-visible:ring-2 focus-visible:ring-brand-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-page",
     "disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     variantClasses[variant],
     sizeClasses[size],

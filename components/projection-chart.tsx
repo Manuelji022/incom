@@ -37,7 +37,7 @@ const ProjectionChartCanvas = dynamic(
     loading: () => (
       <div
         aria-hidden="true"
-        className="h-[330px] animate-pulse rounded-md bg-card"
+        className="h-[330px] motion-safe:animate-pulse rounded-md bg-card"
       />
     ),
   },
@@ -50,8 +50,11 @@ export function ProjectionChart({
 }: ProjectionChartProps) {
   if (points.length === 0) {
     return (
-      <div className="flex h-[320px] items-center justify-center text-sm text-secondary-foreground">
+      <div role="status" className="flex min-h-[320px] flex-col items-center justify-center gap-3 text-sm text-secondary-foreground">
         {text.none}
+        <button type="button" className="rounded-sm px-2 py-1 text-brand-foreground underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus" onClick={() => window.location.reload()}>
+          {locale === "es" ? "Volver a cargar" : "Reload projections"}
+        </button>
       </div>
     );
   }
@@ -79,13 +82,13 @@ export function ProjectionChart({
           {text.growth}
         </li>
         <li className="flex items-center gap-2">
-          <span aria-hidden="true" className="h-0.5 w-4 bg-brand-solid" />
+          <span aria-hidden="true" className="h-0.5 w-4 bg-chart-balance" />
           {text.balance}
         </li>
         <li className="flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="h-0.5 w-4 bg-tertiary-foreground"
+            className="w-4 border-t-2 border-dotted border-tertiary-foreground"
           />
           {text.invested}
         </li>

@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import type { Locale } from "@/lib/locales";
 
 type LanguageSwitcherProps = {
@@ -15,8 +16,16 @@ function isLocale(value: string): value is Locale {
 export function LanguageSwitcher({ locale, label }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const shouldFocusMain = useRef(false);
+
+  useEffect(() => {
+    if (!shouldFocusMain.current) return;
+    shouldFocusMain.current = false;
+    document.getElementById("main-content")?.focus();
+  }, [pathname]);
 
   function changeLanguage(nextLocale: Locale) {
+    shouldFocusMain.current = true;
     const secureAttribute = location.protocol === "https:" ? "; Secure" : "";
     document.cookie = `incom-locale=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax${secureAttribute}`;
 
@@ -36,7 +45,7 @@ export function LanguageSwitcher({ locale, label }: LanguageSwitcherProps) {
         aria-label={label}
         value={locale}
         onChange={(event) => handleChange(event.currentTarget.value)}
-        className="rounded border border-border-default bg-container px-2 py-1 text-primary-foreground"
+        className="min-h-10 rounded border border-control-border bg-container px-2 py-1 text-base text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"
       >
         <option value="en">English</option>
         <option value="es">Español</option>

@@ -84,7 +84,7 @@ export function SliderField({
               )
                 setValue(parsed);
             }}
-            className="pr-14 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="pr-14 tabular-nums"
           />
           <span
             aria-hidden="true"
@@ -96,6 +96,7 @@ export function SliderField({
       </div>
       <Slider
         id={`${id}-slider`}
+        aria-label={`${label} (${unit})`}
         aria-labelledby={labelId}
         aria-describedby={descriptionId}
         min={min}
@@ -125,12 +126,10 @@ export type ScenarioRangeFieldProps = {
   locale: "en" | "es";
   text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];
   id: string;
-  lowerName?: string;
-  upperName?: string;
+  name: string;
   label: string;
   expectedReturn: number;
-  defaultLowerSpread?: number;
-  defaultUpperSpread?: number;
+  defaultSpread?: number;
   step?: number;
   maxSpread?: number;
   optional?: boolean;
@@ -138,12 +137,10 @@ export type ScenarioRangeFieldProps = {
 
 export function ScenarioRangeField({
   id,
-  lowerName,
-  upperName,
+  name,
   label,
   expectedReturn,
-  defaultLowerSpread = 2,
-  defaultUpperSpread = 2,
+  defaultSpread = 2,
   step = 0.1,
   maxSpread = 10,
   optional = false,
@@ -151,10 +148,8 @@ export function ScenarioRangeField({
   text,
   locale,
 }: ScenarioRangeFieldProps) {
-  const [lowerSpread, setLowerSpread] = useState(defaultLowerSpread);
-  const [upperSpread, setUpperSpread] = useState(defaultUpperSpread);
-  const [lowerDraft, setLowerDraft] = useState(String(defaultLowerSpread));
-  const [upperDraft, setUpperDraft] = useState(String(defaultUpperSpread));
+  const [spread, setSpread] = useState(defaultSpread);
+  const [draft, setDraft] = useState(String(defaultSpread));
   const labelId = `${id}-label`;
   const descriptionId = `${id}-description`;
   const format = (value: number) =>
@@ -164,7 +159,7 @@ export function ScenarioRangeField({
       maximumFractionDigits: 1,
     }).format(value / 100);
 
-  const updateSpread = (side: "lower" | "upper", draft: string) => {
+  const updateSpread = (draft: string) => {
     const parsed = Number(draft);
     if (
       draft === "" ||
@@ -174,124 +169,62 @@ export function ScenarioRangeField({
       !isStepAligned(parsed, 0, step)
     )
       return;
-    if (side === "lower") setLowerSpread(parsed);
-    else setUpperSpread(parsed);
+    setSpread(parsed);
   };
 
   return (
     <Field>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-          <FieldLabel id={labelId}>{label}</FieldLabel>
+          <FieldLabel id={labelId} htmlFor={id}>{label}</FieldLabel>
           {optional ? (
             <span className="shrink-0 text-xs font-normal text-tertiary-foreground">
               {optionalLabel}
             </span>
           ) : null}
         </div>
-        <div className="flex flex-wrap justify-end gap-3">
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor={`${id}-lower`}
-              className="text-xs text-tertiary-foreground"
-            >
-              {text.low}
-            </label>
-            <div className="relative w-24 shrink-0">
-              <Input
-                id={`${id}-lower`}
-                name={lowerName}
-                type="number"
-                inputMode="decimal"
-                min="0"
-                max={maxSpread}
-                step={step}
-                value={lowerDraft}
-                required
-                aria-describedby={descriptionId}
-                onChange={(event) => {
-                  const next = event.currentTarget.value;
-                  setLowerDraft(next);
-                  updateSpread("lower", next);
-                }}
-                className="pr-10 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-              />
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-tertiary-foreground"
-              >
-                pp
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor={`${id}-upper`}
-              className="text-xs text-tertiary-foreground"
-            >
-              {text.high}
-            </label>
-            <div className="relative w-24 shrink-0">
-              <Input
-                id={`${id}-upper`}
-                name={upperName}
-                type="number"
-                inputMode="decimal"
-                min="0"
-                max={maxSpread}
-                step={step}
-                value={upperDraft}
-                required
-                aria-describedby={descriptionId}
-                onChange={(event) => {
-                  const next = event.currentTarget.value;
-                  setUpperDraft(next);
-                  updateSpread("upper", next);
-                }}
-                className="pr-10 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-              />
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-tertiary-foreground"
-              >
-                pp
-              </span>
-            </div>
-          </div>
+        <div className="relative w-28 shrink-0">
+          <Input
+            id={id}
+            name={name}
+            type="number"
+            inputMode="decimal"
+            aria-label={`${label} (${text.rangeAmount})`}
+            min="0"
+            max={maxSpread}
+            step={step}
+            value={draft}
+            required
+            aria-describedby={descriptionId}
+            onChange={(event) => {
+              const next = event.currentTarget.value;
+              setDraft(next);
+              updateSpread(next);
+            }}
+            className="pr-10 tabular-nums"
+          />
+          <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-tertiary-foreground">pp</span>
         </div>
       </div>
       <div className="mt-2 grid gap-2">
         <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2">
-          <label htmlFor={`${id}-lower-slider`} className="text-xs text-tertiary-foreground">{text.lowShort}</label>
+          <label htmlFor={`${id}-slider`} className="text-xs text-tertiary-foreground">{text.lowShort} / {text.highShort}</label>
           <Slider
-            id={`${id}-lower-slider`}
+            id={`${id}-slider`}
+            aria-label={label}
             min={0}
             max={maxSpread}
             step={step}
-            value={lowerSpread}
-            aria-valuetext={format(expectedReturn - lowerSpread)}
+            value={spread}
+            aria-valuetext={text.rangePreview
+              .replace("{low}", format(expectedReturn - spread))
+              .replace("{expected}", format(expectedReturn))
+              .replace("{high}", format(expectedReturn + spread))}
             aria-describedby={descriptionId}
             onValueChange={(next) => {
               const nextSpread = Number(next.toFixed(6));
-              setLowerSpread(nextSpread);
-              setLowerDraft(String(nextSpread));
-            }}
-          />
-        </div>
-        <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2">
-          <label htmlFor={`${id}-upper-slider`} className="text-xs text-tertiary-foreground">{text.highShort}</label>
-          <Slider
-            id={`${id}-upper-slider`}
-            min={0}
-            max={maxSpread}
-            step={step}
-            value={upperSpread}
-            aria-valuetext={format(expectedReturn + upperSpread)}
-            aria-describedby={descriptionId}
-            onValueChange={(next) => {
-              const nextSpread = Number(next.toFixed(6));
-              setUpperSpread(nextSpread);
-              setUpperDraft(String(nextSpread));
+              setSpread(nextSpread);
+              setDraft(String(nextSpread));
             }}
           />
         </div>
@@ -300,7 +233,7 @@ export function ScenarioRangeField({
         <span className="text-left">
           {text.lowShort}{" "}
           <strong className="font-medium text-secondary-foreground">
-            {format(expectedReturn - lowerSpread)}
+            {format(expectedReturn - spread)}
           </strong>
         </span>
         <span className="text-center">
@@ -312,7 +245,7 @@ export function ScenarioRangeField({
         <span className="text-right">
           {text.highShort}{" "}
           <strong className="font-medium text-secondary-foreground">
-            {format(expectedReturn + upperSpread)}
+            {format(expectedReturn + spread)}
           </strong>
         </span>
       </div>
@@ -369,6 +302,9 @@ export function ProjectionSliderFields({
               value={returnDraft}
               step="0.1"
               required
+              aria-label={`${text.return} (%)`}
+              min="-100"
+              max="100"
               aria-describedby="expected-annual-return-description"
               onChange={(event) => {
                 const draft = event.currentTarget.value;
@@ -376,7 +312,7 @@ export function ProjectionSliderFields({
                 if (draft !== "" && Number.isFinite(Number(draft)))
                   setExpectedReturn(Number(draft));
               }}
-              className="pr-14 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="pr-14 tabular-nums"
             />
             <span
               aria-hidden="true"
@@ -392,14 +328,12 @@ export function ProjectionSliderFields({
       </Field>
       <ScenarioRangeField
         id="scenario-range"
+        name="scenario_range_percentage_points"
         label={text.range}
         expectedReturn={expectedReturn}
-        defaultLowerSpread={2}
-        defaultUpperSpread={2}
+        defaultSpread={2}
         step={0.1}
         maxSpread={10}
-        optional
-        optionalLabel={text.optional}
         text={text}
         locale={locale}
       />

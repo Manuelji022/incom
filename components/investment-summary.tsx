@@ -91,27 +91,35 @@ export function InvestmentSummary({
           </Button>
         ) : null}
       </div>
-      <div className="overflow-x-auto">
+      <p className="mb-2 text-xs text-secondary-foreground sm:hidden">
+        {locale === "es" ? "Desliza horizontalmente para ver todas las columnas." : "Scroll horizontally to see all columns."}
+      </p>
+      <div
+        role="region"
+        aria-label={locale === "es" ? "Tabla de proyección anual; desplázate horizontalmente para ver todas las columnas" : "Annual projection table; scroll horizontally to see all columns"}
+        tabIndex={0}
+        className="overflow-x-auto rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"
+      >
         <table
           id="yearly-projection-table"
-          className="w-full min-w-[660px] border-collapse text-left text-xs sm:text-sm"
+          className="w-full min-w-[660px] border-collapse text-start text-xs sm:text-sm"
         >
           <caption className="sr-only">{text.caption}</caption>
           <thead>
             <tr className="border-b border-border-subtle text-xs text-secondary-foreground">
-              <th className="w-12 py-2 pr-3 font-medium" scope="col">
+              <th className="w-12 py-2 pe-3 font-medium" scope="col">
                 {text.year}
               </th>
-              <th className="px-3 py-2 text-right font-medium" scope="col">
+              <th className="px-3 py-2 text-end font-medium" scope="col">
                 {text.portfolio}
               </th>
-              <th className="px-3 py-2 text-right font-medium" scope="col">
+              <th className="px-3 py-2 text-end font-medium" scope="col">
                 {text.contributions}
               </th>
-              <th className="px-3 py-2 text-right font-medium" scope="col">
+              <th className="px-3 py-2 text-end font-medium" scope="col">
                 {text.growth}
               </th>
-              <th className="py-2 pl-3 text-right font-medium" scope="col">
+              <th className="py-2 ps-3 text-end font-medium" scope="col">
                 {text.real}
               </th>
             </tr>
@@ -129,24 +137,24 @@ export function InvestmentSummary({
                   }
                 >
                   <th
-                    className="py-3 pr-3 font-medium text-secondary-foreground"
+                    className="py-3 pe-3 font-medium text-secondary-foreground"
                     scope="row"
                   >
                     {point.year}
                   </th>
-                  <td className="whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums text-primary-foreground">
+                  <td className="whitespace-nowrap px-4 py-3 text-end font-semibold tabular-nums text-primary-foreground">
                     {euro.format(Number(point.nominal_balance))}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-secondary-foreground">
+                  <td className="whitespace-nowrap px-3 py-3 text-end tabular-nums text-secondary-foreground">
                     {euro.format(
                       Number(point.initial_principal) +
                         Number(point.cumulative_contributions),
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-secondary-foreground">
+                  <td className="whitespace-nowrap px-3 py-3 text-end tabular-nums text-secondary-foreground">
                     {euro.format(Number(point.cumulative_investment_growth))}
                   </td>
-                  <td className="whitespace-nowrap py-3 pl-3 text-right tabular-nums text-secondary-foreground">
+                  <td className="whitespace-nowrap py-3 ps-3 text-end tabular-nums text-secondary-foreground">
                     {euro.format(Number(point.inflation_adjusted_balance))}
                   </td>
                 </tr>

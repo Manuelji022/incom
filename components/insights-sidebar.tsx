@@ -34,7 +34,7 @@ export function InsightsSidebar({
   const scenarioLabel = text.scenarios[selectedScenario];
 
   return (
-    <aside className="border-t border-border-subtle bg-container lg:min-h-full lg:border-t-0 lg:border-l">
+    <aside className="[container-type:inline-size] border-t border-border-subtle bg-container lg:min-h-full lg:border-t-0 lg:border-s">
       <Scenarios
         durationYears={durationYears}
         scenarios={scenarios}

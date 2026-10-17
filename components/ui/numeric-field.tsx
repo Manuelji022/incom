@@ -46,16 +46,17 @@ function NumericField({
           {...inputProps}
           id={id}
           name={name}
+          aria-label={`${label} (${unit})`}
           type="number"
           inputMode="decimal"
           defaultValue={defaultValue}
           disabled={disabled}
           aria-describedby={describedBy}
-          className={`pr-14 tabular-nums ${className}`.trim()}
+          className={`pe-14 tabular-nums ${className}`.trim()}
         />
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-tertiary-foreground"
+          className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-tertiary-foreground"
         >
           {unit}
         </span>

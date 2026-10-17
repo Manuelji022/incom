@@ -6,7 +6,9 @@ import type {
 } from "@/types/compound-interest";
 
 const projectionEndpoint =
-  "https://incom-api.manuelji.dev/api/v1/compound-interest/projections";
+  typeof window === "undefined"
+    ? "https://incom-api.manuelji.dev/api/v1/compound-interest/projections"
+    : "/api/compound-interest/projections";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -29,7 +31,7 @@ function parsePoint(value: unknown): ProjectionPoint | null {
 }
 
 function parseScenario(value: unknown): ProjectionScenario | null {
-  if (!isRecord(value) || !isRecord(value.final_summary) || !Array.isArray(value.annual_points)) return null;
+  if (!isRecord(value) || !isRecord(value.final_summary) || !Array.isArray(value.annual_points) || value.annual_points.length === 0) return null;
   const name = value.name;
   if (name !== "low" && name !== "expected" && name !== "high") return null;
   const points = value.annual_points.map(parsePoint);
@@ -51,14 +53,15 @@ function parseResponse(value: unknown): CompoundInterestProjectionResponse {
   if (!isRecord(value) || !isRecord(value.resolved_inputs) ||
       !isRecord(value.resolved_inputs.expected_annual_inflation_percent) ||
       !Array.isArray(value.scenarios)) {
-    throw new Error("The projection service returned an unexpected response.");
+    throw new Error("invalid-response");
   }
   const inflation = value.resolved_inputs.expected_annual_inflation_percent;
   const scenarios = value.scenarios.map(parseScenario);
   if (typeof value.resolved_inputs.duration_years !== "number" ||
       !isMoney(inflation.value) || typeof inflation.source !== "string" ||
-      scenarios.some((scenario) => scenario === null)) {
-    throw new Error("The projection service returned incomplete projection data.");
+      scenarios.length !== 3 || scenarios.some((scenario) => scenario === null) ||
+      new Set(scenarios.flatMap((scenario) => scenario ? [scenario.name] : [])).size !== 3) {
+    throw new Error("invalid-response");
   }
   return {
     resolved_inputs: {
@@ -79,8 +82,10 @@ export async function fetchProjection(
     signal: AbortSignal.timeout(10_000),
     cache: "no-store",
   });
-  if (!response.ok) {
-    throw new Error(`Projection service request failed (${response.status}).`);
+  if (!response.ok) throw new Error(response.status === 400 || response.status === 422 ? "invalid-input" : "projection-failed");
+  try {
+    return parseResponse(await response.json());
+  } catch {
+    throw new Error("invalid-response");
   }
-  return parseResponse(await response.json());
 }

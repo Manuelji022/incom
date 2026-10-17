@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { getDictionary } from "@/lib/i18n";
 import { hasLocale, locales } from "@/lib/locales";
 import "../globals.css";
@@ -26,8 +27,20 @@ export default async function LocaleLayout({
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   return (
-    <html lang={lang}>
-      <body>{children}</body>
+    <html lang={lang} suppressHydrationWarning>
+      <body>
+        <a className="sr-only fixed start-4 top-4 z-50 rounded-md bg-container px-4 py-3 text-base text-primary-foreground focus:not-sr-only focus:outline-2 focus:outline-offset-2 focus:outline-brand-border-focus" href="#main-content">
+          {lang === "es" ? "Saltar al contenido principal" : "Skip to main content"}
+        </a>
+        {children}
+        <Script
+          id="incom-theme-bootstrap"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `try{var theme=localStorage.getItem("incom-theme");if(theme==="light"||theme==="dark"){document.documentElement.classList.add(theme)}}catch{}`,
+          }}
+        />
+      </body>
     </html>
   );
 }

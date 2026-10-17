@@ -34,6 +34,7 @@ export function PortfolioComposition({ point, locale, text }: PortfolioCompositi
   const formattedContributions = euro.format(contributions);
   const formattedGrowth = euro.format(growth);
   const compositionTotal = Math.max(0, contributions) + Math.max(0, growth);
+  const hasLoss = growth < 0;
   const contributionWidth = compositionTotal > 0
     ? (Math.max(0, contributions) / compositionTotal) * 100
     : 0;
@@ -52,7 +53,7 @@ export function PortfolioComposition({ point, locale, text }: PortfolioCompositi
       <div>
         <h2
           id="portfolio-composition-title"
-          className="text-lg font-semibold leading-6 text-primary-foreground"
+          className="text-base font-semibold leading-6 text-primary-foreground"
         >
           {text.title}
         </h2>
@@ -61,36 +62,38 @@ export function PortfolioComposition({ point, locale, text }: PortfolioCompositi
         </p>
       </div>
 
-      <div
-        role="img"
-        aria-label={ariaLabel}
-        className="mt-6 flex h-4 w-full overflow-hidden rounded-full bg-brand-subtle"
-      >
-        <span
-          aria-hidden="true"
-          className="h-full bg-secondary-foreground"
-          style={{ width: `${contributionWidth}%` }}
-        />
-      </div>
+      {hasLoss ? (
+        <p className="mt-5 text-sm leading-5 text-secondary-foreground" role="img" aria-label={ariaLabel}>
+          {formattedContributions} · {formattedGrowth}
+        </p>
+      ) : (
+        <div
+          role="img"
+          aria-label={ariaLabel}
+          className="mt-6 flex h-4 w-full overflow-hidden rounded-full bg-brand-subtle"
+        >
+          <span aria-hidden="true" className="h-full bg-secondary-foreground" style={{ width: `${contributionWidth}%` }} />
+        </div>
+      )}
 
       <ul className="mt-4 space-y-3" aria-label={text.listLabel}>
-        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 text-sm leading-5">
+        <li className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1 text-sm leading-5 @[22rem]:grid-cols-[minmax(0,1fr)_auto_auto]">
           <span className="flex min-w-0 items-center gap-2.5 text-primary-foreground">
             <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-secondary-foreground" />
             {text.contributions}
           </span>
-          <span className="tabular-nums text-primary-foreground">{formattedContributions}</span>
-          <span className="w-10 text-right tabular-nums text-secondary-foreground">
+          <span className="break-words text-right text-xs tabular-nums text-primary-foreground sm:text-sm">{formattedContributions}</span>
+          <span className="col-start-2 text-right text-xs tabular-nums text-secondary-foreground @[22rem]:col-start-auto @[22rem]:w-10 @[22rem]:text-sm">
             {percent.format(contributionShare)}
           </span>
         </li>
-        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 text-sm leading-5">
+        <li className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1 text-sm leading-5 @[22rem]:grid-cols-[minmax(0,1fr)_auto_auto]">
           <span className="flex min-w-0 items-center gap-2.5 text-primary-foreground">
             <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-brand-subtle" />
             {text.growth}
           </span>
-          <span className="tabular-nums text-primary-foreground">{formattedGrowth}</span>
-          <span className="w-10 text-right tabular-nums text-secondary-foreground">
+          <span className="break-words text-right text-xs tabular-nums text-primary-foreground sm:text-sm">{formattedGrowth}</span>
+          <span className="col-start-2 text-right text-xs tabular-nums text-secondary-foreground @[22rem]:col-start-auto @[22rem]:w-10 @[22rem]:text-sm">
             {percent.format(growthShare)}
           </span>
         </li>

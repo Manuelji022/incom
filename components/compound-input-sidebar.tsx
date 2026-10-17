@@ -13,6 +13,8 @@ import type {
 type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className"> & {
   text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];
   locale: "en" | "es";
+  submitting: boolean;
+  calculatingLabel: string;
 };
 
 const contributionFrequencies: {
@@ -33,11 +35,13 @@ export function CompoundInputSidebar({
   className = "",
   text,
   locale,
+  submitting,
+  calculatingLabel,
 }: CompoundInputSidebarProps) {
   return (
     <aside
       aria-labelledby="compound-input-sidebar-title"
-      className={`flex min-h-0 w-full max-w-[18.25rem] shrink-0 flex-col border-r border-border-default bg-container ${className}`.trim()}
+      className={`flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container lg:max-w-[18.25rem] ${className}`.trim()}
     >
       <header className="border-b border-border-subtle px-4 py-5">
         <h2
@@ -51,7 +55,7 @@ export function CompoundInputSidebar({
         </p>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
+      <fieldset disabled={submitting} className="m-0 min-h-0 min-w-0 flex-1 overflow-y-auto border-0 px-4 py-5 disabled:opacity-100">
         <div className="space-y-6">
           <section
             aria-labelledby="contribution-fields-title"
@@ -182,11 +186,11 @@ export function CompoundInputSidebar({
             </FieldGroup>
           </section>
         </div>
-      </div>
+      </fieldset>
 
       <footer className="border-t border-border-subtle px-4 py-4">
-        <Button type="submit" className="w-full">
-          {text.calculate}
+        <Button type="submit" aria-disabled={submitting} className="w-full">
+          {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
         </Button>
       </footer>
     </aside>
