@@ -79,8 +79,8 @@ export const mockProjection: CompoundInterestProjectionResponse = {
     },
   },
   scenarios: [
-    buildScenario("low", 5.8),
-    buildScenario("expected", 7.8),
-    buildScenario("high", 9.8),
+    buildScenario("low", 6),
+    buildScenario("expected", 8),
+    buildScenario("high", 10),
   ],
 };

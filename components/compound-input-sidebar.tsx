@@ -114,7 +114,7 @@ export function CompoundInputSidebar({
               {Number(recurringAmount) > 0 ? <SegmentedControl
                 label={text.timing}
                 name="recurring_contribution.timing"
-                defaultValue="end"
+                defaultValue="beginning"
                 options={contributionTimings.map((option) => ({
                   ...option,
                   label:

@@ -265,8 +265,8 @@ export function ProjectionSliderFields({
   locale: "en" | "es";
   text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];
 }) {
-  const [expectedReturn, setExpectedReturn] = useState(7.8);
-  const [returnDraft, setReturnDraft] = useState("7.8");
+  const [expectedReturn, setExpectedReturn] = useState(8);
+  const [returnDraft, setReturnDraft] = useState("8");
 
   return (
     <>
