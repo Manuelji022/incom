@@ -3,7 +3,7 @@
 import type { ComponentProps } from "react";
 
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { DecimalInput } from "@/components/ui/decimal-input";
 
 type NumericFieldProps = {
   id: string;
@@ -13,7 +13,7 @@ type NumericFieldProps = {
   description?: string;
   optional?: boolean;
   optionalLabel?: string;
-} & Omit<ComponentProps<typeof Input>, "id" | "name" | "type">;
+} & Omit<ComponentProps<typeof DecimalInput>, "id" | "name" | "type">;
 
 function NumericField({
   id,
@@ -45,13 +45,11 @@ function NumericField({
         ) : null}
       </div>
       <div className="relative">
-        <Input
+        <DecimalInput
           {...inputProps}
           id={id}
           name={name}
           aria-label={`${label} (${unit})`}
-          type="number"
-          inputMode="decimal"
           defaultValue={defaultValue}
           disabled={disabled}
           onWheel={(event) => {

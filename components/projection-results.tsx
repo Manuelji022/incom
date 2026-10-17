@@ -15,6 +15,7 @@ type SummaryText = { [Key in keyof SummaryDictionary]: string };
 
 type ProjectionResultsProps = {
   isDesktop: boolean;
+  sidebarCollapsed: boolean;
   scenarios: readonly ProjectionScenario[];
   selectedName: ProjectionScenario["name"];
   onSelectScenario: (name: ProjectionScenario["name"]) => void;
@@ -34,6 +35,7 @@ type ProjectionResultsProps = {
 
 export function ProjectionResults({
   isDesktop,
+  sidebarCollapsed,
   scenarios,
   selectedName,
   onSelectScenario,
@@ -70,6 +72,7 @@ export function ProjectionResults({
         locale={locale}
         currency={currency}
         text={text.summary}
+        sidebarCollapsed={sidebarCollapsed}
       /> : null}
       <ProjectionChart
         points={selectedScenario.annual_points}
@@ -88,6 +91,7 @@ export function ProjectionResults({
         locale={locale}
         currency={currency}
         text={text.summary}
+        sidebarCollapsed={sidebarCollapsed}
       />
         <PortfolioComposition
           point={selectedScenario.annual_points.at(-1)}

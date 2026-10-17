@@ -95,7 +95,7 @@ const dictionaries = {
     summary: {
       cardsLabel: "Final investment summary",
       initialPrincipal: "Initial principal",
-      totalContributions: "Total invested (including initial investment)",
+      totalContributions: "Total invested",
       investmentGrowth: "Investment growth",
       totalFeesPaid: "Total fees paid",
       feesPaidDescription: "Paid over the full projection",

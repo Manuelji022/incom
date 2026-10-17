@@ -3,9 +3,10 @@
 import { useState } from "react";
 
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { DecimalInput } from "@/components/ui/decimal-input";
 import { Slider } from "@/components/ui/slider";
 import { clearFieldValidation } from "@/lib/field-validation";
+import { normalizeDecimalInput } from "@/lib/decimal-input";
 
 export type SliderFieldProps = {
   optionalLabel?: string;
@@ -47,7 +48,7 @@ export function SliderField({
   initialValues,
 }: SliderFieldProps) {
   const initialDraft = initialValues?.[name] ?? String(defaultValue);
-  const parsedInitial = Number(initialDraft);
+  const parsedInitial = Number(normalizeDecimalInput(initialDraft));
   const validInitial = initialDraft !== "" && Number.isFinite(parsedInitial) && parsedInitial >= min && parsedInitial <= inputMax && isStepAligned(parsedInitial, min, step);
   const [value, setValue] = useState(validInitial ? parsedInitial : defaultValue);
   const [draft, setDraft] = useState(initialDraft);
@@ -68,11 +69,9 @@ export function SliderField({
           ) : null}
         </div>
         <div className="relative w-28 shrink-0">
-          <Input
+          <DecimalInput
             id={id}
             name={name}
-            type="number"
-            inputMode="decimal"
             value={draft}
             min={min}
             max={inputMax}
@@ -82,7 +81,7 @@ export function SliderField({
             onChange={(event) => {
               const next = event.currentTarget.value;
               setDraft(next);
-              const parsed = Number(next);
+              const parsed = Number(normalizeDecimalInput(next));
               if (
                 next !== "" &&
                 Number.isFinite(parsed) &&
@@ -161,7 +160,7 @@ export function ScenarioRangeField({
   initialValues,
 }: ScenarioRangeFieldProps) {
   const initialDraft = initialValues?.[name] ?? String(defaultSpread);
-  const parsedInitial = Number(initialDraft);
+  const parsedInitial = Number(normalizeDecimalInput(initialDraft));
   const validInitial = initialDraft !== "" && Number.isFinite(parsedInitial) && parsedInitial >= 0 && parsedInitial <= maxSpread && isStepAligned(parsedInitial, 0, step);
   const [spread, setSpread] = useState(validInitial ? parsedInitial : defaultSpread);
   const [draft, setDraft] = useState(initialDraft);
@@ -175,7 +174,7 @@ export function ScenarioRangeField({
     }).format(value / 100);
 
   const updateSpread = (draft: string) => {
-    const parsed = Number(draft);
+    const parsed = Number(normalizeDecimalInput(draft));
     if (
       draft === "" ||
       !Number.isFinite(parsed) ||
@@ -199,11 +198,9 @@ export function ScenarioRangeField({
           ) : null}
         </div>
         <div className="relative w-28 shrink-0">
-          <Input
+          <DecimalInput
             id={id}
             name={name}
-            type="number"
-            inputMode="decimal"
             aria-label={`${label} (${text.rangeAmount})`}
             min="0"
             max={maxSpread}
@@ -316,11 +313,9 @@ export function ProjectionSliderFields({
             {text.return}
           </FieldLabel>
           <div className="relative w-28 shrink-0">
-            <Input
+            <DecimalInput
               id="expected-annual-return"
               name="expected_annual_return_percent"
-              type="number"
-              inputMode="decimal"
               value={returnDraft}
               step="0.1"
               required
