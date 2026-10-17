@@ -5,6 +5,7 @@ import { ProjectionHeader } from "@/components/projection-header";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
 import type { ProjectionScenario } from "@/types/compound-interest";
+import type { Currency } from "@/lib/currency";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 type SummaryDictionary = Dictionary["summary"];
@@ -14,6 +15,7 @@ type ProjectionResultsProps = {
   selectedScenario: ProjectionScenario;
   durationYears: number;
   locale: Locale;
+  currency: Currency;
   text: {
     header: Dictionary["header"];
     chart: Dictionary["chart"];
@@ -26,6 +28,7 @@ export function ProjectionResults({
   selectedScenario,
   durationYears,
   locale,
+  currency,
   text,
 }: ProjectionResultsProps) {
   return (
@@ -35,11 +38,13 @@ export function ProjectionResults({
         durationYears={durationYears}
         text={text.header}
         locale={locale}
+        currency={currency}
       />
       <InvestmentSummaryCards
         point={selectedScenario.annual_points.at(-1)}
         cumulativeFeesPaid={selectedScenario.final_summary.cumulative_fees_paid}
         locale={locale}
+        currency={currency}
         text={text.summary}
       />
       <ProjectionChart
@@ -50,6 +55,7 @@ export function ProjectionResults({
           aria: text.chart.aria.replace("{scenario}", text.scenarioLabel),
         }}
         locale={locale}
+        currency={currency}
       />
       <InvestmentSummary
         points={selectedScenario.annual_points}
@@ -62,6 +68,7 @@ export function ProjectionResults({
           ),
         }}
         locale={locale}
+        currency={currency}
       />
     </section>
   );

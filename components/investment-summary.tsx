@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ProjectionPoint } from "@/types/compound-interest";
+import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 
 import type { Locale } from "@/lib/locales";
@@ -12,6 +13,7 @@ type SummaryText = { [Key in keyof SummaryDictionary]: string };
 type InvestmentSummaryProps = {
   points: readonly ProjectionPoint[];
   locale: Locale;
+  currency: Currency;
   text: SummaryText;
 };
 
@@ -28,11 +30,10 @@ function getCheckpointPoints(points: readonly ProjectionPoint[]) {
 export function InvestmentSummary({
   points,
   locale,
+  currency,
   text,
 }: InvestmentSummaryProps) {
-  const euro = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
-    style: "currency",
-    currency: "EUR",
+  const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
   const [showAllYears, setShowAllYears] = useState(false);
@@ -146,22 +147,22 @@ export function InvestmentSummary({
                     {point.year}
                   </th>
                   <td className="whitespace-nowrap px-4 py-3 text-end font-semibold tabular-nums text-primary-foreground">
-                    {euro.format(Number(point.nominal_balance))}
+                    {formatter.format(Number(point.nominal_balance))}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3 text-end tabular-nums text-secondary-foreground">
-                    {euro.format(
+                    {formatter.format(
                       Number(point.initial_principal) +
                         Number(point.cumulative_contributions),
                     )}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3 text-end tabular-nums text-secondary-foreground">
-                    {euro.format(Number(point.cumulative_investment_growth))}
+                    {formatter.format(Number(point.cumulative_investment_growth))}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3 text-end tabular-nums text-secondary-foreground">
-                    {euro.format(Number(point.cumulative_fees_paid))}
+                    {formatter.format(Number(point.cumulative_fees_paid))}
                   </td>
                   <td className="whitespace-nowrap py-3 ps-3 text-end tabular-nums text-secondary-foreground">
-                    {euro.format(Number(point.inflation_adjusted_balance))}
+                    {formatter.format(Number(point.inflation_adjusted_balance))}
                   </td>
                 </tr>
               );

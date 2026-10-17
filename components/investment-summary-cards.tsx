@@ -1,5 +1,6 @@
 import type { Locale } from "@/lib/locales";
 import type { ProjectionPoint } from "@/types/compound-interest";
+import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 
 type SummaryText = {
   cardsLabel: string;
@@ -17,15 +18,14 @@ type InvestmentSummaryCardsProps = {
   point: ProjectionPoint | undefined;
   cumulativeFeesPaid: string;
   locale: Locale;
+  currency: Currency;
   text: SummaryText;
 };
 
-export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, text }: InvestmentSummaryCardsProps) {
+export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, currency, text }: InvestmentSummaryCardsProps) {
   if (!point) return null;
 
-  const euro = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
-    style: "currency",
-    currency: "EUR",
+  const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
   const percent = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
@@ -41,26 +41,26 @@ export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, text
   const cards = [
     {
       label: text.initialPrincipal,
-      value: euro.format(Number(point.initial_principal)),
+      value: formatter.format(Number(point.initial_principal)),
       detail: formatShare(Number(point.initial_principal)),
     },
     {
       label: text.totalContributions,
-      value: euro.format(Number(point.initial_principal) + Number(point.cumulative_contributions)),
+      value: formatter.format(Number(point.initial_principal) + Number(point.cumulative_contributions)),
       detail: formatShare(Number(point.initial_principal) + Number(point.cumulative_contributions)),
     },
     {
       label: text.investmentGrowth,
-      value: euro.format(Number(point.cumulative_investment_growth)),
+      value: formatter.format(Number(point.cumulative_investment_growth)),
       detail: formatShare(Number(point.cumulative_investment_growth)),
     },
     {
       label: text.totalFeesPaid,
-      value: euro.format(Number(cumulativeFeesPaid)),
+      value: formatter.format(Number(cumulativeFeesPaid)),
     },
     {
       label: text.finalValue,
-      value: euro.format(Number(point.inflation_adjusted_balance)),
+      value: formatter.format(Number(point.inflation_adjusted_balance)),
     },
   ];
 

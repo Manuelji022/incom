@@ -6,6 +6,7 @@ import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { tooltip } from "@tanstack/charts/tooltip";
 import type { ProjectionPoint } from "@/types/compound-interest";
+import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 
 type ProjectionChartRow = {
   year: number;
@@ -29,6 +30,7 @@ type ChartText = {
 type ProjectionChartCanvasProps = {
   points: readonly ProjectionPoint[];
   locale: Locale;
+  currency: Currency;
   text: ChartText;
 };
 
@@ -49,27 +51,19 @@ function formatTooltip(
 export function ProjectionChartCanvas({
   points,
   locale,
+  currency,
   text,
 }: ProjectionChartCanvasProps) {
-  const currencyLocale = locale === "es" ? "es-ES" : "en-IE";
   const compactEuro = useMemo(
-    () =>
-      new Intl.NumberFormat(currencyLocale, {
-        style: "currency",
-        currency: "EUR",
-        notation: "compact",
-        maximumFractionDigits: 1,
-      }),
-    [currencyLocale],
+    () => getCurrencyFormatter(locale, currency, {
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }),
+    [locale, currency],
   );
   const fullEuro = useMemo(
-    () =>
-      new Intl.NumberFormat(currencyLocale, {
-        style: "currency",
-        currency: "EUR",
-        maximumFractionDigits: 0,
-      }),
-    [currencyLocale],
+    () => getCurrencyFormatter(locale, currency, { maximumFractionDigits: 0 }),
+    [locale, currency],
   );
   const rows = useMemo(
     () =>

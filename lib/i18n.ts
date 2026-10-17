@@ -46,6 +46,7 @@ const dictionaries = {
       monthly: "Monthly",
       quarterly: "Quarterly",
       annual: "Annual",
+      currency: "Display currency",
     },
     header: {
       portfolio: "Portfolio value",
@@ -172,6 +173,7 @@ const dictionaries = {
       monthly: "Mensual",
       quarterly: "Trimestral",
       annual: "Anual",
+      currency: "Moneda de visualización",
     },
     header: {
       portfolio: "Valor de la cartera",
