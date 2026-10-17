@@ -15,6 +15,7 @@ export type SliderFieldProps = {
   defaultValue: number;
   min: number;
   max: number;
+  inputMax?: number;
   step: number;
   description?: string;
   valueText?: (value: number) => string;
@@ -35,6 +36,7 @@ export function SliderField({
   defaultValue,
   min,
   max,
+  inputMax = max,
   step,
   description,
   valueText,
@@ -67,7 +69,7 @@ export function SliderField({
             inputMode="decimal"
             value={draft}
             min={min}
-            max={max}
+            max={inputMax}
             step={step}
             required
             aria-describedby={descriptionId}
@@ -79,7 +81,7 @@ export function SliderField({
                 next !== "" &&
                 Number.isFinite(parsed) &&
                 parsed >= min &&
-                parsed <= max &&
+                parsed <= inputMax &&
                 isStepAligned(parsed, min, step)
               )
                 setValue(parsed);
@@ -263,8 +265,8 @@ export function ProjectionSliderFields({
   locale: "en" | "es";
   text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];
 }) {
-  const [expectedReturn, setExpectedReturn] = useState(7.8);
-  const [returnDraft, setReturnDraft] = useState("7.8");
+  const [expectedReturn, setExpectedReturn] = useState(8);
+  const [returnDraft, setReturnDraft] = useState("8");
 
   return (
     <>
@@ -275,7 +277,8 @@ export function ProjectionSliderFields({
         unit={text.years}
         defaultValue={25}
         min={1}
-        max={100}
+        max={50}
+        inputMax={100}
         step={1}
         valueText={(value) =>
           new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
