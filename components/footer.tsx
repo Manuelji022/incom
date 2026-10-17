@@ -6,6 +6,8 @@ export function Footer({ label }: { label: string }) {
         <a
           className="rounded-xs underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-border-focus"
           href="https://manuelji.dev/"
+          target="_blank"
+          rel="noreferrer"
         >
           Manuelji
         </a>
