@@ -38,6 +38,7 @@ export function ProjectionResults({
       />
       <InvestmentSummaryCards
         point={selectedScenario.annual_points.at(-1)}
+        cumulativeFeesPaid={selectedScenario.final_summary.cumulative_fees_paid}
         locale={locale}
         text={text.summary}
       />

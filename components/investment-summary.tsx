@@ -119,6 +119,9 @@ export function InvestmentSummary({
               <th className="px-3 py-2 text-end font-medium" scope="col">
                 {text.growth}
               </th>
+              <th className="px-3 py-2 text-end font-medium" scope="col">
+                {text.fees}
+              </th>
               <th className="py-2 ps-3 text-end font-medium" scope="col">
                 {text.real}
               </th>
@@ -153,6 +156,9 @@ export function InvestmentSummary({
                   </td>
                   <td className="whitespace-nowrap px-3 py-3 text-end tabular-nums text-secondary-foreground">
                     {euro.format(Number(point.cumulative_investment_growth))}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3 text-end tabular-nums text-secondary-foreground">
+                    {euro.format(Number(point.cumulative_fees_paid))}
                   </td>
                   <td className="whitespace-nowrap py-3 ps-3 text-end tabular-nums text-secondary-foreground">
                     {euro.format(Number(point.inflation_adjusted_balance))}

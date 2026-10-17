@@ -6,6 +6,8 @@ type SummaryText = {
   initialPrincipal: string;
   totalContributions: string;
   investmentGrowth: string;
+  totalFeesPaid: string;
+  feesPaidDescription: string;
   finalValue: string;
   shareOfFinalValue: string;
   realTerms: string;
@@ -13,11 +15,12 @@ type SummaryText = {
 
 type InvestmentSummaryCardsProps = {
   point: ProjectionPoint | undefined;
+  cumulativeFeesPaid: string;
   locale: Locale;
   text: SummaryText;
 };
 
-export function InvestmentSummaryCards({ point, locale, text }: InvestmentSummaryCardsProps) {
+export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, text }: InvestmentSummaryCardsProps) {
   if (!point) return null;
 
   const euro = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
@@ -52,6 +55,10 @@ export function InvestmentSummaryCards({ point, locale, text }: InvestmentSummar
       detail: formatShare(Number(point.cumulative_investment_growth)),
     },
     {
+      label: text.totalFeesPaid,
+      value: euro.format(Number(cumulativeFeesPaid)),
+    },
+    {
       label: text.finalValue,
       value: euro.format(Number(point.inflation_adjusted_balance)),
     },
@@ -60,7 +67,7 @@ export function InvestmentSummaryCards({ point, locale, text }: InvestmentSummar
   return (
     <dl
       aria-label={text.cardsLabel}
-      className="grid grid-cols-2 border border-border-subtle bg-page sm:grid-cols-4"
+      className="grid grid-cols-2 border border-border-subtle bg-page sm:grid-cols-5"
     >
       {cards.map((card) => (
         <div key={card.label} className="flex min-w-0 flex-col gap-1 px-3 py-4.5">

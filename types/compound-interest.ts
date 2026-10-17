@@ -25,13 +25,14 @@ export type ProjectionPoint = {
   initial_principal: string;
   cumulative_contributions: string;
   cumulative_investment_growth: string;
+  cumulative_fees_paid: string;
   inflation_adjusted_balance: string;
 };
 
 export type ProjectionScenario = {
   name: "low" | "expected" | "high";
   annual_return_percent: string;
-  final_summary: Pick<ProjectionPoint, "nominal_balance" | "inflation_adjusted_balance">;
+  final_summary: Pick<ProjectionPoint, "nominal_balance" | "inflation_adjusted_balance" | "cumulative_fees_paid">;
   annual_points: ProjectionPoint[];
 };
 

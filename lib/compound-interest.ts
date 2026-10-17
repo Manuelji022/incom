@@ -21,13 +21,14 @@ function isMoney(value: unknown): value is string {
 function parsePoint(value: unknown): ProjectionPoint | null {
   if (!isRecord(value)) return null;
   const { year, nominal_balance, initial_principal, cumulative_contributions,
-    cumulative_investment_growth, inflation_adjusted_balance } = value;
+    cumulative_investment_growth, cumulative_fees_paid, inflation_adjusted_balance } = value;
   if (typeof year !== "number" || !Number.isInteger(year) ||
       !isMoney(nominal_balance) || !isMoney(initial_principal) ||
       !isMoney(cumulative_contributions) || !isMoney(cumulative_investment_growth) ||
+      !isMoney(cumulative_fees_paid) ||
       !isMoney(inflation_adjusted_balance)) return null;
   return { year, nominal_balance, initial_principal, cumulative_contributions,
-    cumulative_investment_growth, inflation_adjusted_balance };
+    cumulative_investment_growth, cumulative_fees_paid, inflation_adjusted_balance };
 }
 
 function parseScenario(value: unknown): ProjectionScenario | null {
@@ -37,12 +38,14 @@ function parseScenario(value: unknown): ProjectionScenario | null {
   const points = value.annual_points.map(parsePoint);
   if (points.some((point) => point === null) || !isMoney(value.annual_return_percent) ||
       !isMoney(value.final_summary.nominal_balance) ||
+      !isMoney(value.final_summary.cumulative_fees_paid) ||
       !isMoney(value.final_summary.inflation_adjusted_balance)) return null;
   return {
     name,
     annual_return_percent: value.annual_return_percent,
     final_summary: {
       nominal_balance: value.final_summary.nominal_balance,
+      cumulative_fees_paid: value.final_summary.cumulative_fees_paid,
       inflation_adjusted_balance: value.final_summary.inflation_adjusted_balance,
     },
     annual_points: points.filter((point): point is ProjectionPoint => point !== null),
