@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/select";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { ProjectionSliderFields, ScenarioRangeField } from "@/components/slider-fields";
 import { getCurrencyFormatter, currencies, getCurrencySymbol, isCurrency, type Currency } from "@/lib/currency";
+import { normalizeDecimalInput } from "@/lib/decimal-input";
 import type {
   ContributionFrequency,
   ContributionTiming,
@@ -69,10 +70,11 @@ export function CompoundInputSidebar({
   });
   const format = getCurrencyFormatter(locale, currency, { maximumFractionDigits: 0 });
   const number = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", { maximumFractionDigits: 2 });
+  const parsed = (value: string) => Number(normalizeDecimalInput(value));
   const frequencyLabel = summaryValues.frequency === "annual" ? text.annual : summaryValues.frequency === "quarterly" ? text.quarterly : text.monthly;
-  const contributionSummary = Number(summaryValues.recurring) > 0 ? ` · ${format.format(Number(summaryValues.recurring))} ${frequencyLabel.toLocaleLowerCase(locale)}` : "";
-  const summary = `${format.format(Number(summaryValues.principal))}${contributionSummary} · ${summaryValues.years} ${text.years} · ${number.format(Number(summaryValues.expectedReturn))}%`;
-  const advancedSummary = `${text.fee} ${number.format(Number(summaryValues.fee))}% · ${text.inflation} ${number.format(Number(summaryValues.inflation || "2"))}% · ±${number.format(Number(summaryValues.range || "2"))} pp`;
+  const contributionSummary = parsed(summaryValues.recurring) > 0 ? ` · ${format.format(parsed(summaryValues.recurring))} ${frequencyLabel.toLocaleLowerCase(locale)}` : "";
+  const summary = `${format.format(parsed(summaryValues.principal))}${contributionSummary} · ${summaryValues.years} ${text.years} · ${number.format(parsed(summaryValues.expectedReturn))}%`;
+  const advancedSummary = `${text.fee} ${number.format(parsed(summaryValues.fee))}% · ${text.inflation} ${number.format(parsed(summaryValues.inflation || "2"))}% · ±${number.format(parsed(summaryValues.range || "2"))} pp`;
   const toggleLabel = locale === "es"
     ? (collapsed ? "Abrir supuestos" : "Cerrar supuestos")
     : (collapsed ? "Open assumptions" : "Close assumptions");
@@ -180,7 +182,7 @@ export function CompoundInputSidebar({
                 optionalLabel={text.optional}
               />
 
-              {Number(recurringAmount) > 0 ? <SegmentedControl
+              {parsed(recurringAmount) > 0 ? <SegmentedControl
                 label={text.frequency}
                 name="recurring_contribution.frequency"
                 defaultValue={initialValues?.["recurring_contribution.frequency"] ?? "monthly"}
@@ -227,7 +229,7 @@ export function CompoundInputSidebar({
             <p className="mt-1 text-xs leading-5 text-secondary-foreground lg:hidden">{advancedSummary}</p>
             <div id="advanced-assumption-fields" className={`${advancedOpen ? "" : "hidden"} space-y-6 pt-5 lg:block lg:pt-0`}>
               <FieldGroup className="gap-4">
-              {Number(recurringAmount) > 0 ? <SegmentedControl
+              {parsed(recurringAmount) > 0 ? <SegmentedControl
                 label={text.timing}
                 name="recurring_contribution.timing"
                 defaultValue={initialValues?.["recurring_contribution.timing"] ?? "beginning"}
@@ -254,7 +256,7 @@ export function CompoundInputSidebar({
                 id="scenario-range"
                 name="scenario_range_percentage_points"
                 label={text.range}
-                expectedReturn={Number(summaryValues.expectedReturn)}
+                expectedReturn={parsed(summaryValues.expectedReturn)}
                 text={text}
                 locale={locale}
                 initialValues={initialValues}

@@ -12,6 +12,7 @@ import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
 import type { CompoundInterestProjectionInput, CompoundInterestProjectionResponse, ProjectionScenario } from "@/types/compound-interest";
 import { clearFieldValidation } from "@/lib/field-validation";
+import { isValidDecimalInput, normalizeDecimalInput } from "@/lib/decimal-input";
 import { consumeProjectionSession, saveProjectionSession } from "@/lib/projection-session";
 
 type Dictionary = ReturnType<typeof getDictionary>;
@@ -75,27 +76,24 @@ function InsightsSkeleton() {
 function inputFromForm(form: HTMLFormElement): CompoundInterestProjectionInput {
   const values = new FormData(form);
   const get = (name: string) => String(values.get(name) ?? "").trim();
+  const decimal = (name: string) => normalizeDecimalInput(get(name));
   const amount = get("recurring_contribution.amount");
   const frequency = get("recurring_contribution.frequency");
   const timing = get("recurring_contribution.timing");
-  const optional = (name: string) => {
-    const value = get(name);
-    return value === "" ? undefined : value;
-  };
   const input: CompoundInterestProjectionInput = {
-    initial_principal: get("initial_principal"),
-    duration_years: Number(get("duration_years")),
-    expected_annual_return_percent: get("expected_annual_return_percent"),
-    ...(optional("annual_fee_percent") === undefined ? {} : { annual_fee_percent: optional("annual_fee_percent") }),
-    ...(optional("expected_annual_inflation_percent") === undefined ? {} : { expected_annual_inflation_percent: optional("expected_annual_inflation_percent") }),
-    ...(optional("scenario_range_percentage_points") === undefined ? {} : { scenario_range_percentage_points: optional("scenario_range_percentage_points") }),
+    initial_principal: decimal("initial_principal"),
+    duration_years: Number(decimal("duration_years")),
+    expected_annual_return_percent: decimal("expected_annual_return_percent"),
+    ...(decimal("annual_fee_percent") === "" ? {} : { annual_fee_percent: decimal("annual_fee_percent") }),
+    ...(decimal("expected_annual_inflation_percent") === "" ? {} : { expected_annual_inflation_percent: decimal("expected_annual_inflation_percent") }),
+    ...(decimal("scenario_range_percentage_points") === "" ? {} : { scenario_range_percentage_points: decimal("scenario_range_percentage_points") }),
   };
-  if (amount !== "" && Number(amount) > 0) {
+  if (amount !== "" && Number(normalizeDecimalInput(amount)) > 0) {
     input.recurring_contribution = {
-      amount,
+      amount: normalizeDecimalInput(amount),
       frequency: frequency === "quarterly" || frequency === "annual" ? frequency : "monthly",
       timing: timing === "beginning" ? "beginning" : "end",
-      ...(optional("recurring_contribution.annual_increase_percent") === undefined ? {} : { annual_increase_percent: optional("recurring_contribution.annual_increase_percent") }),
+      ...(decimal("recurring_contribution.annual_increase_percent") === "" ? {} : { annual_increase_percent: decimal("recurring_contribution.annual_increase_percent") }),
     };
   }
   return input;
@@ -172,12 +170,33 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
     event.preventDefault();
     if (submitting) return;
     const form = event.currentTarget;
+    const decimalFields = Array.from(form.elements).filter(
+      (element): element is HTMLInputElement => element instanceof HTMLInputElement && element.inputMode === "decimal",
+    );
+    for (const field of decimalFields) {
+      const raw = field.value.trim();
+      const value = normalizeDecimalInput(raw);
+      const numeric = Number(value);
+      const min = field.min === "" ? undefined : Number(field.min);
+      const max = field.max === "" ? undefined : Number(field.max);
+      const step = field.step === "" || field.step === "any" ? undefined : Number(field.step);
+      let invalid = !isValidDecimalInput(raw) || (raw !== "" && !Number.isFinite(numeric));
+      if (raw === "" && field.required) invalid = true;
+      if (!invalid && raw !== "" && min !== undefined && numeric < min) invalid = true;
+      if (!invalid && raw !== "" && max !== undefined && numeric > max) invalid = true;
+      if (!invalid && raw !== "" && step !== undefined && Math.abs((numeric - (min ?? 0)) / step - Math.round((numeric - (min ?? 0)) / step)) > 1e-8) invalid = true;
+      field.setCustomValidity(invalid
+        ? (locale === "es" ? "Introduce un número válido dentro del rango permitido." : "Enter a valid number within the allowed range.")
+        : "");
+    }
     const amount = form.elements.namedItem("recurring_contribution.amount");
     const principal = form.elements.namedItem("initial_principal");
-    if (amount instanceof HTMLInputElement && principal instanceof HTMLInputElement) {
-      principal.setCustomValidity((amount.value.trim() === "" || Number(amount.value) <= 0) && Number(principal.value) <= 0
+    if (amount instanceof HTMLInputElement && principal instanceof HTMLInputElement && amount.validity.valid && principal.validity.valid) {
+      const priorError = principal.validationMessage;
+      const missingPrincipal = (amount.value.trim() === "" || Number(normalizeDecimalInput(amount.value)) <= 0) && Number(normalizeDecimalInput(principal.value)) <= 0;
+      principal.setCustomValidity(missingPrincipal
         ? (locale === "es" ? "La inversión inicial debe ser mayor que cero si no hay aportaciones." : "Initial investment must be greater than zero when there are no contributions.")
-        : "");
+        : priorError);
     }
     if (!form.checkValidity()) {
       const invalid = Array.from(form.elements).filter((element): element is HTMLInputElement => element instanceof HTMLInputElement && !element.validity.valid);
