@@ -39,17 +39,25 @@ export function LanguageSwitcher({ locale, label }: LanguageSwitcherProps) {
   }
 
   return (
-    <label className="flex items-center gap-2 text-sm text-secondary-foreground">
+    <label className="relative flex items-center gap-2 text-sm text-secondary-foreground">
       <span className="sr-only sm:not-sr-only">{label}</span>
       <select
         aria-label={label}
         value={locale}
         onChange={(event) => handleChange(event.currentTarget.value)}
-        className="min-h-10 rounded border border-control-border bg-container px-2 py-1 text-base text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"
+        className="min-h-10 appearance-none rounded border border-control-border bg-container py-1 pr-9 pl-2 text-base text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"
       >
         <option value="en">English</option>
         <option value="es">Español</option>
       </select>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 20 20"
+        fill="none"
+        className="pointer-events-none absolute right-3 size-4 text-secondary-foreground"
+      >
+        <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </label>
   );
 }
