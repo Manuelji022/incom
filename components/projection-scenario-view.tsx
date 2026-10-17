@@ -244,6 +244,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
           <RequestGate promise={pendingPromise} />
           {selectedScenario ? <ProjectionResults
             isDesktop={isDesktop}
+            sidebarCollapsed={sidebarCollapsed}
             scenarios={projection.scenarios}
             selectedName={selectedName}
             onSelectScenario={setSelectedName}
