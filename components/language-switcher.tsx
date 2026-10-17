@@ -58,14 +58,10 @@ export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submit
         <option value="en">English</option>
         <option value="es">Español</option>
       </select>
-      <svg
+      <span
         aria-hidden="true"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="pointer-events-none absolute end-2 sm:end-3 size-4 text-secondary-foreground"
-      >
-        <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+        className="pointer-events-none absolute end-2 top-1/2 size-4 -translate-y-1/2 bg-current text-secondary-foreground [mask-image:url('/assets/svgs/chevron-down.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] sm:end-3"
+      />
       {handoffError === "storage" || (handoffError === "pending" && submitting) ? <span role="alert" className="absolute end-0 top-full z-30 mt-1 w-64 rounded border border-danger-border-default bg-container p-2 text-xs text-danger-foreground">{handoffError === "pending" ? (locale === "es" ? "Espera a que termine el cálculo antes de cambiar el idioma." : "Wait for the calculation to finish before changing language.") : (locale === "es" ? "No se pudieron conservar los cambios. Inténtalo de nuevo." : "Your changes could not be saved. Please try again.")}</span> : null}
     </div>
   );
