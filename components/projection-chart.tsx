@@ -2,11 +2,13 @@
 
 import dynamic from "next/dynamic";
 import type { ProjectionPoint } from "@/types/compound-interest";
+import type { Currency } from "@/lib/currency";
 
 import type { Locale } from "@/lib/locales";
 type ProjectionChartProps = {
   points: readonly ProjectionPoint[];
   locale: Locale;
+  currency: Currency;
   text: {
     none: string;
     title: string;
@@ -46,6 +48,7 @@ const ProjectionChartCanvas = dynamic(
 export function ProjectionChart({
   points,
   locale,
+  currency,
   text,
 }: ProjectionChartProps) {
   if (points.length === 0) {
@@ -69,7 +72,7 @@ export function ProjectionChart({
           {text.scenario}
         </span>
       </div>
-      <ProjectionChartCanvas points={points} locale={locale} text={text} />
+      <ProjectionChartCanvas points={points} locale={locale} currency={currency} text={text} />
       <ul
         aria-label={text.legend}
         className="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-secondary-foreground"

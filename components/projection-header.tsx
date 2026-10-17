@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/locales";
+import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 
 type ProjectionHeaderText = {
   portfolio: string;
@@ -10,6 +11,7 @@ type ProjectionHeaderProps = {
   nominalBalance?: string;
   durationYears?: number;
   locale: Locale;
+  currency: Currency;
   text: ProjectionHeaderText;
 };
 
@@ -17,14 +19,13 @@ export function ProjectionHeader({
   nominalBalance,
   durationYears = 25,
   locale,
+  currency,
   text,
 }: ProjectionHeaderProps) {
-  const formattingLocale = locale === "es" ? "es-ES" : "en-IE";
-  const euro = new Intl.NumberFormat(formattingLocale, {
-    style: "currency",
-    currency: "EUR",
+  const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
+  const formattingLocale = locale === "es" ? "es-ES" : "en-IE";
   const duration = new Intl.NumberFormat(formattingLocale, {
     style: "unit",
     unit: "year",
@@ -45,7 +46,7 @@ export function ProjectionHeader({
           </h2>
           <p className="mt-1 whitespace-normal [overflow-wrap:anywhere] text-[clamp(3rem,12cqi,5.5rem)] leading-none font-semibold tracking-[-0.06em] tabular-nums text-primary-foreground">
             {nominalBalance
-              ? euro.format(Number(nominalBalance))
+              ? formatter.format(Number(nominalBalance))
               : text.unavailable}
           </p>
           <p className="mt-2 text-sm leading-5 text-secondary-foreground">

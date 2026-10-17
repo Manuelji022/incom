@@ -3,6 +3,7 @@ import { Scenarios } from "@/components/scenarios";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
 import type { ProjectionScenario } from "@/types/compound-interest";
+import type { Currency } from "@/lib/currency";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 type CompositionDictionary = Dictionary["composition"];
@@ -14,6 +15,7 @@ type InsightsSidebarProps = {
   onSelectScenario: (scenario: ProjectionScenario["name"]) => void;
   durationYears: number;
   locale: Locale;
+  currency: Currency;
   text: {
     scenarios: Dictionary["scenarios"];
     composition: CompositionText;
@@ -26,6 +28,7 @@ export function InsightsSidebar({
   onSelectScenario,
   durationYears,
   locale,
+  currency,
   text,
 }: InsightsSidebarProps) {
   const selectedProjection = scenarios.find(
@@ -39,6 +42,7 @@ export function InsightsSidebar({
         durationYears={durationYears}
         scenarios={scenarios}
         locale={locale}
+        currency={currency}
         text={text.scenarios}
         selectedScenario={selectedScenario}
         onSelectScenario={onSelectScenario}
@@ -46,6 +50,7 @@ export function InsightsSidebar({
       <PortfolioComposition
         point={selectedProjection?.annual_points.at(-1)}
         locale={locale}
+        currency={currency}
         text={{
           ...text.composition,
           subtitle: text.composition.subtitle.replace(

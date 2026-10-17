@@ -5,8 +5,10 @@ import { useState, type ComponentProps } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { NumericField } from "@/components/ui/numeric-field";
+import { Select } from "@/components/ui/select";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { ProjectionSliderFields } from "@/components/slider-fields";
+import { currencies, getCurrencySymbol, isCurrency, type Currency } from "@/lib/currency";
 import type {
   ContributionFrequency,
   ContributionTiming,
@@ -19,6 +21,8 @@ type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className"> & {
   calculatingLabel: string;
   collapsed: boolean;
   onToggleCollapsed: () => void;
+  currency: Currency;
+  onCurrencyChange: (currency: Currency) => void;
 };
 
 const contributionFrequencies: {
@@ -43,6 +47,8 @@ export function CompoundInputSidebar({
   calculatingLabel,
   collapsed,
   onToggleCollapsed,
+  currency,
+  onCurrencyChange,
 }: CompoundInputSidebarProps) {
   const [recurringAmount, setRecurringAmount] = useState("1000");
   const toggleLabel = locale === "es"
@@ -95,11 +101,30 @@ export function CompoundInputSidebar({
               {text.contributions}
             </h3>
             <FieldGroup className="gap-4">
+              <div className="flex flex-col gap-2.5">
+                <label htmlFor="display-currency" className="text-sm font-medium leading-5 text-primary-foreground">
+                  {text.currency}
+                </label>
+                <Select
+                  id="display-currency"
+                  value={currency}
+                  onChange={(event) => {
+                    const value = event.currentTarget.value;
+                    if (isCurrency(value)) onCurrencyChange(value);
+                  }}
+                >
+                  {currencies.map((option) => (
+                    <option key={option} value={option}>
+                      {option} ({getCurrencySymbol(option)})
+                    </option>
+                  ))}
+                </Select>
+              </div>
               <NumericField
                 id="initial-principal"
                 name="initial_principal"
                 label={text.initial}
-                unit="€"
+                unit={getCurrencySymbol(currency)}
                 defaultValue="40000"
                 min="0"
                 step="0.01"
@@ -111,7 +136,7 @@ export function CompoundInputSidebar({
                 id="recurring-contribution-amount"
                 name="recurring_contribution.amount"
                 label={text.recurring}
-                unit="€"
+                unit={getCurrencySymbol(currency)}
                 defaultValue="1000"
                 min="0"
                 step="0.01"

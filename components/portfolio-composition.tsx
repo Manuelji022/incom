@@ -1,5 +1,6 @@
 import type { ProjectionPoint } from "@/types/compound-interest";
 import type { Locale } from "@/lib/locales";
+import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 
 type CompositionDictionary = ReturnType<typeof import("@/lib/i18n").getDictionary>["composition"];
 type CompositionText = { [Key in keyof CompositionDictionary]: string };
@@ -7,16 +8,15 @@ type CompositionText = { [Key in keyof CompositionDictionary]: string };
 type PortfolioCompositionProps = {
   point?: ProjectionPoint;
   locale: Locale;
+  currency: Currency;
   text: CompositionText;
 };
 
-export function PortfolioComposition({ point, locale, text }: PortfolioCompositionProps) {
+export function PortfolioComposition({ point, locale, currency, text }: PortfolioCompositionProps) {
   if (!point) return null;
 
   const formattingLocale = locale === "es" ? "es-ES" : "en-IE";
-  const euro = new Intl.NumberFormat(formattingLocale, {
-    style: "currency",
-    currency: "EUR",
+  const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
   const percent = new Intl.NumberFormat(formattingLocale, {
@@ -31,8 +31,8 @@ export function PortfolioComposition({ point, locale, text }: PortfolioCompositi
   const total = Number(point.nominal_balance);
   const contributions = Number(point.initial_principal) + Number(point.cumulative_contributions);
   const growth = Number(point.cumulative_investment_growth);
-  const formattedContributions = euro.format(contributions);
-  const formattedGrowth = euro.format(growth);
+  const formattedContributions = formatter.format(contributions);
+  const formattedGrowth = formatter.format(growth);
   const compositionTotal = Math.max(0, contributions) + Math.max(0, growth);
   const hasLoss = growth < 0;
   const contributionWidth = compositionTotal > 0

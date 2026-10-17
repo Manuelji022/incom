@@ -1,5 +1,6 @@
 import type { Locale } from "@/lib/locales";
 import type { ProjectionScenario } from "@/types/compound-interest";
+import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 
 type ScenarioText = ReturnType<
   typeof import("@/lib/i18n").getDictionary
@@ -9,6 +10,7 @@ type ScenariosProps = {
   durationYears: number;
   scenarios: readonly ProjectionScenario[];
   locale: Locale;
+  currency: Currency;
   text: ScenarioText;
   selectedScenario: ProjectionScenario["name"];
   onSelectScenario: (scenario: ProjectionScenario["name"]) => void;
@@ -18,14 +20,13 @@ export function Scenarios({
   durationYears,
   scenarios,
   locale,
+  currency,
   text,
   selectedScenario,
   onSelectScenario,
 }: ScenariosProps) {
   const formattingLocale = locale === "es" ? "es-ES" : "en-IE";
-  const euro = new Intl.NumberFormat(formattingLocale, {
-    style: "currency",
-    currency: "EUR",
+  const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
   const percent = new Intl.NumberFormat(formattingLocale, {
@@ -69,10 +70,10 @@ export function Scenarios({
               const annualReturn = percent.format(
                 Number(scenario.annual_return_percent) / 100,
               );
-              const nominalBalance = euro.format(
+              const nominalBalance = formatter.format(
                 Number(scenario.final_summary.nominal_balance),
               );
-              const realBalance = euro.format(
+              const realBalance = formatter.format(
                 Number(scenario.final_summary.inflation_adjusted_balance),
               );
 
