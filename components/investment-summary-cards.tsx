@@ -53,11 +53,7 @@ export function InvestmentSummaryCards({ point, locale, text }: InvestmentSummar
     },
     {
       label: text.finalValue,
-      value: euro.format(finalValue),
-      detail: text.realTerms.replace(
-        "{amount}",
-        euro.format(Number(point.inflation_adjusted_balance)),
-      ),
+      value: euro.format(Number(point.inflation_adjusted_balance)),
     },
   ];
 
@@ -67,14 +63,16 @@ export function InvestmentSummaryCards({ point, locale, text }: InvestmentSummar
       className="grid grid-cols-2 border border-border-subtle bg-page sm:grid-cols-4"
     >
       {cards.map((card) => (
-        <div key={card.label} className="flex min-w-0 flex-col gap-2.5 px-3 py-4.5">
-          <dt className="text-xs leading-[18px] text-secondary-foreground">{card.label}</dt>
+        <div key={card.label} className="flex min-w-0 flex-col gap-1 px-3 py-4.5">
+          <dt className="min-h-5 text-xs leading-[18px] text-secondary-foreground">{card.label}</dt>
           <dd className="[overflow-wrap:anywhere] text-xl font-semibold leading-7 tracking-[-0.025em] tabular-nums text-primary-foreground">
             {card.value}
           </dd>
-          <dd className="[overflow-wrap:anywhere] text-xs leading-[17px] text-secondary-foreground">
-            {card.detail}
-          </dd>
+          {card.detail ? (
+            <dd className="[overflow-wrap:anywhere] text-xs leading-[17px] text-secondary-foreground">
+              {card.detail}
+            </dd>
+          ) : null}
         </div>
       ))}
     </dl>

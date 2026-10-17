@@ -13,7 +13,6 @@ type SummaryText = { [Key in keyof SummaryDictionary]: string };
 type ProjectionResultsProps = {
   selectedScenario: ProjectionScenario;
   durationYears: number;
-  inflationPercent: string;
   locale: Locale;
   text: {
     header: Dictionary["header"];
@@ -26,7 +25,6 @@ type ProjectionResultsProps = {
 export function ProjectionResults({
   selectedScenario,
   durationYears,
-  inflationPercent,
   locale,
   text,
 }: ProjectionResultsProps) {
@@ -34,11 +32,14 @@ export function ProjectionResults({
     <section className="min-w-0 border-r border-border-subtle bg-page">
       <ProjectionHeader
         nominalBalance={selectedScenario.final_summary.nominal_balance}
-        realBalance={selectedScenario.final_summary.inflation_adjusted_balance}
         durationYears={durationYears}
-        inflationPercent={inflationPercent}
         text={text.header}
         locale={locale}
+      />
+      <InvestmentSummaryCards
+        point={selectedScenario.annual_points.at(-1)}
+        locale={locale}
+        text={text.summary}
       />
       <ProjectionChart
         points={selectedScenario.annual_points}
@@ -48,11 +49,6 @@ export function ProjectionResults({
           aria: text.chart.aria.replace("{scenario}", text.scenarioLabel),
         }}
         locale={locale}
-      />
-      <InvestmentSummaryCards
-        point={selectedScenario.annual_points.at(-1)}
-        locale={locale}
-        text={text.summary}
       />
       <InvestmentSummary
         points={selectedScenario.annual_points}
