@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
 
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
@@ -38,6 +38,8 @@ export function CompoundInputSidebar({
   submitting,
   calculatingLabel,
 }: CompoundInputSidebarProps) {
+  const [recurringAmount, setRecurringAmount] = useState("1000");
+
   return (
     <aside
       aria-labelledby="compound-input-sidebar-title"
@@ -76,6 +78,8 @@ export function CompoundInputSidebar({
                 defaultValue="40000"
                 min="0"
                 step="0.01"
+                optional
+                optionalLabel={text.optional}
                 required
               />
               <NumericField
@@ -87,16 +91,15 @@ export function CompoundInputSidebar({
                 min="0"
                 step="0.01"
                 description={text.blank}
+                onChange={(event) => setRecurringAmount(event.currentTarget.value)}
                 optional
                 optionalLabel={text.optional}
               />
 
-              <SegmentedControl
+              {Number(recurringAmount) > 0 ? <SegmentedControl
                 label={text.frequency}
                 name="recurring_contribution.frequency"
                 defaultValue="monthly"
-                optional
-                optionalLabel={text.optional}
                 options={contributionFrequencies.map((option) => ({
                   ...option,
                   label:
@@ -106,20 +109,18 @@ export function CompoundInputSidebar({
                         ? text.quarterly
                         : text.annual,
                 }))}
-              />
+              /> : null}
 
-              <SegmentedControl
+              {Number(recurringAmount) > 0 ? <SegmentedControl
                 label={text.timing}
                 name="recurring_contribution.timing"
                 defaultValue="end"
-                optional
-                optionalLabel={text.optional}
                 options={contributionTimings.map((option) => ({
                   ...option,
                   label:
                     option.value === "beginning" ? text.beginning : text.end,
                 }))}
-              />
+              /> : null}
 
               <NumericField
                 id="contribution-increase"
