@@ -21,7 +21,7 @@ export function Header({ locale, languageLabel, themeLabel, stale, staleText, on
       <p role={stale ? "status" : undefined} className={`col-span-2 row-start-2 text-center text-xs text-secondary-foreground sm:col-span-1 sm:col-start-2 sm:row-start-1 ${stale ? "" : "hidden"}`}>
         {staleText}
       </p>
-      <div className="flex min-w-0 flex-wrap items-center gap-2 sm:col-start-3 sm:justify-self-end sm:gap-3">
+      <div className="flex min-w-0 items-center gap-1 sm:col-start-3 sm:justify-self-end sm:gap-3">
         <LanguageSwitcher locale={locale} label={languageLabel} onBeforeLanguageChange={onBeforeLanguageChange} submitting={submitting} />
         <ThemeToggle label={themeLabel} />
       </div>

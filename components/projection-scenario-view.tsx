@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, use, useEffect, useRef, useState, type FormEvent, type SyntheticEvent } from "react";
+import { Suspense, use, useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type SyntheticEvent } from "react";
 import { Header } from "@/components/header";
 import { InsightsSidebar } from "@/components/insights-sidebar";
 import { ProjectionResults } from "@/components/projection-results";
@@ -26,6 +26,20 @@ type ProjectionScenarioViewProps = {
     composition: CompositionText;
   };
 };
+
+// One responsive presentation, sharing all calculation and form state.
+const desktopQuery = "(min-width: 64rem)";
+function subscribeDesktop(onChange: () => void) {
+  const media = window.matchMedia(desktopQuery);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+function getDesktopSnapshot() {
+  return window.matchMedia(desktopQuery).matches;
+}
+function getServerDesktopSnapshot() {
+  return true;
+}
 
 function RequestGate({ promise }: { promise: Promise<void> | null }) {
   if (promise) use(promise);
@@ -93,6 +107,8 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   const [pendingPromise, setPendingPromise] = useState<Promise<void> | null>(null);
   const [selectedName, setSelectedName] = useState<ScenarioName>("expected");
   const [currency, setCurrency] = useState<Currency>("EUR");
+  const isDesktop = useSyncExternalStore(subscribeDesktop, getDesktopSnapshot, getServerDesktopSnapshot);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
@@ -102,6 +118,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   const [restoredValues, setRestoredValues] = useState<Record<string, string> | undefined>();
   const [formVersion, setFormVersion] = useState(0);
   const resultsRef = useRef<HTMLElement>(null);
+  const revealResults = useRef(false);
   const selectedScenario = projection?.scenarios.find((scenario) => scenario.name === selectedName);
 
   useEffect(() => {
@@ -119,6 +136,16 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
       document.getElementById("main-content")?.focus();
     });
   }, [locale]);
+
+  useEffect(() => {
+    if (submitting || pendingPromise || !revealResults.current) return;
+    revealResults.current = false;
+    if (!window.matchMedia(desktopQuery).matches) {
+      // Scroll after the collapsed form and resolved Suspense content commit.
+      resultsRef.current?.focus({ preventScroll: true });
+      resultsRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
+    }
+  }, [submitting, pendingPromise]);
 
   const clearValidation = (event: SyntheticEvent<HTMLFormElement>) => {
     const target = event.target;
@@ -168,7 +195,10 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
         }
       }
       setStatus(text.validation);
-      invalid[0]?.focus();
+      const firstInvalid = invalid[0];
+      if (firstInvalid?.closest("#advanced-assumption-fields")) setAdvancedOpen(true);
+      if (sidebarCollapsed) setSidebarCollapsed(false);
+      window.requestAnimationFrame(() => firstInvalid?.focus());
       return;
     }
     setSubmitting(true);
@@ -183,13 +213,8 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
       setSelectedName("expected");
       setStale(false);
       setStatus(text.resultsReady);
-      window.setTimeout(() => {
-        if (window.matchMedia("(max-width: 1023px)").matches) {
-          const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-          resultsRef.current?.scrollIntoView({ behavior: reduceMotion ? "instant" : "smooth", block: "start" });
-          resultsRef.current?.focus({ preventScroll: true });
-        }
-      }, 0);
+      if (!window.matchMedia(desktopQuery).matches) setSidebarCollapsed(true);
+      revealResults.current = true;
     } catch (caught) {
       setError(true);
       const rejected = caught instanceof Error && caught.message === "invalid-input";
@@ -210,14 +235,20 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
       if (target instanceof HTMLSelectElement && target.id === "display-currency") return;
       if (projection) setStale(true);
     }} className="contents">
-      <CompoundInputSidebar text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed((value) => !value)} currency={currency} onCurrencyChange={setCurrency} initialValues={restoredValues} />
+      <CompoundInputSidebar advancedOpen={advancedOpen} onToggleAdvanced={() => setAdvancedOpen((value) => !value)} text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed((value) => !value)} currency={currency} onCurrencyChange={setCurrency} initialValues={restoredValues} />
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className="min-w-0 border-e border-border-subtle bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
-        {sample ? <p className="px-5 pt-2 text-xs text-secondary-foreground">{locale === "es" ? "Datos de ejemplo" : "Sample data"}</p> : null}
-        {error ? <div role="alert" className="mx-5 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{status} <button type="submit" className="ms-2 underline">{text.retry}</button></div> : null}
+        {sample ? <p className="px-4 pt-3 text-xs text-secondary-foreground">{locale === "es" ? "Datos de ejemplo" : "Sample data"}</p> : null}
+        {error ? <div role="alert" className="mx-4 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{status} <button type="submit" className="ms-2 underline">{text.retry}</button></div> : null}
         <Suspense fallback={<ProjectionSkeleton />}>
           <RequestGate promise={pendingPromise} />
           {selectedScenario ? <ProjectionResults
+            isDesktop={isDesktop}
+            scenarios={projection.scenarios}
+            selectedName={selectedName}
+            onSelectScenario={setSelectedName}
+            compositionText={text.composition}
+            scenarioText={text.scenarios}
             selectedScenario={selectedScenario}
             durationYears={projection.resolved_inputs.duration_years}
             locale={locale}
@@ -226,7 +257,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
           /> : null}
         </Suspense>
       </section>
-      <Suspense fallback={<InsightsSkeleton />}>
+      {isDesktop ? <Suspense fallback={<InsightsSkeleton />}>
         <RequestGate promise={pendingPromise} />
         <InsightsSidebar
           scenarios={projection.scenarios}
@@ -237,7 +268,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
           currency={currency}
           text={{ scenarios: text.scenarios, composition: text.composition }}
         />
-      </Suspense>
+      </Suspense> : null}
     </form>
     </main>
     </>

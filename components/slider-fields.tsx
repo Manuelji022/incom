@@ -92,11 +92,11 @@ export function SliderField({
               )
                 setValue(parsed);
             }}
-            className="pr-14 tabular-nums"
+            className="pe-14 tabular-nums"
           />
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-tertiary-foreground"
+            className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-tertiary-foreground"
           >
             {unit}
           </span>
@@ -189,7 +189,7 @@ export function ScenarioRangeField({
 
   return (
     <Field>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
           <FieldLabel id={labelId} htmlFor={id}>{label}</FieldLabel>
           {optional ? (
@@ -216,9 +216,9 @@ export function ScenarioRangeField({
               setDraft(next);
               updateSpread(next);
             }}
-            className="pr-10 tabular-nums"
+            className="pe-10 tabular-nums"
           />
-          <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-tertiary-foreground">pp</span>
+          <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-tertiary-foreground">pp</span>
         </div>
       </div>
       <div className="mt-2 grid gap-2">
@@ -247,7 +247,7 @@ export function ScenarioRangeField({
         </div>
       </div>
       <div className="grid grid-cols-3 text-xs tabular-nums text-tertiary-foreground">
-        <span className="text-left">
+        <span className="text-start">
           {text.lowShort}{" "}
           <strong className="font-medium text-secondary-foreground">
             {format(expectedReturn - spread)}
@@ -259,7 +259,7 @@ export function ScenarioRangeField({
             {format(expectedReturn)}
           </strong>
         </span>
-        <span className="text-right">
+        <span className="text-end">
           {text.highShort}{" "}
           <strong className="font-medium text-secondary-foreground">
             {format(expectedReturn + spread)}
@@ -283,7 +283,6 @@ export function ProjectionSliderFields({
   initialValues?: Record<string, string>;
 }) {
   const returnDraftInitial = initialValues?.expected_annual_return_percent ?? "8";
-  const [expectedReturn, setExpectedReturn] = useState(Number.isFinite(Number(returnDraftInitial)) ? Number(returnDraftInitial) : 8);
   const [returnDraft, setReturnDraft] = useState(returnDraftInitial);
 
   return (
@@ -310,6 +309,7 @@ export function ProjectionSliderFields({
       <Field>
         <div className="flex items-center justify-between gap-3">
           <FieldLabel
+            className="min-w-0 flex-1"
             id="expected-annual-return-label"
             htmlFor="expected-annual-return"
           >
@@ -331,14 +331,12 @@ export function ProjectionSliderFields({
               onChange={(event) => {
                 const draft = event.currentTarget.value;
                 setReturnDraft(draft);
-                if (draft !== "" && Number.isFinite(Number(draft)))
-                  setExpectedReturn(Number(draft));
               }}
-              className="pr-14 tabular-nums"
+              className="pe-14 tabular-nums"
             />
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-tertiary-foreground"
+              className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-tertiary-foreground"
             >
               %
             </span>
@@ -348,18 +346,7 @@ export function ProjectionSliderFields({
           {text.beforeFees}
         </FieldDescription>
       </Field>
-      <ScenarioRangeField
-        id="scenario-range"
-        name="scenario_range_percentage_points"
-        label={text.range}
-        expectedReturn={expectedReturn}
-        defaultSpread={2}
-        step={0.1}
-        maxSpread={10}
-        text={text}
-        locale={locale}
-        initialValues={initialValues}
-      />
+
     </>
   );
 }

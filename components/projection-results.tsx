@@ -1,3 +1,5 @@
+import { Scenarios } from "@/components/scenarios";
+import { PortfolioComposition } from "@/components/portfolio-composition";
 import { InvestmentSummary } from "@/components/investment-summary";
 import { InvestmentSummaryCards } from "@/components/investment-summary-cards";
 import { ProjectionChart } from "@/components/projection-chart";
@@ -12,6 +14,12 @@ type SummaryDictionary = Dictionary["summary"];
 type SummaryText = { [Key in keyof SummaryDictionary]: string };
 
 type ProjectionResultsProps = {
+  isDesktop: boolean;
+  scenarios: readonly ProjectionScenario[];
+  selectedName: ProjectionScenario["name"];
+  onSelectScenario: (name: ProjectionScenario["name"]) => void;
+  compositionText: { [Key in keyof Dictionary["composition"]]: string };
+  scenarioText: Dictionary["scenarios"];
   selectedScenario: ProjectionScenario;
   durationYears: number;
   locale: Locale;
@@ -25,6 +33,12 @@ type ProjectionResultsProps = {
 };
 
 export function ProjectionResults({
+  isDesktop,
+  scenarios,
+  selectedName,
+  onSelectScenario,
+  compositionText,
+  scenarioText,
   selectedScenario,
   durationYears,
   locale,
@@ -32,7 +46,7 @@ export function ProjectionResults({
   text,
 }: ProjectionResultsProps) {
   return (
-    <section className="min-w-0 border-r border-border-subtle bg-page">
+    <section className="min-w-0 lg:border-e lg:border-border-subtle bg-page">
       <ProjectionHeader
         nominalBalance={selectedScenario.final_summary.nominal_balance}
         durationYears={durationYears}
@@ -40,13 +54,23 @@ export function ProjectionResults({
         locale={locale}
         currency={currency}
       />
-      <InvestmentSummaryCards
+      {!isDesktop ? <Scenarios
+        compact
+        scenarios={scenarios}
+        selectedScenario={selectedName}
+        onSelectScenario={onSelectScenario}
+        durationYears={durationYears}
+        locale={locale}
+        currency={currency}
+        text={scenarioText}
+      /> : null}
+      {isDesktop ? <InvestmentSummaryCards
         point={selectedScenario.annual_points.at(-1)}
         cumulativeFeesPaid={selectedScenario.final_summary.cumulative_fees_paid}
         locale={locale}
         currency={currency}
         text={text.summary}
-      />
+      /> : null}
       <ProjectionChart
         points={selectedScenario.annual_points}
         text={{
@@ -57,6 +81,21 @@ export function ProjectionResults({
         locale={locale}
         currency={currency}
       />
+      {!isDesktop ? <>
+      <InvestmentSummaryCards
+        point={selectedScenario.annual_points.at(-1)}
+        cumulativeFeesPaid={selectedScenario.final_summary.cumulative_fees_paid}
+        locale={locale}
+        currency={currency}
+        text={text.summary}
+      />
+        <PortfolioComposition
+          point={selectedScenario.annual_points.at(-1)}
+          locale={locale}
+          currency={currency}
+          text={{ ...compositionText, subtitle: compositionText.subtitle.replace("{scenario}", text.scenarioLabel) }}
+        />
+      </> : null}
       <InvestmentSummary
         points={selectedScenario.annual_points}
         text={{

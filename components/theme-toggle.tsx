@@ -76,7 +76,7 @@ export function ThemeToggle({ label }: { label: string }) {
   return (
     <Button
       aria-label={label}
-      className="theme-toggle"
+      className="theme-toggle min-h-[44px] min-w-[44px] sm:min-h-8 sm:min-w-8"
       onClick={toggleTheme}
       size="icon-sm"
       title={label}

@@ -36,6 +36,7 @@ export function InvestmentSummary({
   const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
+  const [showTable, setShowTable] = useState(false);
   const [showAllYears, setShowAllYears] = useState(false);
   const [tableOverflows, setTableOverflows] = useState(false);
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +68,7 @@ export function InvestmentSummary({
   return (
     <section
       aria-labelledby="investment-summary-title"
-      className="border-b border-border-subtle px-5 py-6 sm:px-8 sm:py-8"
+      className="border-b border-border-subtle px-4 py-6 lg:px-8 lg:py-8"
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -96,7 +97,7 @@ export function InvestmentSummary({
         </div>
         {checkpoints.length < points.length ? (
           <Button
-            aria-controls="yearly-projection-table"
+            aria-controls="yearly-projection-data"
             aria-expanded={showAllYears}
             onClick={() => {
               setShowAllYears((isShowingAll) => !isShowingAll);
@@ -109,6 +110,31 @@ export function InvestmentSummary({
           </Button>
         ) : null}
       </div>
+      <div id="yearly-projection-data">
+        <div className="mb-4 lg:hidden">
+          <Button size="sm" variant="outline" aria-pressed={showTable} onClick={() => setShowTable((value) => !value)}>
+            {showTable ? (locale === "es" ? "Ver resumen por año" : "View yearly summary") : (locale === "es" ? "Ver tabla completa" : "View full table")}
+          </Button>
+        </div>
+        {!showTable ? <div className="divide-y divide-border-subtle lg:hidden">
+          {visiblePoints.map((point) => (
+            <details key={point.year} className="group py-1">
+              <summary className="flex min-h-14 cursor-pointer list-none flex-wrap items-center justify-between gap-2 rounded-sm py-2 text-sm [&::-webkit-details-marker]:hidden">
+                <span className="flex items-center gap-2 text-secondary-foreground"><span aria-hidden="true" className="text-base group-open:rotate-90 rtl:group-open:-rotate-90">›</span>{text.year} {point.year}</span>
+                <span className="min-w-0 text-end font-semibold tabular-nums [overflow-wrap:anywhere]">{formatter.format(Number(point.nominal_balance))}</span>
+              </summary>
+              <dl className="space-y-3 rounded-md bg-card p-3 text-xs">
+                {[
+                  [text.contributions, Number(point.initial_principal) + Number(point.cumulative_contributions)],
+                  [text.growth, Number(point.cumulative_investment_growth)],
+                  [text.fees, Number(point.cumulative_fees_paid)],
+                  [text.real, Number(point.inflation_adjusted_balance)],
+                ].map(([label, value]) => <div key={label} className="grid grid-cols-[minmax(0,1fr)_minmax(0,45%)] items-baseline gap-3"><dt className="text-secondary-foreground">{label}</dt><dd className="min-w-0 text-end tabular-nums [overflow-wrap:anywhere]">{formatter.format(Number(value))}</dd></div>)}
+              </dl>
+            </details>
+          ))}
+        </div> : null}
+      <div className={showTable ? "" : "hidden lg:block"}>
       {tableOverflows ? <p className="mb-2 text-xs text-secondary-foreground">
         {locale === "es" ? "Desliza horizontalmente para ver todas las columnas." : "Scroll horizontally to see all columns."}
       </p> : null}
@@ -188,10 +214,12 @@ export function InvestmentSummary({
           </tbody>
         </table>
       </div>
+      </div>
+      </div>
       {showAllYears && pageCount > 1 ? (
         <nav
           aria-label={text.pagination}
-          className="mt-4 flex items-center justify-between gap-3"
+          className="mt-4 flex flex-wrap items-center justify-between gap-3"
         >
           <Button
             disabled={currentPage === 0}

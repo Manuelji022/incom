@@ -48,7 +48,7 @@ export function PortfolioComposition({ point, locale, currency, text }: Portfoli
   return (
     <section
       aria-labelledby="portfolio-composition-title"
-      className="border-b border-border-subtle px-3 py-8 sm:px-3 sm:py-8"
+      className="border-b border-border-subtle px-4 py-6 lg:px-3 lg:py-8"
     >
       <div>
         <h2

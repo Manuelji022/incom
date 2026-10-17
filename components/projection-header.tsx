@@ -31,10 +31,11 @@ export function ProjectionHeader({
     unit: "year",
     unitDisplay: "long",
   }).format(durationYears);
+  const balance = nominalBalance ? formatter.format(Number(nominalBalance)) : text.unavailable;
   return (
     <section
       aria-labelledby="portfolio-value-title"
-      className="[container-type:inline-size] border-b border-border-subtle px-3 py-5 sm:px-3 sm:py-6"
+      className="[container-type:inline-size] border-b border-border-subtle px-4 py-6 lg:px-3"
     >
       <div>
         <div className="min-w-0">
@@ -44,10 +45,8 @@ export function ProjectionHeader({
           >
             {text.portfolio}
           </h2>
-          <p className="mt-1 whitespace-normal [overflow-wrap:anywhere] text-[clamp(3rem,12cqi,5.5rem)] leading-none font-semibold tracking-[-0.06em] tabular-nums text-primary-foreground">
-            {nominalBalance
-              ? formatter.format(Number(nominalBalance))
-              : text.unavailable}
+          <p className={`mt-2 [overflow-wrap:anywhere] leading-[1.08] font-semibold tracking-[-0.06em] tabular-nums text-primary-foreground ${balance.length > 14 ? "text-[clamp(1.25rem,6cqi,3rem)]" : "text-[clamp(1.75rem,10cqi,5.5rem)] lg:text-[clamp(3rem,12cqi,5.5rem)]"}`}>
+            {balance}
           </p>
           <p className="mt-2 text-sm leading-5 text-secondary-foreground">
             {text.projected.replace("{duration}", duration)}

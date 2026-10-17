@@ -7,6 +7,7 @@ type ScenarioText = ReturnType<
 >["scenarios"];
 
 type ScenariosProps = {
+  compact?: boolean;
   durationYears: number;
   scenarios: readonly ProjectionScenario[];
   locale: Locale;
@@ -17,6 +18,7 @@ type ScenariosProps = {
 };
 
 export function Scenarios({
+  compact = false,
   durationYears,
   scenarios,
   locale,
@@ -48,7 +50,7 @@ export function Scenarios({
   return (
     <section
       aria-labelledby="scenarios-at-a-glance-title"
-      className="px-3 py-8"
+      className={compact ? "px-4 py-4" : "px-4 py-5 lg:px-3 lg:py-8"}
     >
       <section className="pt-2">
         <h2
@@ -57,14 +59,14 @@ export function Scenarios({
         >
           {text.title}
         </h2>
-        <p className="mt-1 text-xs leading-4 text-secondary-foreground">
+        <p className={compact ? "sr-only" : "mt-1 text-xs leading-4 text-secondary-foreground"}>
           {text.subtitle.replace("{duration}", duration)}
         </p>
 
         {scenarios.length > 0 ? (
           <ul
             aria-label={text.listLabel}
-            className="mt-2 overflow-hidden rounded-lg border border-border-default"
+            className={compact ? "mt-3 grid grid-cols-3 gap-2" : "mt-2 overflow-hidden rounded-lg border border-border-default"}
           >
             {scenarios.map((scenario) => {
               const annualReturn = percent.format(
@@ -80,16 +82,17 @@ export function Scenarios({
               return (
                 <li
                   key={scenario.name}
-                  className={`${scenario.name !== "high" ? "border-b border-border-subtle" : ""}`}
+                  className={`${!compact && scenario.name !== "high" ? "border-b border-border-subtle" : ""}`}
                 >
                   <button
                     type="button"
+                    aria-label={compact ? `${scenarioLabels[scenario.name]} · ${compact ? annualReturn : text.return.replace("{percent}", annualReturn)} · ${nominalBalance}` : undefined}
                     aria-pressed={scenario.name === selectedScenario}
                     onClick={() => onSelectScenario(scenario.name)}
-                    className={`flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-s-2 px-[0.6875rem] py-2 text-start transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
+                    className={`${compact ? "flex min-h-16 w-full flex-col items-center justify-center gap-1 rounded-lg border px-1 py-3 text-center" : "flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-s-2 px-[0.6875rem] py-2 text-start"} transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
                       scenario.name === selectedScenario
                         ? "border-brand-solid bg-brand-subtle"
-                        : "border-transparent hover:bg-card"
+                        : compact ? "border-border-default bg-card hover:bg-component-hover" : "border-transparent hover:bg-card"
                     }`}
                   >
                     <span className="min-w-0">
@@ -97,11 +100,11 @@ export function Scenarios({
                         {scenarioLabels[scenario.name]}
                       </span>
                       <span className="block text-xs leading-4 text-secondary-foreground">
-                        {text.return.replace("{percent}", annualReturn)}
+                        {compact ? annualReturn : text.return.replace("{percent}", annualReturn)}
                       </span>
                     </span>
 
-                    <span className="min-w-0 text-end tabular-nums">
+                    <span className={compact ? "hidden" : "min-w-0 text-end tabular-nums"}>
                       <span className="block break-words text-xs font-semibold leading-4 text-primary-foreground">
                         {nominalBalance}
                       </span>

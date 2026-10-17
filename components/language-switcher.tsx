@@ -53,7 +53,7 @@ export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submit
         aria-label={label}
         value={locale}
         onChange={(event) => handleChange(event.currentTarget.value)}
-        className="min-h-10 appearance-none rounded border border-control-border bg-container py-1 pr-9 pl-2 text-base text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"
+        className="min-h-10 appearance-none rounded border border-control-border bg-container py-1 pe-7 ps-2 sm:pe-9 text-base text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"
       >
         <option value="en">English</option>
         <option value="es">Español</option>
@@ -62,7 +62,7 @@ export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submit
         aria-hidden="true"
         viewBox="0 0 20 20"
         fill="none"
-        className="pointer-events-none absolute right-3 size-4 text-secondary-foreground"
+        className="pointer-events-none absolute end-2 sm:end-3 size-4 text-secondary-foreground"
       >
         <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
