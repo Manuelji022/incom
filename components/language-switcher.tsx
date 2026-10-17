@@ -1,22 +1,25 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/lib/locales";
 
 type LanguageSwitcherProps = {
   locale: Locale;
   label: string;
+  onBeforeLanguageChange: (nextLocale: Locale) => boolean;
+  submitting: boolean;
 };
 
 function isLocale(value: string): value is Locale {
   return value === "en" || value === "es";
 }
 
-export function LanguageSwitcher({ locale, label }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submitting }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
   const shouldFocusMain = useRef(false);
+  const [handoffError, setHandoffError] = useState<"pending" | "storage" | null>(null);
 
   useEffect(() => {
     if (!shouldFocusMain.current) return;
@@ -25,6 +28,11 @@ export function LanguageSwitcher({ locale, label }: LanguageSwitcherProps) {
   }, [pathname]);
 
   function changeLanguage(nextLocale: Locale) {
+    if (!onBeforeLanguageChange(nextLocale)) {
+      setHandoffError(submitting ? "pending" : "storage");
+      return;
+    }
+    setHandoffError(null);
     shouldFocusMain.current = true;
     const secureAttribute = location.protocol === "https:" ? "; Secure" : "";
     document.cookie = `incom-locale=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax${secureAttribute}`;
@@ -39,7 +47,7 @@ export function LanguageSwitcher({ locale, label }: LanguageSwitcherProps) {
   }
 
   return (
-    <label className="relative flex items-center gap-2 text-sm text-secondary-foreground">
+    <div className="relative flex items-center gap-2 text-sm text-secondary-foreground">
       <span className="sr-only sm:not-sr-only">{label}</span>
       <select
         aria-label={label}
@@ -58,6 +66,7 @@ export function LanguageSwitcher({ locale, label }: LanguageSwitcherProps) {
       >
         <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-    </label>
+      {handoffError === "storage" || (handoffError === "pending" && submitting) ? <span role="alert" className="absolute end-0 top-full z-30 mt-1 w-64 rounded border border-danger-border-default bg-container p-2 text-xs text-danger-foreground">{handoffError === "pending" ? (locale === "es" ? "Espera a que termine el cálculo antes de cambiar el idioma." : "Wait for the calculation to finish before changing language.") : (locale === "es" ? "No se pudieron conservar los cambios. Inténtalo de nuevo." : "Your changes could not be saved. Please try again.")}</span> : null}
+    </div>
   );
 }

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { clearFieldValidation } from "@/lib/field-validation";
 
 export type SliderFieldProps = {
   optionalLabel?: string;
@@ -20,6 +21,7 @@ export type SliderFieldProps = {
   description?: string;
   valueText?: (value: number) => string;
   optional?: boolean;
+  initialValues?: Record<string, string>;
 };
 
 function isStepAligned(value: number, min: number, step: number) {
@@ -42,9 +44,13 @@ export function SliderField({
   valueText,
   optional = false,
   optionalLabel = "Optional",
+  initialValues,
 }: SliderFieldProps) {
-  const [value, setValue] = useState(defaultValue);
-  const [draft, setDraft] = useState(String(defaultValue));
+  const initialDraft = initialValues?.[name] ?? String(defaultValue);
+  const parsedInitial = Number(initialDraft);
+  const validInitial = initialDraft !== "" && Number.isFinite(parsedInitial) && parsedInitial >= min && parsedInitial <= inputMax && isStepAligned(parsedInitial, min, step);
+  const [value, setValue] = useState(validInitial ? parsedInitial : defaultValue);
+  const [draft, setDraft] = useState(initialDraft);
   const descriptionId = description ? `${id}-description` : undefined;
   const labelId = `${id}-label`;
 
@@ -108,6 +114,8 @@ export function SliderField({
         onValueChange={(next) => {
           setValue(next);
           setDraft(String(next));
+          const field = document.getElementById(id);
+          if (field instanceof HTMLInputElement) clearFieldValidation(field);
         }}
         aria-valuetext={valueText ? valueText(value) : undefined}
         className="mt-2 w-full"
@@ -135,6 +143,7 @@ export type ScenarioRangeFieldProps = {
   step?: number;
   maxSpread?: number;
   optional?: boolean;
+  initialValues?: Record<string, string>;
 };
 
 export function ScenarioRangeField({
@@ -149,9 +158,13 @@ export function ScenarioRangeField({
   optionalLabel = "Optional",
   text,
   locale,
+  initialValues,
 }: ScenarioRangeFieldProps) {
-  const [spread, setSpread] = useState(defaultSpread);
-  const [draft, setDraft] = useState(String(defaultSpread));
+  const initialDraft = initialValues?.[name] ?? String(defaultSpread);
+  const parsedInitial = Number(initialDraft);
+  const validInitial = initialDraft !== "" && Number.isFinite(parsedInitial) && parsedInitial >= 0 && parsedInitial <= maxSpread && isStepAligned(parsedInitial, 0, step);
+  const [spread, setSpread] = useState(validInitial ? parsedInitial : defaultSpread);
+  const [draft, setDraft] = useState(initialDraft);
   const labelId = `${id}-label`;
   const descriptionId = `${id}-description`;
   const format = (value: number) =>
@@ -227,6 +240,8 @@ export function ScenarioRangeField({
               const nextSpread = Number(next.toFixed(6));
               setSpread(nextSpread);
               setDraft(String(nextSpread));
+              const field = document.getElementById(id);
+              if (field instanceof HTMLInputElement) clearFieldValidation(field);
             }}
           />
         </div>
@@ -261,12 +276,15 @@ export function ScenarioRangeField({
 export function ProjectionSliderFields({
   text,
   locale,
+  initialValues,
 }: {
   locale: "en" | "es";
   text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];
+  initialValues?: Record<string, string>;
 }) {
-  const [expectedReturn, setExpectedReturn] = useState(8);
-  const [returnDraft, setReturnDraft] = useState("8");
+  const returnDraftInitial = initialValues?.expected_annual_return_percent ?? "8";
+  const [expectedReturn, setExpectedReturn] = useState(Number.isFinite(Number(returnDraftInitial)) ? Number(returnDraftInitial) : 8);
+  const [returnDraft, setReturnDraft] = useState(returnDraftInitial);
 
   return (
     <>
@@ -280,6 +298,7 @@ export function ProjectionSliderFields({
         max={50}
         inputMax={100}
         step={1}
+        initialValues={initialValues}
         valueText={(value) =>
           new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
             style: "unit",
@@ -339,6 +358,7 @@ export function ProjectionSliderFields({
         maxSpread={10}
         text={text}
         locale={locale}
+        initialValues={initialValues}
       />
     </>
   );

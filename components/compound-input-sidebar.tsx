@@ -23,6 +23,7 @@ type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className"> & {
   onToggleCollapsed: () => void;
   currency: Currency;
   onCurrencyChange: (currency: Currency) => void;
+  initialValues?: Record<string, string>;
 };
 
 const contributionFrequencies: {
@@ -49,8 +50,9 @@ export function CompoundInputSidebar({
   onToggleCollapsed,
   currency,
   onCurrencyChange,
+  initialValues,
 }: CompoundInputSidebarProps) {
-  const [recurringAmount, setRecurringAmount] = useState("1000");
+  const [recurringAmount, setRecurringAmount] = useState(initialValues?.["recurring_contribution.amount"] ?? "1000");
   const toggleLabel = locale === "es"
     ? (collapsed ? "Abrir supuestos" : "Cerrar supuestos")
     : (collapsed ? "Open assumptions" : "Close assumptions");
@@ -125,11 +127,9 @@ export function CompoundInputSidebar({
                 name="initial_principal"
                 label={text.initial}
                 unit={getCurrencySymbol(currency)}
-                defaultValue="40000"
+                defaultValue={initialValues?.initial_principal ?? "40000"}
                 min="0"
                 step="0.01"
-                optional
-                optionalLabel={text.optional}
                 required
               />
               <NumericField
@@ -137,7 +137,7 @@ export function CompoundInputSidebar({
                 name="recurring_contribution.amount"
                 label={text.recurring}
                 unit={getCurrencySymbol(currency)}
-                defaultValue="1000"
+                defaultValue={initialValues?.["recurring_contribution.amount"] ?? "1000"}
                 min="0"
                 step="0.01"
                 description={text.blank}
@@ -149,7 +149,7 @@ export function CompoundInputSidebar({
               {Number(recurringAmount) > 0 ? <SegmentedControl
                 label={text.frequency}
                 name="recurring_contribution.frequency"
-                defaultValue="monthly"
+                defaultValue={initialValues?.["recurring_contribution.frequency"] ?? "monthly"}
                 options={contributionFrequencies.map((option) => ({
                   ...option,
                   label:
@@ -164,7 +164,7 @@ export function CompoundInputSidebar({
               {Number(recurringAmount) > 0 ? <SegmentedControl
                 label={text.timing}
                 name="recurring_contribution.timing"
-                defaultValue="beginning"
+                defaultValue={initialValues?.["recurring_contribution.timing"] ?? "beginning"}
                 options={contributionTimings.map((option) => ({
                   ...option,
                   label:
@@ -177,7 +177,7 @@ export function CompoundInputSidebar({
                 name="recurring_contribution.annual_increase_percent"
                 label={text.increase}
                 unit="%"
-                defaultValue="2"
+                defaultValue={initialValues?.["recurring_contribution.annual_increase_percent"] ?? "2"}
                 min="0"
                 step="0.1"
                 optional
@@ -197,7 +197,7 @@ export function CompoundInputSidebar({
               {text.projection}
             </h3>
             <FieldGroup className="gap-4">
-              <ProjectionSliderFields text={text} locale={locale} />
+              <ProjectionSliderFields text={text} locale={locale} initialValues={initialValues} />
             </FieldGroup>
           </section>
 
@@ -217,7 +217,7 @@ export function CompoundInputSidebar({
                 name="annual_fee_percent"
                 label={text.fee}
                 unit="%"
-                defaultValue="0.05"
+                defaultValue={initialValues?.annual_fee_percent ?? "0.05"}
                 min="0"
                 step="0.01"
                 description={text.feeDescription}
@@ -229,7 +229,7 @@ export function CompoundInputSidebar({
                 name="expected_annual_inflation_percent"
                 label={text.inflation}
                 unit="%"
-                defaultValue="2"
+                defaultValue={initialValues?.expected_annual_inflation_percent ?? "2"}
                 step="0.1"
                 optional
                 optionalLabel={text.optional}

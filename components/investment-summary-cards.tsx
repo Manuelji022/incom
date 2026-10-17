@@ -67,16 +67,16 @@ export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, curr
   return (
     <dl
       aria-label={text.cardsLabel}
-      className="grid grid-cols-2 border border-border-subtle bg-page sm:grid-cols-5"
+      className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] border border-border-subtle bg-page"
     >
       {cards.map((card) => (
         <div key={card.label} className="flex min-w-0 flex-col gap-1 px-3 py-4.5">
-          <dt className="min-h-5 text-xs leading-[18px] text-secondary-foreground">{card.label}</dt>
-          <dd className="[overflow-wrap:anywhere] text-xl font-semibold leading-7 tracking-[-0.025em] tabular-nums text-primary-foreground">
+          <dt className="min-h-5 text-xs leading-normal text-secondary-foreground">{card.label}</dt>
+          <dd className="text-[clamp(1rem,5vw,1.25rem)] font-semibold leading-7 tracking-[-0.025em] tabular-nums text-primary-foreground">
             {card.value}
           </dd>
           {card.detail ? (
-            <dd className="[overflow-wrap:anywhere] text-xs leading-[17px] text-secondary-foreground">
+            <dd className="text-xs leading-normal text-secondary-foreground">
               {card.detail}
             </dd>
           ) : null}

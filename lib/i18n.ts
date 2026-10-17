@@ -95,7 +95,7 @@ const dictionaries = {
     summary: {
       cardsLabel: "Final investment summary",
       initialPrincipal: "Initial principal",
-      totalContributions: "Total contributions",
+      totalContributions: "Total invested (including initial investment)",
       investmentGrowth: "Investment growth",
       totalFeesPaid: "Total fees paid",
       feesPaidDescription: "Paid over the full projection",
@@ -224,7 +224,7 @@ const dictionaries = {
     summary: {
       cardsLabel: "Resumen final de la inversión",
       initialPrincipal: "Capital inicial",
-      totalContributions: "Aportaciones totales",
+      totalContributions: "Total invertido (incluye la inversión inicial)",
       investmentGrowth: "Crecimiento de la inversión",
       totalFeesPaid: "Comisiones totales pagadas",
       feesPaidDescription: "Pagadas durante toda la proyección",

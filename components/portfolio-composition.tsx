@@ -77,24 +77,22 @@ export function PortfolioComposition({ point, locale, currency, text }: Portfoli
       )}
 
       <ul className="mt-4 space-y-3" aria-label={text.listLabel}>
-        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 text-sm leading-5">
-          <span className="flex min-w-0 items-center gap-2.5 truncate text-primary-foreground">
+        <li className="grid min-w-0 grid-cols-1 gap-y-1 text-sm leading-5">
+          <span className="flex min-w-0 items-start gap-2.5 text-primary-foreground">
             <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-secondary-foreground" />
-            {text.contributions}
+            <span className="min-w-0 [overflow-wrap:anywhere]">{text.contributions}</span>
           </span>
-          <span className="whitespace-nowrap text-right text-xs tabular-nums text-primary-foreground sm:text-sm">{formattedContributions}</span>
-          <span className="w-10 whitespace-nowrap text-right text-xs tabular-nums text-secondary-foreground sm:text-sm">
-            {percent.format(contributionShare)}
+          <span className="ms-6 flex flex-wrap gap-x-1 text-xs tabular-nums text-primary-foreground sm:text-sm">
+            {formattedContributions} <span className="text-secondary-foreground">({percent.format(contributionShare)})</span>
           </span>
         </li>
-        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 text-sm leading-5">
-          <span className="flex min-w-0 items-center gap-2.5 truncate text-primary-foreground">
+        <li className="grid min-w-0 grid-cols-1 gap-y-1 text-sm leading-5">
+          <span className="flex min-w-0 items-start gap-2.5 text-primary-foreground">
             <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-brand-subtle" />
-            {text.growth}
+            <span className="min-w-0 [overflow-wrap:anywhere]">{text.growth}</span>
           </span>
-          <span className="whitespace-nowrap text-right text-xs tabular-nums text-primary-foreground sm:text-sm">{formattedGrowth}</span>
-          <span className="w-10 whitespace-nowrap text-right text-xs tabular-nums text-secondary-foreground sm:text-sm">
-            {percent.format(growthShare)}
+          <span className="ms-6 flex flex-wrap gap-x-1 text-xs tabular-nums text-primary-foreground sm:text-sm">
+            {formattedGrowth} <span className="text-secondary-foreground">({percent.format(growthShare)})</span>
           </span>
         </li>
       </ul>

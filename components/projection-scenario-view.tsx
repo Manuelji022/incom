@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, use, useRef, useState, type FormEvent, type SyntheticEvent } from "react";
+import { Suspense, use, useEffect, useRef, useState, type FormEvent, type SyntheticEvent } from "react";
 import { Header } from "@/components/header";
 import { InsightsSidebar } from "@/components/insights-sidebar";
 import { ProjectionResults } from "@/components/projection-results";
@@ -11,6 +11,8 @@ import type { Currency } from "@/lib/currency";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
 import type { CompoundInterestProjectionInput, CompoundInterestProjectionResponse, ProjectionScenario } from "@/types/compound-interest";
+import { clearFieldValidation } from "@/lib/field-validation";
+import { consumeProjectionSession, saveProjectionSession } from "@/lib/projection-session";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 type ScenarioName = ProjectionScenario["name"];
@@ -96,20 +98,47 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   const [error, setError] = useState(false);
   const [stale, setStale] = useState(false);
   const [status, setStatus] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const [restoredValues, setRestoredValues] = useState<Record<string, string> | undefined>();
+  const [formVersion, setFormVersion] = useState(0);
   const resultsRef = useRef<HTMLElement>(null);
   const selectedScenario = projection?.scenarios.find((scenario) => scenario.name === selectedName);
+
+  useEffect(() => {
+    const session = consumeProjectionSession(locale);
+    if (!session) return;
+    queueMicrotask(() => {
+      setRestoredValues(session.values);
+      setProjection(session.projection);
+      setSample(session.sample);
+      setSelectedName(session.selectedName);
+      setCurrency(session.currency);
+      setStale(session.stale);
+      setSidebarCollapsed(session.sidebarCollapsed);
+      setFormVersion((version) => version + 1);
+      document.getElementById("main-content")?.focus();
+    });
+  }, [locale]);
 
   const clearValidation = (event: SyntheticEvent<HTMLFormElement>) => {
     const target = event.target;
     if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
-    target.removeAttribute("aria-invalid");
-    if (target instanceof HTMLInputElement) target.setCustomValidity("");
     if (submitting) return;
-    const errorId = `${target.id}-inline-error`;
-    document.getElementById(errorId)?.remove();
-    const describedBy = target.getAttribute("aria-describedby")?.split(" ").filter((id) => id !== errorId).join(" ");
-    if (describedBy) target.setAttribute("aria-describedby", describedBy);
-    else target.removeAttribute("aria-describedby");
+    clearFieldValidation(target);
+  };
+
+  const saveBeforeLocaleChange = (destination: Locale) => {
+    if (submitting) return false;
+    const values: Record<string, string> = {};
+    if (formRef.current) {
+      for (const element of Array.from(formRef.current.elements)) {
+        if (!(element instanceof HTMLInputElement || element instanceof HTMLSelectElement) || !element.name) continue;
+        if (element instanceof HTMLInputElement && (element.type === "radio" || element.type === "checkbox")) {
+          if (element.checked) values[element.name] = element.value;
+        } else values[element.name] = element.value;
+      }
+    }
+    return saveProjectionSession({ destination, values, projection, sample, selectedName, currency, stale, sidebarCollapsed });
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -173,15 +202,15 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
 
   return (
     <>
-    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} />
+    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} onBeforeLanguageChange={saveBeforeLocaleChange} submitting={submitting} />
     <main id="main-content" tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)_19.5rem]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]"}`}>
-    <form noValidate onSubmit={handleSubmit} onInput={(event) => {
+    <form key={formVersion} ref={formRef} noValidate onSubmit={handleSubmit} onInput={(event) => {
       const target = event.target;
       clearValidation(event);
       if (target instanceof HTMLSelectElement && target.id === "display-currency") return;
       if (projection) setStale(true);
     }} className="contents">
-      <CompoundInputSidebar text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed((value) => !value)} currency={currency} onCurrencyChange={setCurrency} />
+      <CompoundInputSidebar text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed((value) => !value)} currency={currency} onCurrencyChange={setCurrency} initialValues={restoredValues} />
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className="min-w-0 border-e border-border-subtle bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
         {sample ? <p className="px-5 pt-2 text-xs text-secondary-foreground">{locale === "es" ? "Datos de ejemplo" : "Sample data"}</p> : null}

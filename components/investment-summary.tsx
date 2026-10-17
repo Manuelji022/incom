@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ProjectionPoint } from "@/types/compound-interest";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,8 @@ export function InvestmentSummary({
     maximumFractionDigits: 0,
   });
   const [showAllYears, setShowAllYears] = useState(false);
+  const [tableOverflows, setTableOverflows] = useState(false);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const checkpoints = getCheckpointPoints(points);
   const pageCount = Math.ceil(points.length / PAGE_SIZE);
@@ -46,6 +48,21 @@ export function InvestmentSummary({
     : checkpoints;
   const firstVisibleYear = visiblePoints[0]?.year;
   const lastVisibleYear = visiblePoints.at(-1)?.year;
+
+  useEffect(() => {
+    const container = tableContainerRef.current;
+    const table = container?.querySelector("table");
+    if (!container || !table) return;
+
+    const updateOverflow = () => {
+      setTableOverflows(container.scrollWidth > container.clientWidth);
+    };
+    updateOverflow();
+    const observer = new ResizeObserver(updateOverflow);
+    observer.observe(container);
+    observer.observe(table);
+    return () => observer.disconnect();
+  }, [visiblePoints.length]);
 
   return (
     <section
@@ -92,11 +109,12 @@ export function InvestmentSummary({
           </Button>
         ) : null}
       </div>
-      <p className="mb-2 text-xs text-secondary-foreground sm:hidden">
+      {tableOverflows ? <p className="mb-2 text-xs text-secondary-foreground">
         {locale === "es" ? "Desliza horizontalmente para ver todas las columnas." : "Scroll horizontally to see all columns."}
-      </p>
+      </p> : null}
       <div
         role="region"
+        ref={tableContainerRef}
         aria-label={locale === "es" ? "Tabla de proyección anual; desplázate horizontalmente para ver todas las columnas" : "Annual projection table; scroll horizontally to see all columns"}
         tabIndex={0}
         className="overflow-x-auto rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"

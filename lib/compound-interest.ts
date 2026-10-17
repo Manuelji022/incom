@@ -52,7 +52,7 @@ function parseScenario(value: unknown): ProjectionScenario | null {
   };
 }
 
-function parseResponse(value: unknown): CompoundInterestProjectionResponse {
+export function parseProjectionResponse(value: unknown): CompoundInterestProjectionResponse {
   if (!isRecord(value) || !isRecord(value.resolved_inputs) ||
       !isRecord(value.resolved_inputs.expected_annual_inflation_percent) ||
       !Array.isArray(value.scenarios)) {
@@ -87,7 +87,7 @@ export async function fetchProjection(
   });
   if (!response.ok) throw new Error(response.status === 400 || response.status === 422 ? "invalid-input" : "projection-failed");
   try {
-    return parseResponse(await response.json());
+    return parseProjectionResponse(await response.json());
   } catch {
     throw new Error("invalid-response");
   }
