@@ -119,6 +119,10 @@ html.theme-changing *::after {
   outline-offset: 2px;
 }
 
+:where([aria-invalid="true"]):focus-visible {
+  outline-color: var(--danger-border-default);
+}
+
 @media (forced-colors: active) {
   :focus-visible {
     outline-color: Highlight;

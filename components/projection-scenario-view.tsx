@@ -11,7 +11,7 @@ import type { Currency } from "@/lib/currency";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
 import type { CompoundInterestProjectionInput, CompoundInterestProjectionResponse, ProjectionScenario } from "@/types/compound-interest";
-import { clearFieldValidation } from "@/lib/field-validation";
+import { clearFieldValidation, showFieldValidation } from "@/lib/field-validation";
 import { isValidDecimalInput, normalizeDecimalInput } from "@/lib/decimal-input";
 import { consumeProjectionSession, saveProjectionSession } from "@/lib/projection-session";
 
@@ -150,6 +150,9 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
     if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
     if (submitting) return;
     clearFieldValidation(target);
+    if (target instanceof HTMLInputElement && target.type === "number") {
+      showFieldValidation(target, locale);
+    }
   };
 
   const saveBeforeLocaleChange = (destination: Locale) => {
@@ -201,17 +204,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
     if (!form.checkValidity()) {
       const invalid = Array.from(form.elements).filter((element): element is HTMLInputElement => element instanceof HTMLInputElement && !element.validity.valid);
       for (const field of invalid) {
-        const message = field.validationMessage;
-        field.setAttribute("aria-invalid", "true");
-        const errorId = `${field.id}-inline-error`;
-        field.setAttribute("aria-describedby", [field.getAttribute("aria-describedby"), errorId].filter(Boolean).join(" "));
-        if (!document.getElementById(errorId)) {
-          const detail = document.createElement("p");
-          detail.id = errorId;
-          detail.className = "mt-1 text-xs text-danger-foreground";
-          detail.textContent = message;
-          field.parentElement?.insertAdjacentElement("afterend", detail);
-        }
+        showFieldValidation(field, locale);
       }
       setStatus(text.validation);
       const firstInvalid = invalid[0];

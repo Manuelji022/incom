@@ -1,3 +1,5 @@
+"use client";
+
 import type { ComponentProps } from "react";
 
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
@@ -24,6 +26,7 @@ function NumericField({
   optionalLabel = "Optional",
   className = "",
   disabled,
+  onWheel,
   "aria-describedby": ariaDescribedBy,
   ...inputProps
 }: NumericFieldProps) {
@@ -49,6 +52,10 @@ function NumericField({
           aria-label={`${label} (${unit})`}
           defaultValue={defaultValue}
           disabled={disabled}
+          onWheel={(event) => {
+            onWheel?.(event);
+            event.currentTarget.blur();
+          }}
           aria-describedby={describedBy}
           className={`pe-14 tabular-nums ${className}`.trim()}
         />
