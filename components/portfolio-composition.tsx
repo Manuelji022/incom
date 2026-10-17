@@ -77,23 +77,23 @@ export function PortfolioComposition({ point, locale, text }: PortfolioCompositi
       )}
 
       <ul className="mt-4 space-y-3" aria-label={text.listLabel}>
-        <li className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1 text-sm leading-5 @[22rem]:grid-cols-[minmax(0,1fr)_auto_auto]">
-          <span className="flex min-w-0 items-center gap-2.5 text-primary-foreground">
+        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 text-sm leading-5">
+          <span className="flex min-w-0 items-center gap-2.5 truncate text-primary-foreground">
             <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-secondary-foreground" />
             {text.contributions}
           </span>
-          <span className="break-words text-right text-xs tabular-nums text-primary-foreground sm:text-sm">{formattedContributions}</span>
-          <span className="col-start-2 text-right text-xs tabular-nums text-secondary-foreground @[22rem]:col-start-auto @[22rem]:w-10 @[22rem]:text-sm">
+          <span className="whitespace-nowrap text-right text-xs tabular-nums text-primary-foreground sm:text-sm">{formattedContributions}</span>
+          <span className="w-10 whitespace-nowrap text-right text-xs tabular-nums text-secondary-foreground sm:text-sm">
             {percent.format(contributionShare)}
           </span>
         </li>
-        <li className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1 text-sm leading-5 @[22rem]:grid-cols-[minmax(0,1fr)_auto_auto]">
-          <span className="flex min-w-0 items-center gap-2.5 text-primary-foreground">
+        <li className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 text-sm leading-5">
+          <span className="flex min-w-0 items-center gap-2.5 truncate text-primary-foreground">
             <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-brand-subtle" />
             {text.growth}
           </span>
-          <span className="break-words text-right text-xs tabular-nums text-primary-foreground sm:text-sm">{formattedGrowth}</span>
-          <span className="col-start-2 text-right text-xs tabular-nums text-secondary-foreground @[22rem]:col-start-auto @[22rem]:w-10 @[22rem]:text-sm">
+          <span className="whitespace-nowrap text-right text-xs tabular-nums text-primary-foreground sm:text-sm">{formattedGrowth}</span>
+          <span className="w-10 whitespace-nowrap text-right text-xs tabular-nums text-secondary-foreground sm:text-sm">
             {percent.format(growthShare)}
           </span>
         </li>
