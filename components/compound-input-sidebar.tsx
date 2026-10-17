@@ -51,7 +51,7 @@ export function CompoundInputSidebar({
   return (
     <aside
       aria-labelledby="compound-input-sidebar-title"
-      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-0 lg:min-w-0 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
+      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
     >
       <header className={`flex items-start justify-between gap-2 border-b border-border-subtle px-4 py-5 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
         <div className={collapsed ? "lg:hidden" : ""}>
@@ -73,7 +73,7 @@ export function CompoundInputSidebar({
           aria-expanded={!collapsed}
           aria-controls="compound-input-sidebar-fields"
           onClick={onToggleCollapsed}
-          className={`shrink-0 ${collapsed ? "lg:absolute lg:start-0 lg:top-0 lg:z-20" : ""}`}
+          className={`shrink-0 ${collapsed ? "lg:absolute lg:start-0 lg:top-5 lg:z-20" : ""}`}
         >
           <span
             aria-hidden="true"

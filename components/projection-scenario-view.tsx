@@ -172,7 +172,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   return (
     <>
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} />
-    <main id="main-content" tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[0_minmax(0,1fr)_19.5rem]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]"}`}>
+    <main id="main-content" tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)_19.5rem]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]"}`}>
     <form noValidate onSubmit={handleSubmit} onInput={(event) => {
       clearValidation(event);
       if (projection) setStale(true);
