@@ -47,7 +47,10 @@ describe("target input serialization and validation", () => {
 });
 
 describe("target response parsing", () => {
-  it("retains every decimal string, annual point, disclosure and metadata field", () => expect(parseTargetResponse(fixture)).toEqual(fixture));
+  it("accepts the raw backend response without disclosures and retains required fields", () => {
+    expect(fixture).not.toHaveProperty("disclosures");
+    expect(parseTargetResponse(fixture)).toEqual(fixture);
+  });
   it("accepts a zero starting contribution", () => {
     const body = structuredClone(fixture);
     body.scenarios[1].required_contribution_amount = "0.00";
@@ -62,16 +65,15 @@ describe("target response parsing", () => {
     if (kind === "bad-summary") body.scenarios[0].final_summary.nominal_balance = "garbage";
     expect(() => parseTargetResponse(body)).toThrow("invalid-response");
   });
-  it.each(["wrong-model", "unknown-disclosure"]) ("rejects unsupported contract metadata: %s", (kind) => {
+  it("rejects unsupported contract metadata", () => {
     const body = structuredClone(fixture);
-    if (kind === "wrong-model") body.metadata.calculation_model_version = "old";
-    else body.disclosures[0] = "SOMETHING_NEW";
+    body.metadata.calculation_model_version = "old";
     expect(() => parseTargetResponse(body)).toThrow("invalid-response");
   });
 });
 
 describe("client request and proxy", () => {
-  it("posts the exact input to the same-origin endpoint", async () => {
+  it("accepts the raw backend 200 through fetchTarget at the same-origin endpoint", async () => {
     const mock = vi.fn().mockResolvedValue(Response.json(fixture)); vi.stubGlobal("fetch", mock);
     expect(await fetchTarget(input)).toEqual(fixture);
     expect(mock).toHaveBeenCalledWith("/api/compound-interest/targets", expect.objectContaining({ method: "POST", body: JSON.stringify(input), cache: "no-store" }));
@@ -86,7 +88,7 @@ describe("client request and proxy", () => {
     await expect(fetchTarget(input)).rejects.toMatchObject({ problem: problem(status) });
     await expect(fetchTarget(input)).rejects.toBeInstanceOf(TargetApiError);
   });
-  it("proxies to financial-api without changing request or response decimals", async () => {
+  it("returns the raw backend 200 through the same-origin POST proxy without changing decimals", async () => {
     const mock = vi.fn().mockResolvedValue(Response.json(fixture)); vi.stubGlobal("fetch", mock);
     const response = await POST(request(input));
     expect(response.status).toBe(200); expect(await response.json()).toEqual(fixture);

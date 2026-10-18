@@ -20,7 +20,6 @@ export type Money = string;
 export type Percent = string;
 export type ScenarioName = "low" | "expected" | "high";
 export type InputSource = "caller" | "server_default";
-export type DisclosureCode = "PROJECTION_NOT_GUARANTEE" | "TAXES_EXCLUDED" | "FEES_MODELED" | "RETURNS_ASSUMED_CONSTANT";
 
 type Resolved<T = Percent> = { value: T; source: InputSource };
 export type TargetValues = Omit<ProjectionPoint, "year"> & { fee_impact: string };
@@ -50,7 +49,6 @@ export type TargetResponse = {
     };
   };
   scenarios: TargetScenario[];
-  disclosures: DisclosureCode[];
 };
 export type ProblemDetail = {
   type: string;

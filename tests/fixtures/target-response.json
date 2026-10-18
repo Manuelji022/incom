@@ -192,11 +192,5 @@
         }
       ]
     }
-  ],
-  "disclosures": [
-    "PROJECTION_NOT_GUARANTEE",
-    "TAXES_EXCLUDED",
-    "FEES_MODELED",
-    "RETURNS_ASSUMED_CONSTANT"
   ]
 }

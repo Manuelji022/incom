@@ -90,5 +90,4 @@ export const mockTarget: TargetResponse = {
     },
   },
   scenarios: [buildScenario("low"), buildScenario("expected"), buildScenario("high")],
-  disclosures: ["PROJECTION_NOT_GUARANTEE", "TAXES_EXCLUDED", "FEES_MODELED", "RETURNS_ASSUMED_CONSTANT"],
 };

@@ -115,8 +115,6 @@ export function parseTargetResponse(value: unknown): TargetResponse {
       !["annual_fee_percent", "expected_annual_inflation_percent", "scenario_range_percentage_points"].every((key) => resolved(inputs[key])) ||
       !record(inputs.contribution_plan) || !frequency(inputs.contribution_plan.frequency) || !resolved(inputs.contribution_plan.timing, timing) || !resolved(inputs.contribution_plan.annual_increase_percent)) return invalid();
   if (typeof value.metadata.calculated_at !== "string" || value.metadata.calculation_model_version !== "compound-interest-v2" || value.metadata.scenario_policy_version !== "scenario-policy-v2") return invalid();
-  const disclosureCodes = ["PROJECTION_NOT_GUARANTEE", "TAXES_EXCLUDED", "FEES_MODELED", "RETURNS_ASSUMED_CONSTANT"];
-  if (!Array.isArray(value.disclosures) || !value.disclosures.every((item) => disclosureCodes.includes(item as string))) return invalid();
   const validValues = (item: unknown) => record(item) && ["nominal_balance", "initial_principal", "cumulative_contributions", "cumulative_investment_growth", "inflation_adjusted_balance", "cumulative_fees_paid", "fee_impact"].every((key) => decimal(item[key]));
   if (!Array.isArray(value.scenarios) || value.scenarios.length !== 3) return invalid();
   for (const [index, scenario] of value.scenarios.entries()) {
