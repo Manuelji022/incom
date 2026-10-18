@@ -52,6 +52,9 @@ export async function POST(request: Request) {
     if (error instanceof Error && error.message === "invalid-input") {
       return Response.json({ error: "invalid-input" }, { status: 422 });
     }
+    if (error instanceof Error && error.message === "rate-limited") {
+      return Response.json({ error: "rate-limited" }, { status: 429 });
+    }
     return Response.json({ error: "projection-failed" }, { status: 502 });
   }
 }

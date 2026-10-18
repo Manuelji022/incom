@@ -22,6 +22,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           composition: text.composition,
           scenarios: text.scenarios,
           unavailable: text.unavailable,
+          rateLimited: text.rateLimited,
           invalidInputs: text.invalidInputs,
           staleResults: text.staleResults,
           retry: text.retry,

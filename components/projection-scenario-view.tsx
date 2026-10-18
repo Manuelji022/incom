@@ -23,7 +23,7 @@ type ProjectionScenarioViewProps = {
   locale: Locale;
   languageLabel: string;
   themeLabel: string;
-  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady"> & {
+  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "rateLimited" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady"> & {
     composition: CompositionText;
   };
 };
@@ -230,7 +230,8 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
     } catch (caught) {
       setError(true);
       const rejected = caught instanceof Error && caught.message === "invalid-input";
-      setStatus(rejected ? text.invalidInputs : text.unavailable);
+      const rateLimited = caught instanceof Error && caught.message === "rate-limited";
+      setStatus(rejected ? text.invalidInputs : rateLimited ? text.rateLimited : text.unavailable);
     } finally {
       setPendingPromise(null);
       setSubmitting(false);
