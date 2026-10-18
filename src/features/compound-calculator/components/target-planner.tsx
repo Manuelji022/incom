@@ -19,7 +19,7 @@ import { mockTarget } from "@/features/compound-calculator/lib/mock-target";
 
 type Props = { locale: Locale; text: ReturnType<typeof getDictionary>; targetText: ReturnType<typeof getTargetText>; saveRef?: MutableRefObject<() => boolean>; onStatusChange?: (status: { stale: boolean; submitting: boolean }) => void; className?: string; active?: boolean };
 const sessionKey = "incom:target-session:v2";
-const defaults: Record<string, string> = { target_amount: "1000000.00", initial_principal: "10000.00", duration_years: "20", expected_annual_return_percent: "7", "contribution_plan.frequency": "monthly", "contribution_plan.timing": "end", "contribution_plan.annual_increase_percent": "0", annual_fee_percent: "0.08", expected_annual_inflation_percent: "2.5", scenario_range_percentage_points: "2", target_basis: "nominal" };
+const defaults: Record<string, string> = { target_amount: "1000000", initial_principal: "10000", duration_years: "20", expected_annual_return_percent: "7", "contribution_plan.frequency": "monthly", "contribution_plan.timing": "end", "contribution_plan.annual_increase_percent": "0", annual_fee_percent: "0.08", expected_annual_inflation_percent: "2.5", scenario_range_percentage_points: "2", target_basis: "nominal" };
 
 export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusChange, className = "", active = true }: Props) {
   const [values, setValues] = useState(defaults);
@@ -44,7 +44,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
       if (!saved || typeof saved !== "object" || !saved.values || typeof saved.values !== "object" || !Object.values(saved.values).every((value) => typeof value === "string")) return;
       const restored = saved.result ? parseTargetResponse(saved.result) : null;
       queueMicrotask(() => {
-        setValues({ ...defaults, ...saved.values });
+        setValues({ ...defaults, ...saved.values, initial_principal: saved.values.initial_principal?.replace(/\.0+$/, "") ?? defaults.initial_principal, target_amount: saved.values.target_amount?.replace(/\.0+$/, "") ?? defaults.target_amount });
         if (isCurrency(saved.currency)) setCurrency(saved.currency);
         setResult(restored ?? mockTarget);
         setSample(!restored);
@@ -168,9 +168,9 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
         </header>
         <fieldset id="target-planner-fields" disabled={submitting} className={`space-y-5 p-4 ${collapsed ? "hidden" : ""}`}>
           <Field><FieldLabel htmlFor="target-currency">{text.sidebar.currency}</FieldLabel><Select id="target-currency" value={currency} onChange={(event) => { if (isCurrency(event.currentTarget.value)) setCurrency(event.currentTarget.value); }} aria-describedby="target-currency-help">{currencies.map((value) => <option key={value} value={value}>{value} ({getCurrencySymbol(value)})</option>)}</Select><FieldDescription id="target-currency-help">{t.currencyHelp}</FieldDescription></Field>
-          <NumericField id="target-target_amount" name="target_amount" label={`${t.target} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.target_amount} onChange={(event) => update("target_amount", event.currentTarget.value)} description={t.formatHelp} error={errorFor("target_amount")} />
+          <NumericField id="target-target_amount" name="target_amount" label={`${t.target} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.target_amount} onChange={(event) => update("target_amount", event.currentTarget.value)} error={errorFor("target_amount")} />
           {select("target_basis", t.basis, [{ value: "nominal", label: t.nominal }, { value: "real", label: t.real }], t.basisHelp)}
-          {field("initial_principal", `${text.sidebar.initial} (${getCurrencySymbol(currency)})`, t.initialHelp)}
+          <NumericField id="target-initial_principal" name="initial_principal" label={`${text.sidebar.initial} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.initial_principal} onChange={(event) => update("initial_principal", event.currentTarget.value)} error={errorFor("initial_principal")} />
           <ProjectionSliderFields text={text.sidebar} locale={locale} initialValues={values} idPrefix="target" errors={Object.fromEntries(errors.map((error) => [error.field, error.reason]))} onValueChange={update} />
           <SegmentedControl
             label={text.sidebar.frequency}
