@@ -6,6 +6,7 @@ import { Button } from "@/components/primitives/button";
 import { Input } from "@/components/primitives/input";
 import { NumericField } from "@/components/primitives/numeric-field";
 import { Select } from "@/components/primitives/select";
+import { SegmentedControl } from "@/components/primitives/segmented-control";
 import { Field, FieldDescription, FieldLabel } from "@/components/primitives/field";
 import { fetchTarget, TargetApiError, parseTargetResponse, targetInputFromForm, validateTargetInput } from "@/features/compound-calculator/lib/compound-interest-target";
 import { currencies, getCurrencySymbol, isCurrency, type Currency } from "@/lib/currency";
@@ -150,7 +151,19 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
           {select("target_basis", t.basis, [{ value: "nominal", label: t.nominal }, { value: "real", label: t.real }], t.basisHelp)}
           {field("initial_principal", `${text.sidebar.initial} (${getCurrencySymbol(currency)})`, t.initialHelp)}
           <ProjectionSliderFields text={text.sidebar} locale={locale} initialValues={values} idPrefix="target" errors={Object.fromEntries(errors.map((error) => [error.field, error.reason]))} onValueChange={update} />
-          {select("contribution_plan.frequency", text.sidebar.frequency, ["monthly", "quarterly", "annual"].map((value) => ({ value, label: text.sidebar[value as "monthly" | "quarterly" | "annual"] })))}
+          <SegmentedControl
+            label={text.sidebar.frequency}
+            name="contribution_plan.frequency"
+            value={values["contribution_plan.frequency"] as "monthly" | "quarterly" | "annual"}
+            onValueChange={(value) => update("contribution_plan.frequency", value)}
+            options={["monthly", "quarterly", "annual"].map((value) => ({
+              value,
+              label: text.sidebar[value as "monthly" | "quarterly" | "annual"],
+            }))}
+            aria-invalid={!!errorFor("contribution_plan.frequency")}
+            aria-describedby={errorFor("contribution_plan.frequency") ? "target-contribution_plan-frequency-error" : undefined}
+          />
+          {errorFor("contribution_plan.frequency") ? <p id="target-contribution_plan-frequency-error" className="text-sm text-danger-foreground">{errorFor("contribution_plan.frequency")}</p> : null}
           <details open={advanced} onToggle={(event) => setAdvanced(event.currentTarget.open)} className="border-t border-border-subtle pt-4">
             <summary className="cursor-pointer text-sm font-semibold">{t.advanced}</summary>
             <div className="mt-4 space-y-5"><p className="text-sm text-secondary-foreground">{t.defaults}</p>
