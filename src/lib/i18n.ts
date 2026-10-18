@@ -74,7 +74,6 @@ const dictionaries = {
     staleResults: "Inputs changed. Calculate again to update these results.",
     retry: "Try again",
     validation: "Check the highlighted fields and try again.",
-    resultsReady: "Projection results are ready.",
     chart: {
       none: "No annual projection data is available.",
       reload: "Reload projections",
@@ -218,7 +217,6 @@ const dictionaries = {
     staleResults: "Los datos han cambiado. Calcula de nuevo para actualizar los resultados.",
     retry: "Inténtalo de nuevo",
     validation: "Revisa los campos marcados e inténtalo de nuevo.",
-    resultsReady: "Los resultados de la proyección están listos.",
     chart: {
       none: "No hay datos anuales de proyección disponibles.",
       reload: "Volver a cargar",

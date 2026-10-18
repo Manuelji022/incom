@@ -45,7 +45,6 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
           <span className="font-normal text-secondary-foreground">{period}</span>
         </Button>)}
       </div>
-      <p className="text-sm text-secondary-foreground">{t.rounded}</p>
       {Number(scenario.required_contribution_amount) === 0 ? <p className="rounded-md bg-container p-3 text-sm">{t.zero}</p> : null}
       <dl className="grid gap-4 sm:grid-cols-2">
         {[[t.nominalBalance, scenario.final_summary.nominal_balance], [t.realBalance, scenario.final_summary.inflation_adjusted_balance], [text.summary.totalFeesPaid, scenario.final_summary.cumulative_fees_paid], [text.summary.investmentGrowth, scenario.final_summary.cumulative_investment_growth]].map(([label, value]) => <div key={label}>

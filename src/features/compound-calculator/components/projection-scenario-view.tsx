@@ -22,7 +22,7 @@ type ProjectionScenarioViewProps = {
   dictionary: Dictionary;
   languageLabel: string;
   themeLabel: string;
-  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady" | "validationMessages" | "sampleData" | "languageHandoffPending" | "languageHandoffStorage"> & {
+  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "validationMessages" | "sampleData" | "languageHandoffPending" | "languageHandoffStorage"> & {
     composition: CompositionText;
   };
 };
@@ -77,7 +77,6 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   const controller = useProjectionController(locale, text.validationMessages, {
     calculating: text.sidebar.calculating,
     validation: text.validation,
-    ready: text.resultsReady,
     invalid: text.invalidInputs,
     unavailable: text.unavailable,
   });
