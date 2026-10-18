@@ -60,12 +60,12 @@ describe("target planner", () => {
     await userEvent.click(within(toggle).getByRole("button", { name: "Project growth" }));
     expect((document.querySelector("main#main-content") as HTMLElement | null)?.hidden).toBe(false);
     await userEvent.click(within(toggle).getByRole("button", { name: "Plan a target" }));
-    expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("125000");
+    expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("125,000");
     expect(sessionStorage.getItem("incom:calculator-mode:v1")).toBe("target");
     cleanup();
     mountParent();
     await waitFor(() => expect(within(screen.getByRole("group", { name: "Calculation mode" })).getByRole("button", { name: "Plan a target" }).getAttribute("aria-pressed")).toBe("true"));
-    expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("125000");
+    expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("125,000");
   });
   it("offers an accessible in-page mode toggle", async () => {
     const onModeChange = vi.fn();
@@ -184,7 +184,7 @@ describe("target planner", () => {
     expect(saveRef.current()).toBe(true);
     expect(JSON.parse(sessionStorage.getItem("incom:target-session:v2")!).values.target_amount).toBe("123456.78900");
     cleanup(); mount();
-    await waitFor(() => expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("123456.78900"));
+    await waitFor(() => expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("123,456.78900"));
     expect(screen.getByRole("table")).toBeTruthy();
   });
   it("renders the target form in Spanish", () => {

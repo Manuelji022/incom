@@ -84,7 +84,12 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
     setErrors(next);
     setAdvanced(true);
     window.requestAnimationFrame(() => {
-      const first = formRef.current?.elements.namedItem(next[0]?.field ?? "");
+      const first = Array.from(formRef.current?.elements ?? []).find(
+        (element) =>
+          (element instanceof HTMLInputElement || element instanceof HTMLSelectElement) &&
+          (element.name === next[0]?.field || element.name === `${next[0]?.field}-display`) &&
+          !(element instanceof HTMLInputElement && element.type === "hidden"),
+      );
       if (first instanceof HTMLElement) first.focus();
     });
   }
@@ -209,7 +214,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
         </fieldset>
       </form>
       <section ref={resultRef} tabIndex={-1} aria-label={t.title} aria-busy={submitting} className="min-w-0 bg-page focus-visible:outline-2 focus-visible:outline-brand-border-focus">
-        <p role="status" aria-atomic="true" className={status ? "p-4 text-sm text-secondary-foreground" : "sr-only"}>{status}</p>
+        <p role="status" aria-atomic="true" className={status || stale ? "p-4 text-sm text-secondary-foreground" : "sr-only"}>{status || (stale ? t.stale : "")}</p>
         {failure ? <div role="alert" className="m-4 space-y-2 rounded-md border border-danger-border-default p-4 text-sm"><p>{failure}</p>{errors.length ? <ul className="list-disc ps-5">{errors.map((error, index) => <li key={`${error.field}-${index}`}>{fieldLabels[error.field] ? `${fieldLabels[error.field]}: ` : ""}{error.reason}</li>)}</ul> : null}<Button type="button" variant="outline" onClick={() => formRef.current?.requestSubmit()}>{text.retry}</Button></div> : null}
         {sample ? <p className="px-4 pt-3 text-xs text-secondary-foreground">{t.sampleData}</p> : null}
         {result ? <TargetResults key={result.metadata.calculated_at} result={result} locale={locale} currency={currency} text={text} targetText={t} /> : <div className="mx-auto flex min-h-80 max-w-xl flex-col justify-center gap-4 p-6"><h2 className="text-xl font-semibold">{t.title}</h2><p className="text-secondary-foreground">{t.empty}</p><p className="text-sm text-secondary-foreground">{t.caveat}</p></div>}
