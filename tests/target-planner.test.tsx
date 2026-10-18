@@ -91,14 +91,13 @@ describe("target planner", () => {
     expect(screen.getAllByRole("row")).toHaveLength(4); // Header, year 0, year 1, year 2.
     expect(screen.getByRole("rowheader", { name: "0" })).toBeTruthy();
     expect(screen.getByRole("rowheader", { name: "2" })).toBeTruthy();
-    expect(screen.getByText("Illustrative projections, not guaranteed results.")).toBeTruthy();
-    expect(screen.getByText("Taxes are excluded.")).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Assumptions and disclosures" })).toBeNull();
     expect(screen.getAllByText("Balance in today's money").length).toBeGreaterThan(0);
     await userEvent.click(screen.getByRole("button", { name: /Cautious · 5%/ }));
     expect(screen.getByText("Annual contribution schedule · Cautious")).toBeTruthy();
     const table = screen.getByRole("table");
     expect(within(table).getAllByText(/47,697.12/)).toHaveLength(3);
-    expect(screen.getAllByText(/server default/, { selector: "dd" })[0]).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Resolved assumptions" })).toBeNull();
     change(/Target amount/, "120000");
     expect(screen.getAllByText(targetText.stale).length).toBeGreaterThan(0);
   });
