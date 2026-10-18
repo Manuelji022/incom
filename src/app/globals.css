@@ -120,6 +120,91 @@ html.theme-changing *::after {
   transition: none !important;
 }
 
+.projection-results-enter {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+@starting-style {
+  .projection-results-enter {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.animated-alert {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.animated-alert[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.panel-collapse-content {
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.panel-collapse-content--hidden {
+  opacity: 0;
+  transform: translateX(-4px);
+  pointer-events: none;
+}
+
+.panel-collapse-content--hidden:disabled {
+  opacity: 0;
+}
+
+.panel-collapse-icon {
+  transition: transform 200ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projection-results-enter {
+    transition: opacity 200ms var(--ease-out);
+    transform: none;
+  }
+
+  @starting-style {
+    .projection-results-enter {
+      transform: none;
+    }
+  }
+
+  .animated-alert {
+    transition: opacity 200ms var(--ease-out);
+    transform: none;
+  }
+
+  .animated-alert[data-visible="true"] {
+    transform: none;
+  }
+
+  .panel-collapse-content {
+    transition: opacity 200ms var(--ease-out);
+    transform: none;
+  }
+
+  .panel-collapse-content--hidden {
+    transform: none;
+  }
+
+  .panel-collapse-icon {
+    transition: none;
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--brand-border-focus);
   outline-offset: 2px;
@@ -357,6 +442,9 @@ html.light .theme-toggle__icon--sun {
   --text-code-sm--line-height: 1.5;
   --text-code-xs: 0.6875rem;
   --text-code-xs--line-height: 1.5;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
   /* Box shadows */
   --shadow-border: 0 0 0 1px var(--border-default);

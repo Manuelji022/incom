@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent, type MutableRefObject } from "react";
+import { AnimatedAlert } from "@/components/animated-alert";
 import { TargetResults } from "@/features/compound-calculator/components/target-results";
 import { Button } from "@/components/primitives/button";
 import { Input } from "@/components/primitives/input";
@@ -16,6 +17,7 @@ import type { Locale } from "@/lib/locales";
 import type { ProblemDetail, TargetResponse } from "@/features/compound-calculator/types/compound-interest-target";
 import { ProjectionSliderFields, ScenarioRangeField } from "@/features/compound-calculator/components/slider-fields";
 import { mockTarget } from "@/features/compound-calculator/lib/mock-target";
+import { usePresence } from "@/hooks/use-presence";
 
 type Props = { locale: Locale; text: ReturnType<typeof getDictionary>; targetText: ReturnType<typeof getTargetText>; saveRef?: MutableRefObject<() => boolean>; onStatusChange?: (status: { stale: boolean; submitting: boolean }) => void; className?: string; active?: boolean };
 const sessionKey = "incom:target-session:v2";
@@ -35,6 +37,8 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
   const [collapsed, setCollapsed] = useState(false);
   const [formVersion, setFormVersion] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
+  const { rendered: panelContentRendered, present: panelContentPresent } = usePresence(!collapsed);
+  const panelContentClass = `panel-collapse-content ${panelContentPresent ? "" : "panel-collapse-content--hidden"}`.trim();
   const resultRef = useRef<HTMLElement>(null);
   const inFlight = useRef(false);
 
@@ -153,7 +157,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
     </Field>;
   }
   return <main id={active ? "main-content" : undefined} hidden={!active} tabIndex={-1} className={`grid flex-1 grid-cols-1 ${collapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)]"} ${className}`}>
-      <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name && !target.name.endsWith("-display")) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""}`}>
+      <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name && !target.name.endsWith("-display")) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-default bg-container lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""}`}>
         <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle p-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
           <h1 className={`text-base font-semibold ${collapsed ? "lg:hidden" : ""}`}>{t.title}</h1>
           <Button
@@ -167,11 +171,11 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
             className={`min-h-11 shrink-0 lg:min-h-8 lg:px-2 ${collapsed ? "lg:absolute lg:start-0 lg:top-5 lg:z-20" : ""}`}
           >
             <span className="lg:hidden">{collapsed ? text.sidebar.edit : text.sidebar.hide}</span>
-            <span aria-hidden="true" className={`size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
+            <span aria-hidden="true" className={`panel-collapse-icon size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
           </Button>
           <p className={`col-span-2 text-sm leading-5 text-secondary-foreground ${collapsed ? "lg:hidden" : ""}`}>{t.intro}</p>
         </header>
-        <fieldset id="target-planner-fields" disabled={submitting} className={`space-y-5 p-4 ${collapsed ? "hidden" : ""}`}>
+        <fieldset id="target-planner-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`space-y-5 p-4 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
           <Field><FieldLabel htmlFor="target-currency">{text.sidebar.currency}</FieldLabel><Select id="target-currency" value={currency} onChange={(event) => { if (isCurrency(event.currentTarget.value)) setCurrency(event.currentTarget.value); }} aria-describedby="target-currency-help">{currencies.map((value) => <option key={value} value={value}>{value} ({getCurrencySymbol(value)})</option>)}</Select><FieldDescription id="target-currency-help">{t.currencyHelp}</FieldDescription></Field>
           <NumericField id="target-target_amount" name="target_amount" label={`${t.target} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.target_amount} onChange={(event) => update("target_amount", event.currentTarget.value)} error={errorFor("target_amount")} />
           {select("target_basis", t.basis, [{ value: "nominal", label: t.nominal }, { value: "real", label: t.real }], t.basisHelp)}
@@ -214,10 +218,14 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
         </fieldset>
       </form>
       <section ref={resultRef} tabIndex={-1} aria-label={t.title} aria-busy={submitting} className="min-w-0 bg-page focus-visible:outline-2 focus-visible:outline-brand-border-focus">
-        <p role="status" aria-atomic="true" className={status || stale ? "p-4 text-sm text-secondary-foreground" : "sr-only"}>{status || (stale ? t.stale : "")}</p>
-        {failure ? <div role="alert" className="m-4 space-y-2 rounded-md border border-danger-border-default p-4 text-sm"><p>{failure}</p>{errors.length ? <ul className="list-disc ps-5">{errors.map((error, index) => <li key={`${error.field}-${index}`}>{fieldLabels[error.field] ? `${fieldLabels[error.field]}: ` : ""}{error.reason}</li>)}</ul> : null}<Button type="button" variant="outline" onClick={() => formRef.current?.requestSubmit()}>{text.retry}</Button></div> : null}
+        <p role="status" aria-atomic="true" className={status ? "p-4 text-sm text-secondary-foreground" : "sr-only"}>{status}</p>
+        <AnimatedAlert visible={!!failure} className="m-4 space-y-2 rounded-md border border-danger-border-default p-4 text-sm">
+          <p>{failure}</p>
+          {errors.length ? <ul className="list-disc ps-5">{errors.map((error, index) => <li key={`${error.field}-${index}`}>{fieldLabels[error.field] ? `${fieldLabels[error.field]}: ` : ""}{error.reason}</li>)}</ul> : null}
+          <Button type="button" variant="outline" onClick={() => formRef.current?.requestSubmit()}>{text.retry}</Button>
+        </AnimatedAlert>
         {sample ? <p className="px-4 pt-3 text-xs text-secondary-foreground">{t.sampleData}</p> : null}
-        {result ? <TargetResults key={result.metadata.calculated_at} result={result} locale={locale} currency={currency} text={text} targetText={t} /> : <div className="mx-auto flex min-h-80 max-w-xl flex-col justify-center gap-4 p-6"><h2 className="text-xl font-semibold">{t.title}</h2><p className="text-secondary-foreground">{t.empty}</p><p className="text-sm text-secondary-foreground">{t.caveat}</p></div>}
+        {result ? <div key={result.metadata.calculated_at} className="projection-results-enter"><TargetResults result={result} locale={locale} currency={currency} text={text} targetText={t} /></div> : <div className="mx-auto flex min-h-80 max-w-xl flex-col justify-center gap-4 p-6"><h2 className="text-xl font-semibold">{t.title}</h2><p className="text-secondary-foreground">{t.empty}</p><p className="text-sm text-secondary-foreground">{t.caveat}</p></div>}
       </section>
     </main>;
 }

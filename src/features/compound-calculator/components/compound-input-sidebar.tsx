@@ -2,6 +2,8 @@
 
 import { useState, type ComponentProps } from "react";
 
+import { usePresence } from "@/hooks/use-presence";
+
 import { Button } from "@/components/primitives/button";
 import { FieldGroup } from "@/components/primitives/field";
 import { NumericField } from "@/components/primitives/numeric-field";
@@ -75,6 +77,8 @@ export function CompoundInputSidebar({
   const contributionSummary = parsed(summaryValues.recurring) > 0 ? ` · ${format.format(parsed(summaryValues.recurring))} ${frequencyLabel.toLocaleLowerCase(locale)}` : "";
   const summary = `${format.format(parsed(summaryValues.principal))}${contributionSummary} · ${summaryValues.years} ${text.years} · ${number.format(parsed(summaryValues.expectedReturn))}%`;
   const advancedSummary = `${text.fee} ${number.format(parsed(summaryValues.fee))}% · ${text.inflation} ${number.format(parsed(summaryValues.inflation || "2"))}% · ±${number.format(parsed(summaryValues.range || "2"))} pp`;
+  const { rendered: panelContentRendered, present: panelContentPresent } = usePresence(!collapsed);
+  const panelContentClass = `panel-collapse-content ${panelContentPresent ? "" : "panel-collapse-content--hidden"}`.trim();
   const summaryFieldKeys: Record<string, keyof typeof summaryValues> = {
     initial_principal: "principal",
     "recurring_contribution.amount": "recurring",
@@ -96,7 +100,7 @@ export function CompoundInputSidebar({
         const key = summaryFieldKeys[target.name] ?? summaryFieldKeys[target.id];
         if (key) setSummaryValues((values) => ({ ...values, [key]: target.value }));
       }}
-      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
+      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
     >
       <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle px-4 py-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
         <h2 id="compound-input-sidebar-title" className={`text-base font-semibold leading-6 text-primary-foreground ${collapsed ? "lg:hidden" : ""}`}>
@@ -113,14 +117,14 @@ export function CompoundInputSidebar({
           className={`min-h-11 shrink-0 lg:min-h-8 lg:px-2 ${collapsed ? "lg:absolute lg:start-0 lg:top-5 lg:z-20" : ""}`}
         >
           <span className="lg:hidden">{collapsed ? text.edit : text.hide}</span>
-          <span aria-hidden="true" className={`size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
+          <span aria-hidden="true" className={`panel-collapse-icon size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
         </Button>
         <p className={`col-span-2 text-sm leading-5 text-secondary-foreground ${collapsed ? "lg:hidden" : ""}`}>
           {collapsed ? summary : text.intro}
         </p>
       </header>
 
-      <fieldset id="compound-input-sidebar-fields" disabled={submitting} className={`m-0 min-h-0 min-w-0 flex-1 border-0 px-4 py-5 disabled:opacity-100 ${collapsed ? "hidden" : ""}`}>
+      <fieldset id="compound-input-sidebar-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`m-0 min-h-0 min-w-0 flex-1 border-0 px-4 py-5 disabled:opacity-100 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
         <div className="space-y-6">
           <section
             aria-labelledby="contribution-fields-title"
@@ -294,9 +298,9 @@ export function CompoundInputSidebar({
         </div>
       </fieldset>
 
-      <footer className={`border-t border-border-subtle px-4 py-4 ${collapsed ? "hidden" : ""}`}>
-        <Button type="submit" disabled={submitting} className="min-h-12 w-full lg:min-h-10">
-          {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
+      <footer inert={collapsed} aria-hidden={collapsed} className={`border-t border-border-subtle px-4 py-4 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
+        <Button type="submit" disabled={submitting || collapsed} className="min-h-12 w-full lg:min-h-10">
+          {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 motion-safe:animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
         </Button>
       </footer>
     </aside>

@@ -19,19 +19,6 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
   const money = (value: string) => format.format(value as unknown as number);
   const plan = inputs.contribution_plan;
   const period = plan.frequency === "monthly" ? t.perMonth : plan.frequency === "quarterly" ? t.perQuarter : t.perYear;
-  const disclosureText = {
-    PROJECTION_NOT_GUARANTEE: t.caveat,
-    TAXES_EXCLUDED: t.taxes,
-    FEES_MODELED: t.fees,
-    RETURNS_ASSUMED_CONSTANT: t.constant,
-  } as const;
-  const resolvedAssumptions = [
-    [text.sidebar.fee, inputs.annual_fee_percent],
-    [text.sidebar.inflation, inputs.expected_annual_inflation_percent],
-    [text.sidebar.range, inputs.scenario_range_percentage_points],
-    [text.sidebar.timing, inputs.contribution_plan.timing],
-    [text.sidebar.increase, inputs.contribution_plan.annual_increase_percent],
-  ] as const;
   const summaryMetrics = [
     [t.nominalBalance, scenario.final_summary.nominal_balance],
     [t.realBalance, scenario.final_summary.inflation_adjusted_balance],
@@ -89,20 +76,5 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
         </table>
       </div>
     </section>
-    <section aria-labelledby="target-disclosures-title" className="space-y-2 p-4 sm:p-6">
-      <h2 id="target-disclosures-title" className="text-base font-semibold">{t.disclosures}</h2>
-      <ul className="list-inside list-disc space-y-1 text-sm text-secondary-foreground">
-        {result.disclosures.map((code) => <li key={code}>{disclosureText[code]}</li>)}
-      </ul>
-    </section>
-    <details className="border-t border-border-subtle p-4 sm:p-6">
-      <summary className="cursor-pointer text-sm font-medium">{t.assumptions}</summary>
-      <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-        {resolvedAssumptions.map(([label, resolved]) => <div key={label}>
-          <dt className="text-secondary-foreground">{label}</dt>
-          <dd>{resolved.value} · {resolved.source === "server_default" ? t.defaultSource : t.callerSource}</dd>
-        </div>)}
-      </dl>
-    </details>
   </>;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, use, useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type SyntheticEvent } from "react";
+import { AnimatedAlert } from "@/components/animated-alert";
 import { Header } from "@/components/header";
 import { InsightsSidebar } from "@/features/compound-calculator/components/insights-sidebar";
 import { ProjectionResults } from "@/features/compound-calculator/components/projection-results";
@@ -144,7 +145,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
 
   return (
     <>
-    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={mode === "target" ? targetStatus.stale : stale} staleText={mode === "target" ? targetText.stale : text.staleResults} onBeforeLanguageChange={(destination) => {
+    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={mode === "target" ? false : stale} staleText={mode === "target" ? targetText.stale : text.staleResults} onBeforeLanguageChange={(destination) => {
       if (submitting || targetStatus.submitting) return { status: "pending" };
       const projectionSave = saveBeforeLocaleChange(destination);
       if (projectionSave.status !== "saved") return projectionSave;
@@ -172,7 +173,9 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className="min-w-0 border-e border-border-subtle bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
         {sample ? <p className="px-4 pt-3 text-xs text-secondary-foreground">{text.sampleData}</p> : null}
-        {error ? <div role="alert" className="mx-4 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{status} <button type="submit" className="ms-2 underline">{text.retry}</button></div> : null}
+        <AnimatedAlert visible={error} className="mx-4 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">
+          {status} <button type="submit" className="ms-2 underline">{text.retry}</button>
+        </AnimatedAlert>
         <Suspense fallback={<ProjectionSkeleton />}>
           <RequestGate promise={pendingPromise} />
           {selectedScenario ? <ProjectionResults

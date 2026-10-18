@@ -48,7 +48,7 @@ export function ProjectionResults({
   text,
 }: ProjectionResultsProps) {
   return (
-    <section className="min-w-0 lg:border-e lg:border-border-subtle bg-page">
+    <section className="projection-results-enter min-w-0 bg-page lg:border-e lg:border-border-subtle">
       <ProjectionHeader
         nominalBalance={selectedScenario.final_summary.nominal_balance}
         durationYears={durationYears}
