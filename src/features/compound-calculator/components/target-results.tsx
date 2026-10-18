@@ -32,10 +32,12 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
     <section aria-labelledby="target-contributions-title" className="space-y-4 border-b border-border-subtle p-4 sm:p-6">
       <h2 id="target-contributions-title" className="text-lg font-semibold">{t.contribution}</h2>
       <div className="grid gap-3 sm:grid-cols-3">
-        {result.scenarios.map((item) => <Button key={item.name} type="button" variant="outline" aria-pressed={scenario.name === item.name} onClick={() => setSelected(item.name)} className="h-auto min-w-0 flex-col items-start gap-2 p-4 text-start aria-pressed:border-brand-border-focus aria-pressed:bg-brand-subtle">
+        {result.scenarios.map((item) => <Button key={item.name} type="button" variant="outline" aria-pressed={scenario.name === item.name} onClick={() => setSelected(item.name)} className="h-auto min-w-0 flex-col items-stretch gap-2 p-4 text-start aria-pressed:border-brand-border-focus aria-pressed:bg-brand-subtle">
           <span className="font-semibold">{text.scenarios[item.name]} · {item.annual_return_percent}%</span>
-          <span className="break-all text-2xl font-semibold tabular-nums">{money(item.required_contribution_amount)}</span>
-          <span className="font-normal text-secondary-foreground">{period}</span>
+          <span className="flex w-full min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <span className="min-w-0 text-2xl font-semibold tabular-nums">{money(item.required_contribution_amount)}</span>
+            <span className="font-normal text-secondary-foreground">{period}</span>
+          </span>
         </Button>)}
       </div>
       {Number(scenario.required_contribution_amount) === 0 ? <p className="rounded-md bg-container p-3 text-sm">{t.zero}</p> : null}
