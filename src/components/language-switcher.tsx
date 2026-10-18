@@ -17,10 +17,6 @@ export type LanguageChangeResult =
   | { status: "pending" }
   | { status: "storage" };
 
-function isLocale(value: string): value is Locale {
-  return value === "en" || value === "es";
-}
-
 export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submitting, handoffText }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -34,6 +30,8 @@ export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submit
   }, [pathname]);
 
   function changeLanguage(nextLocale: Locale) {
+    if (nextLocale === locale) return;
+
     const result = onBeforeLanguageChange(nextLocale);
     if (result.status !== "saved") {
       setHandoffError(result.status);
@@ -49,27 +47,40 @@ export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submit
     router.push(`/${nextLocale}${suffix}${query}${location.hash}`);
   }
 
-  function handleChange(value: string) {
-    if (isLocale(value)) changeLanguage(value);
-  }
-
   return (
-    <div className="relative flex items-center gap-2 text-sm text-secondary-foreground">
-      <span className="sr-only sm:not-sr-only">{label}</span>
-      <select
+    <div className="relative">
+      <div
         aria-label={label}
-        value={locale}
-        onChange={(event) => handleChange(event.currentTarget.value)}
-        className="min-h-10 appearance-none rounded border border-control-border bg-container py-1 pe-7 ps-2 sm:pe-9 text-base text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"
+        className="flex items-center gap-1 font-mono text-code-sm"
+        role="group"
       >
-        <option value="en">English</option>
-        <option value="es">Español</option>
-      </select>
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute end-2 top-1/2 size-4 -translate-y-1/2 bg-current text-secondary-foreground [mask-image:url('/assets/svgs/chevron-down.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] sm:end-3"
-      />
-      {handoffError === "storage" || (handoffError === "pending" && submitting) ? <span role="alert" className="absolute end-0 top-full z-30 mt-1 w-64 rounded border border-danger-border-default bg-container p-2 text-xs text-danger-foreground">{handoffError === "pending" ? handoffText.pending : handoffText.storage}</span> : null}
+        <button
+          aria-label="English"
+          aria-pressed={locale === "en"}
+          className={`min-h-10 min-w-10 rounded-sm px-2 py-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus ${locale === "en" ? "text-primary-foreground" : "text-secondary-foreground"}`}
+          onClick={() => changeLanguage("en")}
+          type="button"
+        >
+          EN
+        </button>
+        <button
+          aria-label="Español"
+          aria-pressed={locale === "es"}
+          className={`min-h-10 min-w-10 rounded-sm px-2 py-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus ${locale === "es" ? "text-primary-foreground" : "text-secondary-foreground"}`}
+          onClick={() => changeLanguage("es")}
+          type="button"
+        >
+          ES
+        </button>
+      </div>
+      {handoffError === "storage" || (handoffError === "pending" && submitting) ? (
+        <span
+          role="alert"
+          className="absolute end-0 top-full z-30 mt-1 w-64 rounded border border-danger-border-default bg-container p-2 text-xs text-danger-foreground"
+        >
+          {handoffError === "pending" ? handoffText.pending : handoffText.storage}
+        </span>
+      ) : null}
     </div>
   );
 }
