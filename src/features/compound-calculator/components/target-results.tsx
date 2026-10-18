@@ -19,6 +19,15 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
   const money = (value: string) => format.format(value as unknown as number);
   const plan = inputs.contribution_plan;
   const period = plan.frequency === "monthly" ? t.perMonth : plan.frequency === "quarterly" ? t.perQuarter : t.perYear;
+  const summaryMetrics = [
+    [t.nominalBalance, scenario.final_summary.nominal_balance],
+    [t.realBalance, scenario.final_summary.inflation_adjusted_balance],
+    [text.summary.totalFeesPaid, scenario.final_summary.cumulative_fees_paid],
+    [
+      text.summary.investmentGrowth,
+      scenario.final_summary.cumulative_investment_growth,
+    ],
+  ] as const;
   return <>
     <section aria-labelledby="target-contributions-title" className="space-y-4 border-b border-border-subtle p-4 sm:p-6">
       <h2 id="target-contributions-title" className="text-lg font-semibold">{t.contribution}</h2>
@@ -30,16 +39,27 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
         </Button>)}
       </div>
       {Number(scenario.required_contribution_amount) === 0 ? <p className="rounded-md bg-container p-3 text-sm">{t.zero}</p> : null}
-      <dl className="grid gap-4 sm:grid-cols-2">
-        {[[t.nominalBalance, scenario.final_summary.nominal_balance], [t.realBalance, scenario.final_summary.inflation_adjusted_balance], [text.summary.totalFeesPaid, scenario.final_summary.cumulative_fees_paid], [text.summary.investmentGrowth, scenario.final_summary.cumulative_investment_growth]].map(([label, value]) => <div key={label}>
-          <dt className="text-sm text-secondary-foreground">{label}</dt><dd className="mt-1 break-all text-xl font-semibold tabular-nums">{money(value)}</dd>
-        </div>)}
+      <dl className="grid lg:grid-cols-4">
+        {summaryMetrics.map(([label, value]) => (
+          <div
+            key={label}
+            className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,45%)] items-baseline gap-x-4 gap-y-1 py-3 lg:flex lg:flex-col lg:gap-0 lg:px-3"
+          >
+            <dt className="min-h-5 text-xs leading-normal text-secondary-foreground lg:grid lg:min-h-[2lh] lg:content-end">
+              {label}
+            </dt>
+            <dd className="min-w-0 text-end [overflow-wrap:anywhere] text-base font-semibold leading-7 tracking-[-0.025em] tabular-nums text-primary-foreground lg:text-start lg:text-[clamp(1rem,5vw,1.25rem)]">
+              {money(value)}
+            </dd>
+          </div>
+        ))}
       </dl>
     </section>
-    <ProjectionChart points={scenario.annual_points} locale={locale} currency={currency} text={{ ...text.chart, scenario: text.chart.scenario.replace("{scenario}", text.scenarios[scenario.name]), aria: text.chart.aria.replace("{scenario}", text.scenarios[scenario.name]) }} />
+    <ProjectionChart points={scenario.annual_points} locale={locale} currency={currency} inset="section" text={{ ...text.chart, scenario: text.chart.scenario.replace("{scenario}", text.scenarios[scenario.name]), aria: text.chart.aria.replace("{scenario}", text.scenarios[scenario.name]) }} />
     <section aria-labelledby="target-schedule-title" className="space-y-3 border-b border-border-subtle p-4 sm:p-6">
       <h2 id="target-schedule-title" className="text-lg font-semibold">{t.schedule} · {text.scenarios[scenario.name]}</h2>
       <p className="text-sm text-secondary-foreground">{t.scheduleHelp}</p>
+      <p className="text-sm text-secondary-foreground">{t.scheduleScrollHelp}</p>
       <div tabIndex={0} role="region" aria-labelledby="target-schedule-title" className="max-h-[32rem] overflow-auto rounded-md border border-border-subtle focus-visible:outline-2 focus-visible:outline-brand-border-focus">
         <table className="w-full min-w-[54rem] text-start text-sm tabular-nums">
           <caption className="sr-only">{t.schedule} · {text.scenarios[scenario.name]} · {period}</caption>
