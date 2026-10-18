@@ -4,14 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { Footer } from "@/components/footer";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Header } from "@/components/header";
 
 const copy = {
   en: {
-    home: "Incom home",
     language: "Language",
     theme: "Toggle light and dark theme",
     skip: "Skip to main content",
+    handoffPending: "Wait for the calculation to finish before changing language.",
+    handoffStorage: "Your changes could not be saved. Please try again.",
     eyebrow: "Error 404 · Route not found",
     title: "Page not found.",
     description:
@@ -23,10 +24,11 @@ const copy = {
     footer: "Designed by",
   },
   es: {
-    home: "Inicio de Incom",
     language: "Idioma",
     theme: "Cambiar entre tema claro y oscuro",
     skip: "Saltar al contenido principal",
+    handoffPending: "Espera a que termine el cálculo antes de cambiar el idioma.",
+    handoffStorage: "No se pudieron conservar los cambios. Inténtalo de nuevo.",
     eyebrow: "Error 404 · Ruta no encontrada",
     title: "Página no encontrada.",
     description:
@@ -58,43 +60,24 @@ export function NotFoundScreen({ includeSkipLink = false }: { includeSkipLink?: 
           {text.skip}
         </a>
       ) : null}
-      <header className="flex min-h-16 w-full items-center justify-between gap-4 border-b border-border-subtle px-4 py-3 sm:min-h-[72px] sm:px-6">
-        <Link
-          aria-label={text.home}
-          className="rounded-xs font-sans text-[15px] leading-none font-bold tracking-[-0.045em] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-border-focus"
-          href={`/${locale}`}
-        >
-          COMPOUNDING
-        </Link>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <nav
-            aria-label={text.language}
-            className="flex items-center gap-1 font-mono text-code-sm"
-          >
-            <Link
-              aria-current={locale === "en" ? "true" : undefined}
-              aria-label="English"
-              className={`rounded-sm px-2 py-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus ${locale === "en" ? "text-primary-foreground" : "text-secondary-foreground"}`}
-              href="/en"
-            >
-              EN
-            </Link>
-            <Link
-              aria-current={locale === "es" ? "true" : undefined}
-              aria-label="Español"
-              className={`rounded-sm px-2 py-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus ${locale === "es" ? "text-primary-foreground" : "text-secondary-foreground"}`}
-              href="/es"
-            >
-              ES
-            </Link>
-          </nav>
-          <ThemeToggle label={text.theme} />
-        </div>
-      </header>
+      <Header
+        locale={locale}
+        languageLabel={text.language}
+        themeLabel={text.theme}
+        stale={false}
+        staleText=""
+        onBeforeLanguageChange={() => ({ status: "saved" })}
+        submitting={false}
+        languageHandoffText={{
+          pending: text.handoffPending,
+          storage: text.handoffStorage,
+        }}
+      />
 
       <main
         className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-12 px-5 py-12 sm:px-8 md:py-16 lg:grid-cols-[1fr_0.95fr] lg:gap-20 lg:px-12"
         id="main-content"
+        tabIndex={-1}
       >
         <section className="max-w-2xl">
           <p className="mb-4 font-mono text-code-sm font-medium tracking-[0.12em] text-brand-foreground uppercase">
