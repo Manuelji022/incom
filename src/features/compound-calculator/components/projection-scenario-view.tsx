@@ -5,25 +5,19 @@ import { Header } from "@/components/header";
 import { InsightsSidebar } from "@/features/compound-calculator/components/insights-sidebar";
 import { ProjectionResults } from "@/features/compound-calculator/components/projection-results";
 import { CompoundInputSidebar } from "@/features/compound-calculator/components/compound-input-sidebar";
-import { fetchProjection } from "@/features/compound-calculator/api/compound-interest";
-import { mockProjection } from "@/features/compound-calculator/lib/mock-projection";
-import type { Currency } from "@/lib/currency";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
-import type { CompoundInterestProjectionInput, CompoundInterestProjectionResponse, ProjectionScenario } from "@/features/compound-calculator/types/compound-interest";
 import { clearFieldValidation, showFieldValidation } from "@/features/compound-calculator/lib/field-validation";
-import { isValidDecimalInput, normalizeDecimalInput } from "@/features/compound-calculator/lib/decimal-input";
-import { consumeProjectionSession, saveProjectionSession } from "@/features/compound-calculator/lib/projection-session";
+import { useProjectionController } from "@/features/compound-calculator/hooks/use-projection-controller";
 
 type Dictionary = ReturnType<typeof getDictionary>;
-type ScenarioName = ProjectionScenario["name"];
 type CompositionDictionary = Dictionary["composition"];
 type CompositionText = { [Key in keyof CompositionDictionary]: string };
 type ProjectionScenarioViewProps = {
   locale: Locale;
   languageLabel: string;
   themeLabel: string;
-  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady"> & {
+  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady" | "validationMessages" | "sampleData" | "languageHandoffPending" | "languageHandoffStorage"> & {
     composition: CompositionText;
   };
 };
@@ -73,67 +67,21 @@ function InsightsSkeleton() {
   </aside>;
 }
 
-function inputFromForm(form: HTMLFormElement): CompoundInterestProjectionInput {
-  const values = new FormData(form);
-  const get = (name: string) => String(values.get(name) ?? "").trim();
-  const decimal = (name: string) => normalizeDecimalInput(get(name));
-  const amount = get("recurring_contribution.amount");
-  const frequency = get("recurring_contribution.frequency");
-  const timing = get("recurring_contribution.timing");
-  const input: CompoundInterestProjectionInput = {
-    initial_principal: decimal("initial_principal"),
-    duration_years: Number(decimal("duration_years")),
-    expected_annual_return_percent: decimal("expected_annual_return_percent"),
-    ...(decimal("annual_fee_percent") === "" ? {} : { annual_fee_percent: decimal("annual_fee_percent") }),
-    ...(decimal("expected_annual_inflation_percent") === "" ? {} : { expected_annual_inflation_percent: decimal("expected_annual_inflation_percent") }),
-    ...(decimal("scenario_range_percentage_points") === "" ? {} : { scenario_range_percentage_points: decimal("scenario_range_percentage_points") }),
-  };
-  if (amount !== "" && Number(normalizeDecimalInput(amount)) > 0) {
-    input.recurring_contribution = {
-      amount: normalizeDecimalInput(amount),
-      frequency: frequency === "quarterly" || frequency === "annual" ? frequency : "monthly",
-      timing: timing === "beginning" ? "beginning" : "end",
-      ...(decimal("recurring_contribution.annual_increase_percent") === "" ? {} : { annual_increase_percent: decimal("recurring_contribution.annual_increase_percent") }),
-    };
-  }
-  return input;
-}
-
 export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text }: ProjectionScenarioViewProps) {
-  const [projection, setProjection] = useState<CompoundInterestProjectionResponse>(mockProjection);
-  const [sample, setSample] = useState(true);
-  const [pendingPromise, setPendingPromise] = useState<Promise<void> | null>(null);
-  const [selectedName, setSelectedName] = useState<ScenarioName>("expected");
-  const [currency, setCurrency] = useState<Currency>("EUR");
+  const controller = useProjectionController(locale, text.validationMessages, {
+    calculating: text.sidebar.calculating,
+    validation: text.validation,
+    ready: text.resultsReady,
+    invalid: text.invalidInputs,
+    unavailable: text.unavailable,
+  });
+  const { projection, sample, pendingPromise, selectedName, setSelectedName, currency, setCurrency, sidebarCollapsed, setSidebarCollapsed, submitting, error, stale, setStale, status, restoredValues, formVersion } = controller;
   const isDesktop = useSyncExternalStore(subscribeDesktop, getDesktopSnapshot, getServerDesktopSnapshot);
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(false);
-  const [stale, setStale] = useState(false);
-  const [status, setStatus] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
-  const [restoredValues, setRestoredValues] = useState<Record<string, string> | undefined>();
-  const [formVersion, setFormVersion] = useState(0);
   const resultsRef = useRef<HTMLElement>(null);
   const revealResults = useRef(false);
   const selectedScenario = projection?.scenarios.find((scenario) => scenario.name === selectedName);
-
-  useEffect(() => {
-    const session = consumeProjectionSession(locale);
-    if (!session) return;
-    queueMicrotask(() => {
-      setRestoredValues(session.values);
-      setProjection(session.projection);
-      setSample(session.sample);
-      setSelectedName(session.selectedName);
-      setCurrency(session.currency);
-      setStale(session.stale);
-      setSidebarCollapsed(session.sidebarCollapsed);
-      setFormVersion((version) => version + 1);
-      document.getElementById("main-content")?.focus();
-    });
-  }, [locale]);
 
   useEffect(() => {
     if (submitting || pendingPromise || !revealResults.current) return;
@@ -155,91 +103,25 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
     }
   };
 
-  const saveBeforeLocaleChange = (destination: Locale) => {
-    if (submitting) return false;
-    const values: Record<string, string> = {};
-    if (formRef.current) {
-      for (const element of Array.from(formRef.current.elements)) {
-        if (!(element instanceof HTMLInputElement || element instanceof HTMLSelectElement) || !element.name) continue;
-        if (element instanceof HTMLInputElement && (element.type === "radio" || element.type === "checkbox")) {
-          if (element.checked) values[element.name] = element.value;
-        } else values[element.name] = element.value;
-      }
-    }
-    return saveProjectionSession({ destination, values, projection, sample, selectedName, currency, stale, sidebarCollapsed });
-  };
+  const saveBeforeLocaleChange = (destination: Locale) => controller.saveBeforeLocaleChange(destination, formRef.current);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (submitting) return;
     const form = event.currentTarget;
-    const decimalFields = Array.from(form.elements).filter(
-      (element): element is HTMLInputElement => element instanceof HTMLInputElement && element.inputMode === "decimal",
-    );
-    for (const field of decimalFields) {
-      const raw = field.value.trim();
-      const value = normalizeDecimalInput(raw);
-      const numeric = Number(value);
-      const min = field.min === "" ? undefined : Number(field.min);
-      const max = field.max === "" ? undefined : Number(field.max);
-      const step = field.step === "" || field.step === "any" ? undefined : Number(field.step);
-      let invalid = !isValidDecimalInput(raw) || (raw !== "" && !Number.isFinite(numeric));
-      if (raw === "" && field.required) invalid = true;
-      if (!invalid && raw !== "" && min !== undefined && numeric < min) invalid = true;
-      if (!invalid && raw !== "" && max !== undefined && numeric > max) invalid = true;
-      if (!invalid && raw !== "" && step !== undefined && Math.abs((numeric - (min ?? 0)) / step - Math.round((numeric - (min ?? 0)) / step)) > 1e-8) invalid = true;
-      field.setCustomValidity(invalid
-        ? (locale === "es" ? "Introduce un número válido dentro del rango permitido." : "Enter a valid number within the allowed range.")
-        : "");
-    }
-    const amount = form.elements.namedItem("recurring_contribution.amount");
-    const principal = form.elements.namedItem("initial_principal");
-    if (amount instanceof HTMLInputElement && principal instanceof HTMLInputElement && amount.validity.valid && principal.validity.valid) {
-      const priorError = principal.validationMessage;
-      const missingPrincipal = (amount.value.trim() === "" || Number(normalizeDecimalInput(amount.value)) <= 0) && Number(normalizeDecimalInput(principal.value)) <= 0;
-      principal.setCustomValidity(missingPrincipal
-        ? (locale === "es" ? "La inversión inicial debe ser mayor que cero si no hay aportaciones." : "Initial investment must be greater than zero when there are no contributions.")
-        : priorError);
-    }
-    if (!form.checkValidity()) {
-      const invalid = Array.from(form.elements).filter((element): element is HTMLInputElement => element instanceof HTMLInputElement && !element.validity.valid);
+    void controller.submit(form, (invalid) => {
       for (const field of invalid) {
         showFieldValidation(field, locale);
       }
-      setStatus(text.validation);
       const firstInvalid = invalid[0];
       if (firstInvalid?.closest("#advanced-assumption-fields")) setAdvancedOpen(true);
       if (sidebarCollapsed) setSidebarCollapsed(false);
       window.requestAnimationFrame(() => firstInvalid?.focus());
-      return;
-    }
-    setSubmitting(true);
-    setError(false);
-    setStatus(text.sidebar.calculating);
-    const request = fetchProjection(inputFromForm(form));
-    setPendingPromise(request.then(() => undefined, () => undefined));
-    try {
-      const result = await request;
-      setProjection(result);
-      setSample(false);
-      setSelectedName("expected");
-      setStale(false);
-      setStatus(text.resultsReady);
-      if (!window.matchMedia(desktopQuery).matches) setSidebarCollapsed(true);
-      revealResults.current = true;
-    } catch (caught) {
-      setError(true);
-      const rejected = caught instanceof Error && caught.message === "invalid-input";
-      setStatus(rejected ? text.invalidInputs : text.unavailable);
-    } finally {
-      setPendingPromise(null);
-      setSubmitting(false);
-    }
+    }, () => { revealResults.current = true; });
   };
 
   return (
     <>
-    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} onBeforeLanguageChange={saveBeforeLocaleChange} submitting={submitting} />
+    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} onBeforeLanguageChange={saveBeforeLocaleChange} submitting={submitting} languageHandoffText={{ pending: text.languageHandoffPending, storage: text.languageHandoffStorage }} />
     <main id="main-content" tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)_19.5rem]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]"}`}>
     <form key={formVersion} ref={formRef} noValidate onSubmit={handleSubmit} onInput={(event) => {
       const target = event.target;
@@ -250,7 +132,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
       <CompoundInputSidebar advancedOpen={advancedOpen} onToggleAdvanced={() => setAdvancedOpen((value) => !value)} text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed((value) => !value)} currency={currency} onCurrencyChange={setCurrency} initialValues={restoredValues} />
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className="min-w-0 border-e border-border-subtle bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
-        {sample ? <p className="px-4 pt-3 text-xs text-secondary-foreground">{locale === "es" ? "Datos de ejemplo" : "Sample data"}</p> : null}
+        {sample ? <p className="px-4 pt-3 text-xs text-secondary-foreground">{text.sampleData}</p> : null}
         {error ? <div role="alert" className="mx-4 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">{status} <button type="submit" className="ms-2 underline">{text.retry}</button></div> : null}
         <Suspense fallback={<ProjectionSkeleton />}>
           <RequestGate promise={pendingPromise} />
@@ -272,15 +154,15 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
       </section>
       {isDesktop ? <Suspense fallback={<InsightsSkeleton />}>
         <RequestGate promise={pendingPromise} />
-        <InsightsSidebar
+        {selectedScenario ? <InsightsSidebar
           scenarios={projection.scenarios}
-          selectedScenario={selectedName}
+          selectedScenario={selectedScenario}
           onSelectScenario={setSelectedName}
           durationYears={projection.resolved_inputs.duration_years}
           locale={locale}
           currency={currency}
           text={{ scenarios: text.scenarios, composition: text.composition }}
-        />
+        /> : null}
       </Suspense> : null}
     </form>
     </main>

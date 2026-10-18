@@ -1,6 +1,8 @@
 import type { ProjectionPoint } from "@/features/compound-calculator/types/compound-interest";
 import type { Locale } from "@/lib/locales";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
+import { getTotalInvested } from "@/features/compound-calculator/lib/projection-point-metrics";
+import { getIntlLocale } from "@/lib/locales";
 
 type CompositionDictionary = ReturnType<typeof import("@/lib/i18n").getDictionary>["composition"];
 type CompositionText = { [Key in keyof CompositionDictionary]: string };
@@ -15,7 +17,7 @@ type PortfolioCompositionProps = {
 export function PortfolioComposition({ point, locale, currency, text }: PortfolioCompositionProps) {
   if (!point) return null;
 
-  const formattingLocale = locale === "es" ? "es-ES" : "en-IE";
+  const formattingLocale = getIntlLocale(locale);
   const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
@@ -29,7 +31,7 @@ export function PortfolioComposition({ point, locale, currency, text }: Portfoli
     unitDisplay: "long",
   }).format(point.year);
   const total = Number(point.nominal_balance);
-  const contributions = Number(point.initial_principal) + Number(point.cumulative_contributions);
+  const contributions = getTotalInvested(point);
   const growth = Number(point.cumulative_investment_growth);
   const formattedContributions = formatter.format(contributions);
   const formattedGrowth = formatter.format(growth);

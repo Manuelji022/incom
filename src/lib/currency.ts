@@ -1,4 +1,4 @@
-import type { Locale } from "@/lib/locales";
+import { getIntlLocale, type Locale } from "@/lib/locales";
 
 export const currencies = ["EUR", "USD", "GBP"] as const;
 export type Currency = (typeof currencies)[number];
@@ -22,7 +22,7 @@ export function getCurrencyFormatter(
   currency: Currency,
   options: Omit<Intl.NumberFormatOptions, "currency" | "style"> = {},
 ) {
-  return new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
+  return new Intl.NumberFormat(getIntlLocale(locale), {
     ...options,
     style: "currency",
     currency,

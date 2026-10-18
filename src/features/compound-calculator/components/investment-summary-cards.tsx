@@ -1,6 +1,8 @@
 import type { Locale } from "@/lib/locales";
 import type { ProjectionPoint } from "@/features/compound-calculator/types/compound-interest";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
+import { getTotalInvested } from "@/features/compound-calculator/lib/projection-point-metrics";
+import { getIntlLocale } from "@/lib/locales";
 
 type SummaryText = {
   cardsLabel: string;
@@ -29,7 +31,7 @@ export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, curr
   const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
-  const percent = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
+  const percent = new Intl.NumberFormat(getIntlLocale(locale), {
     style: "percent",
     maximumFractionDigits: 0,
   });
@@ -47,8 +49,8 @@ export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, curr
     },
     {
       label: text.totalContributions,
-      value: formatter.format(Number(point.initial_principal) + Number(point.cumulative_contributions)),
-      detail: formatShare(Number(point.initial_principal) + Number(point.cumulative_contributions)),
+      value: formatter.format(getTotalInvested(point)),
+      detail: formatShare(getTotalInvested(point)),
     },
     {
       label: text.investmentGrowth,

@@ -1,6 +1,7 @@
 import type { Locale } from "@/lib/locales";
 import type { ProjectionScenario } from "@/features/compound-calculator/types/compound-interest";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
+import { getIntlLocale } from "@/lib/locales";
 
 type ScenarioText = ReturnType<
   typeof import("@/lib/i18n").getDictionary
@@ -27,7 +28,7 @@ export function Scenarios({
   selectedScenario,
   onSelectScenario,
 }: ScenariosProps) {
-  const formattingLocale = locale === "es" ? "es-ES" : "en-IE";
+  const formattingLocale = getIntlLocale(locale);
   const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
@@ -78,6 +79,9 @@ export function Scenarios({
               const realBalance = formatter.format(
                 Number(scenario.final_summary.inflation_adjusted_balance),
               );
+              const returnLabel = compact
+                ? annualReturn
+                : text.return.replace("{percent}", annualReturn);
 
               return (
                 <li
@@ -86,7 +90,7 @@ export function Scenarios({
                 >
                   <button
                     type="button"
-                    aria-label={compact ? `${scenarioLabels[scenario.name]} · ${compact ? annualReturn : text.return.replace("{percent}", annualReturn)} · ${nominalBalance}` : undefined}
+                    aria-label={compact ? `${scenarioLabels[scenario.name]} · ${returnLabel} · ${nominalBalance}` : undefined}
                     aria-pressed={scenario.name === selectedScenario}
                     onClick={() => onSelectScenario(scenario.name)}
                     className={`${compact ? "flex min-h-16 w-full flex-col items-center justify-center gap-1 rounded-lg border px-1 py-3 text-center" : "flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-s-2 px-[0.6875rem] py-2 text-start"} transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
@@ -100,7 +104,7 @@ export function Scenarios({
                         {scenarioLabels[scenario.name]}
                       </span>
                       <span className="block text-xs leading-4 text-secondary-foreground">
-                        {compact ? annualReturn : text.return.replace("{percent}", annualReturn)}
+                        {returnLabel}
                       </span>
                     </span>
 

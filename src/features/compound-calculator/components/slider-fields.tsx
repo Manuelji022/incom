@@ -7,9 +7,9 @@ import { DecimalInput } from "@/components/primitives/decimal-input";
 import { Slider } from "@/components/primitives/slider";
 import { clearFieldValidation } from "@/features/compound-calculator/lib/field-validation";
 import { normalizeDecimalInput } from "@/features/compound-calculator/lib/decimal-input";
+import { getIntlLocale } from "@/lib/locales";
 
 export type SliderFieldProps = {
-  optionalLabel?: string;
   id: string;
   name: string;
   label: string;
@@ -21,7 +21,6 @@ export type SliderFieldProps = {
   step: number;
   description?: string;
   valueText?: (value: number) => string;
-  optional?: boolean;
   initialValues?: Record<string, string>;
 };
 
@@ -43,8 +42,6 @@ export function SliderField({
   step,
   description,
   valueText,
-  optional = false,
-  optionalLabel = "Optional",
   initialValues,
 }: SliderFieldProps) {
   const initialDraft = initialValues?.[name] ?? String(defaultValue);
@@ -62,11 +59,6 @@ export function SliderField({
           <FieldLabel id={labelId} htmlFor={id}>
             {label}
           </FieldLabel>
-          {optional ? (
-            <span className="shrink-0 text-xs font-normal text-tertiary-foreground">
-              {optionalLabel}
-            </span>
-          ) : null}
         </div>
         <div className="relative w-28 shrink-0">
           <DecimalInput
@@ -131,7 +123,6 @@ export function SliderField({
 }
 
 export type ScenarioRangeFieldProps = {
-  optionalLabel?: string;
   locale: "en" | "es";
   text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];
   id: string;
@@ -141,7 +132,6 @@ export type ScenarioRangeFieldProps = {
   defaultSpread?: number;
   step?: number;
   maxSpread?: number;
-  optional?: boolean;
   initialValues?: Record<string, string>;
 };
 
@@ -153,8 +143,6 @@ export function ScenarioRangeField({
   defaultSpread = 2,
   step = 0.1,
   maxSpread = 10,
-  optional = false,
-  optionalLabel = "Optional",
   text,
   locale,
   initialValues,
@@ -167,7 +155,7 @@ export function ScenarioRangeField({
   const labelId = `${id}-label`;
   const descriptionId = `${id}-description`;
   const format = (value: number) =>
-    new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
+    new Intl.NumberFormat(getIntlLocale(locale), {
       style: "percent",
       minimumFractionDigits: 1,
       maximumFractionDigits: 1,
@@ -189,14 +177,7 @@ export function ScenarioRangeField({
   return (
     <Field>
       <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-          <FieldLabel id={labelId} htmlFor={id}>{label}</FieldLabel>
-          {optional ? (
-            <span className="shrink-0 text-xs font-normal text-tertiary-foreground">
-              {optionalLabel}
-            </span>
-          ) : null}
-        </div>
+        <FieldLabel id={labelId} htmlFor={id}>{label}</FieldLabel>
         <div className="relative w-28 shrink-0">
           <DecimalInput
             id={id}
@@ -296,7 +277,7 @@ export function ProjectionSliderFields({
         step={1}
         initialValues={initialValues}
         valueText={(value) =>
-          new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", {
+          new Intl.NumberFormat(getIntlLocale(locale), {
             style: "unit",
             unit: "year",
             unitDisplay: "long",

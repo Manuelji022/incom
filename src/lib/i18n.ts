@@ -9,9 +9,21 @@ const dictionaries = {
     },
     footer: "Designed by",
     language: "Language",
+    languageHandoffPending: "Wait for the calculation to finish before changing language.",
+    languageHandoffStorage: "Your changes could not be saved. Please try again.",
+    sampleData: "Sample data",
+    validationMessages: {
+      decimalInput: "Enter a valid number within the allowed range.",
+      missingPrincipal:
+        "Initial investment must be greater than zero when there are no contributions.",
+    },
     theme: "Toggle light and dark theme",
     sidebar: {
       title: "Projection inputs",
+      edit: "Edit assumptions",
+      hide: "Hide assumptions",
+      openAssumptions: "Show other assumptions",
+      closeAssumptions: "Hide other assumptions",
       intro: "Set the assumptions for your projection.",
       contributions: "Contributions",
       initial: "Initial investment",
@@ -65,6 +77,7 @@ const dictionaries = {
     resultsReady: "Projection results are ready.",
     chart: {
       none: "No annual projection data is available.",
+      reload: "Reload projections",
       title: "Portfolio projection",
       scenario: "{scenario} scenario",
       legend: "Chart legend",
@@ -94,6 +107,10 @@ const dictionaries = {
     },
     summary: {
       cardsLabel: "Final investment summary",
+      mobileSummaryButton: "View yearly summary",
+      mobileTableButton: "View full table",
+      horizontalScrollHint: "Scroll horizontally to see all columns.",
+      tableRegionLabel: "Annual projection table; scroll horizontally to see all columns",
       initialPrincipal: "Initial principal",
       totalContributions: "Total invested",
       investmentGrowth: "Investment growth",
@@ -136,9 +153,21 @@ const dictionaries = {
     },
     footer: "Diseñado por",
     language: "Idioma",
+    languageHandoffPending: "Espera a que termine el cálculo antes de cambiar el idioma.",
+    languageHandoffStorage: "No se pudieron conservar los cambios. Inténtalo de nuevo.",
+    sampleData: "Datos de ejemplo",
+    validationMessages: {
+      decimalInput: "Introduce un número válido dentro del rango permitido.",
+      missingPrincipal:
+        "La inversión inicial debe ser mayor que cero si no hay aportaciones.",
+    },
     theme: "Cambiar entre tema claro y oscuro",
     sidebar: {
       title: "Datos de la proyección",
+      edit: "Editar supuestos",
+      hide: "Ocultar supuestos",
+      openAssumptions: "Mostrar otros supuestos",
+      closeAssumptions: "Ocultar otros supuestos",
       intro: "Define los supuestos de tu proyección.",
       contributions: "Aportaciones",
       initial: "Inversión inicial",
@@ -192,6 +221,7 @@ const dictionaries = {
     resultsReady: "Los resultados de la proyección están listos.",
     chart: {
       none: "No hay datos anuales de proyección disponibles.",
+      reload: "Volver a cargar",
       title: "Proyección de la cartera",
       scenario: "Escenario {scenario}",
       legend: "Leyenda del gráfico",
@@ -223,6 +253,10 @@ const dictionaries = {
     },
     summary: {
       cardsLabel: "Resumen final de la inversión",
+      mobileSummaryButton: "Ver resumen por año",
+      mobileTableButton: "Ver tabla completa",
+      horizontalScrollHint: "Desliza horizontalmente para ver todas las columnas.",
+      tableRegionLabel: "Tabla de proyección anual; desplázate horizontalmente para ver todas las columnas",
       initialPrincipal: "Capital inicial",
       totalContributions: "Total invertido (incluye la inversión inicial)",
       investmentGrowth: "Crecimiento de la inversión",

@@ -10,6 +10,7 @@ import { SegmentedControl } from "@/components/primitives/segmented-control";
 import { ProjectionSliderFields, ScenarioRangeField } from "@/features/compound-calculator/components/slider-fields";
 import { getCurrencyFormatter, currencies, getCurrencySymbol, isCurrency, type Currency } from "@/lib/currency";
 import { normalizeDecimalInput } from "@/features/compound-calculator/lib/decimal-input";
+import { getIntlLocale } from "@/lib/locales";
 import type {
   ContributionFrequency,
   ContributionTiming,
@@ -57,7 +58,6 @@ export function CompoundInputSidebar({
   advancedOpen,
   onToggleAdvanced,
 }: CompoundInputSidebarProps) {
-  const [recurringAmount, setRecurringAmount] = useState(initialValues?.["recurring_contribution.amount"] ?? "1000");
   const [summaryValues, setSummaryValues] = useState({
     principal: initialValues?.initial_principal ?? "40000",
     recurring: initialValues?.["recurring_contribution.amount"] ?? "1000",
@@ -69,38 +69,32 @@ export function CompoundInputSidebar({
     range: initialValues?.scenario_range_percentage_points ?? "2",
   });
   const format = getCurrencyFormatter(locale, currency, { maximumFractionDigits: 0 });
-  const number = new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", { maximumFractionDigits: 2 });
+  const number = new Intl.NumberFormat(getIntlLocale(locale), { maximumFractionDigits: 2 });
   const parsed = (value: string) => Number(normalizeDecimalInput(value));
   const frequencyLabel = summaryValues.frequency === "annual" ? text.annual : summaryValues.frequency === "quarterly" ? text.quarterly : text.monthly;
   const contributionSummary = parsed(summaryValues.recurring) > 0 ? ` · ${format.format(parsed(summaryValues.recurring))} ${frequencyLabel.toLocaleLowerCase(locale)}` : "";
   const summary = `${format.format(parsed(summaryValues.principal))}${contributionSummary} · ${summaryValues.years} ${text.years} · ${number.format(parsed(summaryValues.expectedReturn))}%`;
   const advancedSummary = `${text.fee} ${number.format(parsed(summaryValues.fee))}% · ${text.inflation} ${number.format(parsed(summaryValues.inflation || "2"))}% · ±${number.format(parsed(summaryValues.range || "2"))} pp`;
-  const toggleLabel = locale === "es"
-    ? (collapsed ? "Abrir supuestos" : "Cerrar supuestos")
-    : (collapsed ? "Open assumptions" : "Close assumptions");
+  const summaryFieldKeys: Record<string, keyof typeof summaryValues> = {
+    initial_principal: "principal",
+    "recurring_contribution.amount": "recurring",
+    "recurring_contribution.frequency": "frequency",
+    duration_years: "years",
+    "duration-years-slider": "years",
+    expected_annual_return_percent: "expectedReturn",
+    annual_fee_percent: "fee",
+    expected_annual_inflation_percent: "inflation",
+    scenario_range_percentage_points: "range",
+    "scenario-range-slider": "range",
+  };
   return (
     <aside
       aria-labelledby="compound-input-sidebar-title"
       onInput={(event) => {
-        const form = event.currentTarget.closest("form");
-        if (!form) return;
-        window.requestAnimationFrame(() => {
-          // Read mounted controls even while a request disables the fieldset.
-          const readValue = (name: string, fallback: string) => {
-            const field = form.elements.namedItem(name);
-            return field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof RadioNodeList ? field.value : fallback;
-          };
-          setSummaryValues({
-            principal: readValue("initial_principal", "0"),
-            recurring: readValue("recurring_contribution.amount", "0"),
-            frequency: readValue("recurring_contribution.frequency", "monthly"),
-            years: readValue("duration_years", ""),
-            expectedReturn: readValue("expected_annual_return_percent", "0"),
-            fee: readValue("annual_fee_percent", "0"),
-            inflation: readValue("expected_annual_inflation_percent", "0"),
-            range: readValue("scenario_range_percentage_points", "0"),
-          });
-        });
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
+        const key = summaryFieldKeys[target.name] ?? summaryFieldKeys[target.id];
+        if (key) setSummaryValues((values) => ({ ...values, [key]: target.value }));
       }}
       className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
     >
@@ -112,13 +106,13 @@ export function CompoundInputSidebar({
           type="button"
           variant="ghost"
           size="sm"
-          aria-label={toggleLabel}
+          aria-label={collapsed ? text.edit : text.hide}
           aria-expanded={!collapsed}
           aria-controls="compound-input-sidebar-fields"
           onClick={onToggleCollapsed}
           className={`min-h-11 shrink-0 lg:min-h-8 lg:px-2 ${collapsed ? "lg:absolute lg:start-0 lg:top-5 lg:z-20" : ""}`}
         >
-          <span className="lg:hidden">{collapsed ? (locale === "es" ? "Editar" : "Edit") : (locale === "es" ? "Ocultar" : "Hide")}</span>
+          <span className="lg:hidden">{collapsed ? text.edit : text.hide}</span>
           <span aria-hidden="true" className={`size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
         </Button>
         <p className={`col-span-2 text-sm leading-5 text-secondary-foreground ${collapsed ? "lg:hidden" : ""}`}>
@@ -177,12 +171,11 @@ export function CompoundInputSidebar({
                 min="0"
                 step="0.01"
                 description={text.blank}
-                onChange={(event) => setRecurringAmount(event.currentTarget.value)}
                 optional
                 optionalLabel={text.optional}
               />
 
-              {parsed(recurringAmount) > 0 ? <SegmentedControl
+              {parsed(summaryValues.recurring) > 0 ? <SegmentedControl
                 label={text.frequency}
                 name="recurring_contribution.frequency"
                 defaultValue={initialValues?.["recurring_contribution.frequency"] ?? "monthly"}
@@ -223,13 +216,13 @@ export function CompoundInputSidebar({
               onClick={onToggleAdvanced}
               className="flex min-h-11 w-full items-center justify-between gap-3 rounded-md text-start text-sm font-semibold lg:hidden"
             >
-              <span>{locale === "es" ? "Supuestos avanzados" : "Advanced assumptions"}</span>
+              <span>{advancedOpen ? text.closeAssumptions : text.openAssumptions}</span>
               <span aria-hidden="true">{advancedOpen ? "−" : "+"}</span>
             </button>
             <p className="mt-1 text-xs leading-5 text-secondary-foreground lg:hidden">{advancedSummary}</p>
             <div id="advanced-assumption-fields" className={`${advancedOpen ? "" : "hidden"} space-y-6 pt-5 lg:block lg:pt-0`}>
               <FieldGroup className="gap-4">
-              {parsed(recurringAmount) > 0 ? <SegmentedControl
+              {parsed(summaryValues.recurring) > 0 ? <SegmentedControl
                 label={text.timing}
                 name="recurring_contribution.timing"
                 defaultValue={initialValues?.["recurring_contribution.timing"] ?? "beginning"}

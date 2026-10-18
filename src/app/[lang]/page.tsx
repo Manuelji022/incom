@@ -27,6 +27,10 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           retry: text.retry,
           validation: text.validation,
           resultsReady: text.resultsReady,
+          validationMessages: text.validationMessages,
+          sampleData: text.sampleData,
+          languageHandoffPending: text.languageHandoffPending,
+          languageHandoffStorage: text.languageHandoffStorage,
         }}
       />
       <Footer label={text.footer} />

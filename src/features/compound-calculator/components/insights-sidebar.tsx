@@ -11,7 +11,7 @@ type CompositionText = { [Key in keyof CompositionDictionary]: string };
 
 type InsightsSidebarProps = {
   scenarios: readonly ProjectionScenario[];
-  selectedScenario: ProjectionScenario["name"];
+  selectedScenario: ProjectionScenario;
   onSelectScenario: (scenario: ProjectionScenario["name"]) => void;
   durationYears: number;
   locale: Locale;
@@ -31,10 +31,7 @@ export function InsightsSidebar({
   currency,
   text,
 }: InsightsSidebarProps) {
-  const selectedProjection = scenarios.find(
-    (scenario) => scenario.name === selectedScenario,
-  );
-  const scenarioLabel = text.scenarios[selectedScenario];
+  const scenarioLabel = text.scenarios[selectedScenario.name];
 
   return (
     <aside className="[container-type:inline-size] border-t border-border-subtle bg-container lg:min-h-full lg:border-t-0 lg:border-s">
@@ -44,11 +41,11 @@ export function InsightsSidebar({
         locale={locale}
         currency={currency}
         text={text.scenarios}
-        selectedScenario={selectedScenario}
+        selectedScenario={selectedScenario.name}
         onSelectScenario={onSelectScenario}
       />
       <PortfolioComposition
-        point={selectedProjection?.annual_points.at(-1)}
+        point={selectedScenario.annual_points.at(-1)}
         locale={locale}
         currency={currency}
         text={{

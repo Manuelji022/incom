@@ -6,6 +6,7 @@ import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { tooltip } from "@tanstack/charts/tooltip";
 import type { ProjectionPoint } from "@/features/compound-calculator/types/compound-interest";
+import { getTotalInvested } from "@/features/compound-calculator/lib/projection-point-metrics";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 
 type ProjectionChartRow = {
@@ -68,12 +69,10 @@ export function ProjectionChartCanvas({
   const rows = useMemo(
     () =>
       points.map((point) => {
-        const initial = Number(point.initial_principal);
-        const contributions = Number(point.cumulative_contributions);
         return {
           year: point.year,
           balance: Number(point.nominal_balance),
-          invested: initial + contributions,
+          invested: getTotalInvested(point),
           growth: Number(point.cumulative_investment_growth),
           realBalance: Number(point.inflation_adjusted_balance),
         };

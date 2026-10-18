@@ -11,6 +11,7 @@ type ProjectionChartProps = {
   currency: Currency;
   text: {
     none: string;
+    reload: string;
     title: string;
     scenario: string;
     legend: string;
@@ -56,7 +57,7 @@ export function ProjectionChart({
       <div role="status" className="flex min-h-[320px] flex-col items-center justify-center gap-3 text-sm text-secondary-foreground">
         {text.none}
         <button type="button" className="rounded-sm px-2 py-1 text-brand-foreground underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus" onClick={() => window.location.reload()}>
-          {locale === "es" ? "Volver a cargar" : "Reload projections"}
+          {text.reload}
         </button>
       </div>
     );

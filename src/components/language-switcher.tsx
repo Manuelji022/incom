@@ -7,15 +7,21 @@ import type { Locale } from "@/lib/locales";
 type LanguageSwitcherProps = {
   locale: Locale;
   label: string;
-  onBeforeLanguageChange: (nextLocale: Locale) => boolean;
+  onBeforeLanguageChange: (nextLocale: Locale) => LanguageChangeResult;
   submitting: boolean;
+  handoffText: { pending: string; storage: string };
 };
+
+export type LanguageChangeResult =
+  | { status: "saved" }
+  | { status: "pending" }
+  | { status: "storage" };
 
 function isLocale(value: string): value is Locale {
   return value === "en" || value === "es";
 }
 
-export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submitting }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submitting, handoffText }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
   const shouldFocusMain = useRef(false);
@@ -28,8 +34,9 @@ export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submit
   }, [pathname]);
 
   function changeLanguage(nextLocale: Locale) {
-    if (!onBeforeLanguageChange(nextLocale)) {
-      setHandoffError(submitting ? "pending" : "storage");
+    const result = onBeforeLanguageChange(nextLocale);
+    if (result.status !== "saved") {
+      setHandoffError(result.status);
       return;
     }
     setHandoffError(null);
@@ -62,7 +69,7 @@ export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submit
         aria-hidden="true"
         className="pointer-events-none absolute end-2 top-1/2 size-4 -translate-y-1/2 bg-current text-secondary-foreground [mask-image:url('/assets/svgs/chevron-down.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] sm:end-3"
       />
-      {handoffError === "storage" || (handoffError === "pending" && submitting) ? <span role="alert" className="absolute end-0 top-full z-30 mt-1 w-64 rounded border border-danger-border-default bg-container p-2 text-xs text-danger-foreground">{handoffError === "pending" ? (locale === "es" ? "Espera a que termine el cálculo antes de cambiar el idioma." : "Wait for the calculation to finish before changing language.") : (locale === "es" ? "No se pudieron conservar los cambios. Inténtalo de nuevo." : "Your changes could not be saved. Please try again.")}</span> : null}
+      {handoffError === "storage" || (handoffError === "pending" && submitting) ? <span role="alert" className="absolute end-0 top-full z-30 mt-1 w-64 rounded border border-danger-border-default bg-container p-2 text-xs text-danger-foreground">{handoffError === "pending" ? handoffText.pending : handoffText.storage}</span> : null}
     </div>
   );
 }

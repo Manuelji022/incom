@@ -43,7 +43,6 @@ function Field({
 
   return (
     <div
-      role="group"
       data-slot="field"
       data-orientation={orientation}
       data-invalid={invalid || undefined}

@@ -1,5 +1,6 @@
 import type { Locale } from "@/lib/locales";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
+import { getIntlLocale } from "@/lib/locales";
 
 type ProjectionHeaderText = {
   portfolio: string;
@@ -25,7 +26,7 @@ export function ProjectionHeader({
   const formatter = getCurrencyFormatter(locale, currency, {
     maximumFractionDigits: 0,
   });
-  const formattingLocale = locale === "es" ? "es-ES" : "en-IE";
+  const formattingLocale = getIntlLocale(locale);
   const duration = new Intl.NumberFormat(formattingLocale, {
     style: "unit",
     unit: "year",
