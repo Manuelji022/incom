@@ -10,7 +10,7 @@ import type { Locale } from "@/lib/locales";
 import type { CompoundInterestProjectionResponse, ProjectionScenario } from "@/features/compound-calculator/types/compound-interest";
 
 type ScenarioName = ProjectionScenario["name"];
-type StatusText = { calculating: string; validation: string; invalid: string; unavailable: string };
+type StatusText = { calculating: string; validation: string; ready: string; invalid: string; unavailable: string; rateLimited: string };
 
 export function useProjectionController(locale: Locale, messages: ProjectionFormMessages, text: StatusText) {
   const [projection, setProjection] = useState<CompoundInterestProjectionResponse>(mockProjection);
@@ -83,7 +83,13 @@ export function useProjectionController(locale: Locale, messages: ProjectionForm
       return "success" as const;
     } catch (caught) {
       setError(true);
-      setStatus(caught instanceof Error && caught.message === "invalid-input" ? text.invalid : text.unavailable);
+      if (caught instanceof Error && caught.message === "invalid-input") {
+        setStatus(text.invalid);
+      } else if (caught instanceof Error && caught.message === "rate-limited") {
+        setStatus(text.rateLimited);
+      } else {
+        setStatus(text.unavailable);
+      }
       return "error" as const;
     } finally {
       setPendingPromise(null);

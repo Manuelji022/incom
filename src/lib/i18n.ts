@@ -69,6 +69,7 @@ const dictionaries = {
     },
     unavailable:
       "Projection results are temporarily unavailable. Please try again shortly.",
+    rateLimited: "You’ve reached the projection request limit. Please wait a minute and try again.",
     invalidInputs: "The projection service could not accept these assumptions. Review the values and try again.",
     pageTitle: "See how your investments could grow",
     staleResults: "Inputs changed. Calculate again to update these results.",
@@ -212,6 +213,7 @@ const dictionaries = {
     },
     unavailable:
       "Los resultados de la proyección no están disponibles temporalmente. Inténtalo de nuevo en breve.",
+    rateLimited: "Has alcanzado el límite de solicitudes de proyección. Espera un minuto e inténtalo de nuevo.",
     invalidInputs: "El servicio no ha podido aceptar estos supuestos. Revisa los valores e inténtalo de nuevo.",
     pageTitle: "Descubre cómo podría crecer tu inversión",
     staleResults: "Los datos han cambiado. Calcula de nuevo para actualizar los resultados.",

@@ -85,7 +85,10 @@ export async function fetchProjection(
     signal: AbortSignal.timeout(10_000),
     cache: "no-store",
   });
-  if (!response.ok) throw new Error(response.status === 400 || response.status === 422 ? "invalid-input" : "projection-failed");
+  if (!response.ok) {
+    if (response.status === 429) throw new Error("rate-limited");
+    throw new Error(response.status === 400 || response.status === 422 ? "invalid-input" : "projection-failed");
+  }
   try {
     return parseProjectionResponse(await response.json());
   } catch {

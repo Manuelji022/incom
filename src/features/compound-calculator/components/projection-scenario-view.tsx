@@ -22,7 +22,7 @@ type ProjectionScenarioViewProps = {
   dictionary: Dictionary;
   languageLabel: string;
   themeLabel: string;
-  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "invalidInputs" | "staleResults" | "retry" | "validation" | "validationMessages" | "sampleData" | "languageHandoffPending" | "languageHandoffStorage"> & {
+  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "rateLimited" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady" | "validationMessages" | "sampleData" | "languageHandoffPending" | "languageHandoffStorage"> & {
     composition: CompositionText;
   };
 };
@@ -77,8 +77,10 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   const controller = useProjectionController(locale, text.validationMessages, {
     calculating: text.sidebar.calculating,
     validation: text.validation,
+    ready: text.resultsReady,
     invalid: text.invalidInputs,
     unavailable: text.unavailable,
+    rateLimited: text.rateLimited,
   });
   const { projection, sample, pendingPromise, selectedName, setSelectedName, currency, setCurrency, sidebarCollapsed, setSidebarCollapsed, submitting, error, stale, setStale, status, restoredValues, formVersion } = controller;
   const isDesktop = useSyncExternalStore(subscribeDesktop, getDesktopSnapshot, getServerDesktopSnapshot);
