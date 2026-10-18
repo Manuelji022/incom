@@ -2,18 +2,18 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Header } from "@/components/header";
-import { CalculatorModeToggle } from "@/components/calculator-mode-toggle";
-import { TargetResults } from "@/components/target-results";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { fetchTarget, TargetApiError, parseTargetResponse, targetInputFromForm, validateTargetInput } from "@/lib/compound-interest-target";
+import { CalculatorModeToggle } from "@/features/compound-calculator/components/calculator-mode-toggle";
+import { TargetResults } from "@/features/compound-calculator/components/target-results";
+import { Button } from "@/components/primitives/button";
+import { Input } from "@/components/primitives/input";
+import { Select } from "@/components/primitives/select";
+import { Field, FieldDescription, FieldLabel } from "@/components/primitives/field";
+import { fetchTarget, TargetApiError, parseTargetResponse, targetInputFromForm, validateTargetInput } from "@/features/compound-calculator/lib/compound-interest-target";
 import { currencies, getCurrencySymbol, isCurrency, type Currency } from "@/lib/currency";
 import type { getDictionary } from "@/lib/i18n";
-import type { getTargetText } from "@/lib/target-i18n";
+import type { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
 import type { Locale } from "@/lib/locales";
-import type { ProblemDetail, TargetResponse } from "@/types/compound-interest-target";
+import type { ProblemDetail, TargetResponse } from "@/features/compound-calculator/types/compound-interest-target";
 
 type Props = { locale: Locale; text: ReturnType<typeof getDictionary>; targetText: ReturnType<typeof getTargetText> };
 const sessionKey = "incom:target-session:v1";

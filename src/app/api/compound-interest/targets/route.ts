@@ -1,5 +1,5 @@
-import { fetchTarget, TargetApiError, targetProblem, validateTargetInput } from "@/lib/compound-interest-target";
-import type { ProblemDetail, TargetInput } from "@/types/compound-interest-target";
+import { fetchTarget, TargetApiError, targetProblem, validateTargetInput } from "@/features/compound-calculator/lib/compound-interest-target";
+import type { ProblemDetail, TargetInput } from "@/features/compound-calculator/types/compound-interest-target";
 
 function problemResponse(problem: ProblemDetail) {
   return Response.json(problem, { status: problem.status, headers: { "Content-Type": "application/problem+json", "Cache-Control": "no-store" } });

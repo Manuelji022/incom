@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ProjectionChart } from "@/components/projection-chart";
+import { Button } from "@/components/primitives/button";
+import { ProjectionChart } from "@/features/compound-calculator/components/projection-chart";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 import type { getDictionary } from "@/lib/i18n";
-import type { getTargetText } from "@/lib/target-i18n";
+import type { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
 import type { Locale } from "@/lib/locales";
-import type { TargetResponse } from "@/types/compound-interest-target";
+import type { TargetResponse } from "@/features/compound-calculator/types/compound-interest-target";
 
 type Props = { result: TargetResponse; locale: Locale; currency: Currency; text: ReturnType<typeof getDictionary>; targetText: ReturnType<typeof getTargetText> };
 export function TargetResults({ result, locale, currency, text, targetText: t }: Props) {

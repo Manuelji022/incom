@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/footer";
-import { TargetPlanner } from "@/components/target-planner";
+import { TargetPlanner } from "@/features/compound-calculator/components/target-planner";
 import { getDictionary } from "@/lib/i18n";
-import { getTargetText } from "@/lib/target-i18n";
+import { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
 import { hasLocale } from "@/lib/locales";
 
 export default async function Targets({ params }: PageProps<"/[lang]/targets">) {

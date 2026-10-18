@@ -1,4 +1,4 @@
-import type { ProblemDetail, TargetInput, TargetResponse } from "@/types/compound-interest-target";
+import type { ProblemDetail, TargetInput, TargetResponse } from "@/features/compound-calculator/types/compound-interest-target";
 
 const moneyPattern = /^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/;
 const percentPattern = /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]{1,4})?$/;

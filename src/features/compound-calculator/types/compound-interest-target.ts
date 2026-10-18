@@ -1,4 +1,4 @@
-import type { ContributionFrequency, ContributionTiming, ProjectionPoint, ProjectionScenario } from "@/types/compound-interest";
+import type { ContributionFrequency, ContributionTiming, ProjectionPoint, ProjectionScenario } from "@/features/compound-calculator/types/compound-interest";
 
 export type TargetInput = {
   target_amount: string;
