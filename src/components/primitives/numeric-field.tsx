@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
 
 import { Field, FieldDescription, FieldLabel } from "@/components/primitives/field";
 import { DecimalInput } from "@/components/primitives/decimal-input";
@@ -32,6 +32,15 @@ function NumericField({
   "aria-describedby": ariaDescribedBy,
   ...inputProps
 }: NumericFieldProps) {
+  const controlledValue = inputProps.value;
+  const [uncontrolledValue, setUncontrolledValue] = useState(String(defaultValue ?? ""));
+  const rawValue = String(controlledValue ?? uncontrolledValue);
+  const formatValue = (value: string) => {
+    const [integer, ...fractionParts] = value.replaceAll(",", "").split(".");
+    const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return fractionParts.length ? `${grouped}.${fractionParts.join("")}` : grouped;
+  };
+  const { value: _value, onChange, ...restInputProps } = inputProps;
   const descriptionId = description ? `${id}-description` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   const describedBy = [ariaDescribedBy, descriptionId, errorId].filter(Boolean).join(" ") || undefined;
@@ -48,11 +57,16 @@ function NumericField({
       </div>
       <div className="relative">
         <DecimalInput
-          {...inputProps}
+          {...restInputProps}
           id={id}
-          name={name}
+          name={`${name}-display`}
           aria-label={`${label} (${unit})`}
-          defaultValue={defaultValue}
+          value={formatValue(rawValue)}
+          onChange={(event) => {
+            const next = event.currentTarget.value.replaceAll(",", "");
+            if (controlledValue === undefined) setUncontrolledValue(next);
+            onChange?.({ ...event, currentTarget: { value: next }, target: { value: next } } as typeof event);
+          }}
           disabled={disabled}
           onWheel={(event) => {
             onWheel?.(event);
@@ -62,6 +76,7 @@ function NumericField({
           aria-invalid={!!error}
           className={`pe-14 tabular-nums ${className}`.trim()}
         />
+        <input type="hidden" name={name} value={rawValue} />
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-tertiary-foreground"

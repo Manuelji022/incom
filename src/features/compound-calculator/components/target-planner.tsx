@@ -18,7 +18,7 @@ import { ProjectionSliderFields, ScenarioRangeField } from "@/features/compound-
 import { mockTarget } from "@/features/compound-calculator/lib/mock-target";
 
 type Props = { locale: Locale; text: ReturnType<typeof getDictionary>; targetText: ReturnType<typeof getTargetText>; saveRef?: MutableRefObject<() => boolean>; onStatusChange?: (status: { stale: boolean; submitting: boolean }) => void; className?: string; active?: boolean };
-const sessionKey = "incom:target-session:v1";
+const sessionKey = "incom:target-session:v2";
 const defaults: Record<string, string> = { target_amount: "1000000.00", initial_principal: "10000.00", duration_years: "20", expected_annual_return_percent: "7", "contribution_plan.frequency": "monthly", "contribution_plan.timing": "end", "contribution_plan.annual_increase_percent": "0", annual_fee_percent: "0.08", expected_annual_inflation_percent: "2.5", scenario_range_percentage_points: "2", target_basis: "nominal" };
 
 export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusChange, className = "", active = true }: Props) {
@@ -148,7 +148,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
     </Field>;
   }
   return <main id={active ? "main-content" : undefined} hidden={!active} tabIndex={-1} className={`grid flex-1 grid-cols-1 ${collapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)]"} ${className}`}>
-      <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""}`}>
+      <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name && !target.name.endsWith("-display")) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""}`}>
         <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle p-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
           <h1 className={`text-base font-semibold ${collapsed ? "lg:hidden" : ""}`}>{t.title}</h1>
           <Button
@@ -168,7 +168,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
         </header>
         <fieldset id="target-planner-fields" disabled={submitting} className={`space-y-5 p-4 ${collapsed ? "hidden" : ""}`}>
           <Field><FieldLabel htmlFor="target-currency">{text.sidebar.currency}</FieldLabel><Select id="target-currency" value={currency} onChange={(event) => { if (isCurrency(event.currentTarget.value)) setCurrency(event.currentTarget.value); }} aria-describedby="target-currency-help">{currencies.map((value) => <option key={value} value={value}>{value} ({getCurrencySymbol(value)})</option>)}</Select><FieldDescription id="target-currency-help">{t.currencyHelp}</FieldDescription></Field>
-          {field("target_amount", `${t.target} (${getCurrencySymbol(currency)})`, t.formatHelp)}
+          <NumericField id="target-target_amount" name="target_amount" label={`${t.target} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.target_amount} onChange={(event) => update("target_amount", event.currentTarget.value)} description={t.formatHelp} error={errorFor("target_amount")} />
           {select("target_basis", t.basis, [{ value: "nominal", label: t.nominal }, { value: "real", label: t.real }], t.basisHelp)}
           {field("initial_principal", `${text.sidebar.initial} (${getCurrencySymbol(currency)})`, t.initialHelp)}
           <ProjectionSliderFields text={text.sidebar} locale={locale} initialValues={values} idPrefix="target" errors={Object.fromEntries(errors.map((error) => [error.field, error.reason]))} onValueChange={update} />
