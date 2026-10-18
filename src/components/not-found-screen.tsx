@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import type { ReactNode } from "react";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 
@@ -41,7 +42,13 @@ const copy = {
   },
 } as const;
 
-export function NotFoundScreen({ includeSkipLink = false }: { includeSkipLink?: boolean }) {
+export function NotFoundScreen({
+  includeSkipLink = false,
+  footer,
+}: {
+  includeSkipLink?: boolean;
+  footer?: ReactNode;
+}) {
   const pathname = usePathname() ?? "";
   const locale = pathname.split("/")[1] === "es" ? "es" : "en";
   const text = copy[locale];
@@ -182,7 +189,7 @@ export function NotFoundScreen({ includeSkipLink = false }: { includeSkipLink?: 
         </section>
       </main>
 
-      <Footer label={text.footer} />
+      {footer ?? <Footer label={text.footer} />}
     </div>
   );
 }
