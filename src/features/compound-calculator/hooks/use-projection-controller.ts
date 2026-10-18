@@ -77,7 +77,7 @@ export function useProjectionController(locale: Locale, messages: ProjectionForm
       setSample(false);
       setSelectedName("expected");
       setStale(false);
-      setStatus(text.ready);
+      setStatus("");
       if (!window.matchMedia("(min-width: 64rem)").matches) setSidebarCollapsed(true);
       onSuccess();
       return "success" as const;

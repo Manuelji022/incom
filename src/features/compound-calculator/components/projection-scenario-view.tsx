@@ -9,12 +9,17 @@ import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
 import { clearFieldValidation, showFieldValidation } from "@/features/compound-calculator/lib/field-validation";
 import { useProjectionController } from "@/features/compound-calculator/hooks/use-projection-controller";
+import { CalculatorModeToggle } from "@/features/compound-calculator/components/calculator-mode-toggle";
+import { TargetPlanner } from "@/features/compound-calculator/components/target-planner";
+import type { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 type CompositionDictionary = Dictionary["composition"];
 type CompositionText = { [Key in keyof CompositionDictionary]: string };
 type ProjectionScenarioViewProps = {
   locale: Locale;
+  targetText: ReturnType<typeof getTargetText>;
+  dictionary: Dictionary;
   languageLabel: string;
   themeLabel: string;
   text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "rateLimited" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady" | "validationMessages" | "sampleData" | "languageHandoffPending" | "languageHandoffStorage"> & {
@@ -24,6 +29,7 @@ type ProjectionScenarioViewProps = {
 
 // One responsive presentation, sharing all calculation and form state.
 const desktopQuery = "(min-width: 64rem)";
+const modeSessionKey = "incom:calculator-mode:v1";
 function subscribeDesktop(onChange: () => void) {
   const media = window.matchMedia(desktopQuery);
   media.addEventListener("change", onChange);
@@ -67,7 +73,7 @@ function InsightsSkeleton() {
   </aside>;
 }
 
-export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text }: ProjectionScenarioViewProps) {
+export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text, targetText, dictionary }: ProjectionScenarioViewProps) {
   const controller = useProjectionController(locale, text.validationMessages, {
     calculating: text.sidebar.calculating,
     validation: text.validation,
@@ -79,10 +85,26 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   const { projection, sample, pendingPromise, selectedName, setSelectedName, currency, setCurrency, sidebarCollapsed, setSidebarCollapsed, submitting, error, stale, setStale, status, restoredValues, formVersion } = controller;
   const isDesktop = useSyncExternalStore(subscribeDesktop, getDesktopSnapshot, getServerDesktopSnapshot);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [mode, setMode] = useState<"projection" | "target">("projection");
+  const [targetStatus, setTargetStatus] = useState({ stale: false, submitting: false });
   const formRef = useRef<HTMLFormElement>(null);
+  const targetSaveRef = useRef<() => boolean>(() => true);
   const resultsRef = useRef<HTMLElement>(null);
   const revealResults = useRef(false);
   const selectedScenario = projection?.scenarios.find((scenario) => scenario.name === selectedName);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      try {
+        if (sessionStorage.getItem(modeSessionKey) === "target") setMode("target");
+      } catch { /* Storage can be unavailable; projection remains the safe default. */ }
+    });
+  }, []);
+
+  const changeMode = (nextMode: "projection" | "target") => {
+    try { sessionStorage.setItem(modeSessionKey, nextMode); } catch { /* The current view still changes without storage. */ }
+    setMode(nextMode);
+  };
 
   useEffect(() => {
     if (submitting || pendingPromise || !revealResults.current) return;
@@ -122,8 +144,24 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
 
   return (
     <>
-    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={stale} staleText={text.staleResults} onBeforeLanguageChange={saveBeforeLocaleChange} submitting={submitting} languageHandoffText={{ pending: text.languageHandoffPending, storage: text.languageHandoffStorage }} />
-    <main id="main-content" tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)_19.5rem]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]"}`}>
+    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={mode === "target" ? targetStatus.stale : stale} staleText={mode === "target" ? targetText.stale : text.staleResults} onBeforeLanguageChange={(destination) => {
+      if (submitting || targetStatus.submitting) return { status: "pending" };
+      const projectionSave = saveBeforeLocaleChange(destination);
+      if (projectionSave.status !== "saved") return projectionSave;
+      return targetSaveRef.current() ? { status: "saved" } : { status: "storage" };
+    }} submitting={mode === "target" ? targetStatus.submitting : submitting} languageHandoffText={{ pending: text.languageHandoffPending, storage: text.languageHandoffStorage }} />
+    <CalculatorModeToggle locale={locale} mode={mode} onModeChange={changeMode} onBeforeSwitch={() => {
+      if (mode === "target") {
+        if (targetStatus.submitting) return false;
+        targetSaveRef.current();
+      } else {
+        if (submitting) return false;
+        controller.saveBeforeLocaleChange(locale, formRef.current);
+      }
+      return true;
+    }} />
+    <TargetPlanner locale={locale} text={dictionary} targetText={targetText} saveRef={targetSaveRef} onStatusChange={setTargetStatus} active={mode === "target"} />
+    <main id={mode === "projection" ? "main-content" : undefined} hidden={mode !== "projection"} tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)_19.5rem]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)_19.5rem]"}`}>
     <form key={formVersion} ref={formRef} noValidate onSubmit={handleSubmit} onInput={(event) => {
       const target = event.target;
       clearValidation(event);

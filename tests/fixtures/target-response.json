@@ -1,0 +1,202 @@
+{
+  "metadata": {
+    "calculated_at": "2026-10-17T15:54:16.813934Z",
+    "calculation_model_version": "compound-interest-v2",
+    "scenario_policy_version": "scenario-policy-v2"
+  },
+  "resolved_inputs": {
+    "target_amount": "100000.00",
+    "target_basis": "nominal",
+    "nominal_target_amount": "100000.00",
+    "initial_principal": "0.00",
+    "duration_years": 2,
+    "expected_annual_return_percent": "7",
+    "annual_fee_percent": {
+      "value": "0",
+      "source": "server_default"
+    },
+    "expected_annual_inflation_percent": {
+      "value": "2",
+      "source": "server_default"
+    },
+    "scenario_range_percentage_points": {
+      "value": "2",
+      "source": "server_default"
+    },
+    "contribution_plan": {
+      "frequency": "monthly",
+      "timing": {
+        "value": "end",
+        "source": "server_default"
+      },
+      "annual_increase_percent": {
+        "value": "0",
+        "source": "server_default"
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "name": "low",
+      "annual_return_percent": "5",
+      "required_contribution_amount": "3974.76",
+      "final_summary": {
+        "nominal_balance": "100000.13",
+        "initial_principal": "0.00",
+        "cumulative_contributions": "95394.24",
+        "cumulative_investment_growth": "4605.89",
+        "inflation_adjusted_balance": "96117.00",
+        "cumulative_fees_paid": "0.00",
+        "fee_impact": "-0.00"
+      },
+      "annual_points": [
+        {
+          "nominal_balance": "0.00",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "0.00",
+          "cumulative_investment_growth": "0.00",
+          "inflation_adjusted_balance": "0.00",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "0.00",
+          "year": 0,
+          "contributions_during_year": "0.00",
+          "fees_during_year": "0.00"
+        },
+        {
+          "nominal_balance": "48780.55",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "47697.12",
+          "cumulative_investment_growth": "1083.43",
+          "inflation_adjusted_balance": "47824.07",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "-0.00",
+          "year": 1,
+          "contributions_during_year": "47697.12",
+          "fees_during_year": "0.00"
+        },
+        {
+          "nominal_balance": "100000.13",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "95394.24",
+          "cumulative_investment_growth": "4605.89",
+          "inflation_adjusted_balance": "96117.00",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "-0.00",
+          "year": 2,
+          "contributions_during_year": "47697.12",
+          "fees_during_year": "0.00"
+        }
+      ]
+    },
+    {
+      "name": "expected",
+      "annual_return_percent": "7",
+      "required_contribution_amount": "3902.11",
+      "final_summary": {
+        "nominal_balance": "100000.21",
+        "initial_principal": "0.00",
+        "cumulative_contributions": "93650.64",
+        "cumulative_investment_growth": "6349.57",
+        "inflation_adjusted_balance": "96117.08",
+        "cumulative_fees_paid": "0.00",
+        "fee_impact": "0.00"
+      },
+      "annual_points": [
+        {
+          "nominal_balance": "0.00",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "0.00",
+          "cumulative_investment_growth": "0.00",
+          "inflation_adjusted_balance": "0.00",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "0.00",
+          "year": 0,
+          "contributions_during_year": "0.00",
+          "fees_during_year": "0.00"
+        },
+        {
+          "nominal_balance": "48309.28",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "46825.32",
+          "cumulative_investment_growth": "1483.96",
+          "inflation_adjusted_balance": "47362.04",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "0.00",
+          "year": 1,
+          "contributions_during_year": "46825.32",
+          "fees_during_year": "0.00"
+        },
+        {
+          "nominal_balance": "100000.21",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "93650.64",
+          "cumulative_investment_growth": "6349.57",
+          "inflation_adjusted_balance": "96117.08",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "0.00",
+          "year": 2,
+          "contributions_during_year": "46825.32",
+          "fees_during_year": "0.00"
+        }
+      ]
+    },
+    {
+      "name": "high",
+      "annual_return_percent": "9",
+      "required_contribution_amount": "3831.65",
+      "final_summary": {
+        "nominal_balance": "100000.14",
+        "initial_principal": "0.00",
+        "cumulative_contributions": "91959.60",
+        "cumulative_investment_growth": "8040.54",
+        "inflation_adjusted_balance": "96117.02",
+        "cumulative_fees_paid": "0.00",
+        "fee_impact": "0.00"
+      },
+      "annual_points": [
+        {
+          "nominal_balance": "0.00",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "0.00",
+          "cumulative_investment_growth": "0.00",
+          "inflation_adjusted_balance": "0.00",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "0.00",
+          "year": 0,
+          "contributions_during_year": "0.00",
+          "fees_during_year": "0.00"
+        },
+        {
+          "nominal_balance": "47846.96",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "45979.80",
+          "cumulative_investment_growth": "1867.16",
+          "inflation_adjusted_balance": "46908.78",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "0.00",
+          "year": 1,
+          "contributions_during_year": "45979.80",
+          "fees_during_year": "0.00"
+        },
+        {
+          "nominal_balance": "100000.14",
+          "initial_principal": "0.00",
+          "cumulative_contributions": "91959.60",
+          "cumulative_investment_growth": "8040.54",
+          "inflation_adjusted_balance": "96117.02",
+          "cumulative_fees_paid": "0.00",
+          "fee_impact": "0.00",
+          "year": 2,
+          "contributions_during_year": "45979.80",
+          "fees_during_year": "0.00"
+        }
+      ]
+    }
+  ],
+  "disclosures": [
+    "PROJECTION_NOT_GUARANTEE",
+    "TAXES_EXCLUDED",
+    "FEES_MODELED",
+    "RETURNS_ASSUMED_CONSTANT"
+  ]
+}

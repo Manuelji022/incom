@@ -3,6 +3,7 @@ import { ProjectionScenarioView } from "@/features/compound-calculator";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/i18n";
 import { hasLocale } from "@/lib/locales";
+import { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
 
 export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
@@ -33,6 +34,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           languageHandoffPending: text.languageHandoffPending,
           languageHandoffStorage: text.languageHandoffStorage,
         }}
+        targetText={getTargetText(lang)}
+        dictionary={text}
       />
       <Footer label={text.footer} />
     </div>

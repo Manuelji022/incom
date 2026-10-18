@@ -73,9 +73,9 @@ const dictionaries = {
     invalidInputs: "The projection service could not accept these assumptions. Review the values and try again.",
     pageTitle: "See how your investments could grow",
     staleResults: "Inputs changed. Calculate again to update these results.",
+    resultsReady: "Projection results are ready.",
     retry: "Try again",
     validation: "Check the highlighted fields and try again.",
-    resultsReady: "Projection results are ready.",
     chart: {
       none: "No annual projection data is available.",
       reload: "Reload projections",
@@ -218,9 +218,9 @@ const dictionaries = {
     invalidInputs: "El servicio no ha podido aceptar estos supuestos. Revisa los valores e inténtalo de nuevo.",
     pageTitle: "Descubre cómo podría crecer tu inversión",
     staleResults: "Los datos han cambiado. Calcula de nuevo para actualizar los resultados.",
+    resultsReady: "Los resultados de la proyección están listos.",
     retry: "Inténtalo de nuevo",
     validation: "Revisa los campos marcados e inténtalo de nuevo.",
-    resultsReady: "Los resultados de la proyección están listos.",
     chart: {
       none: "No hay datos anuales de proyección disponibles.",
       reload: "Volver a cargar",
