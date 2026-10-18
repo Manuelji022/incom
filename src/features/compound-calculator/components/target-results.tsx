@@ -19,22 +19,6 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
   const money = (value: string) => format.format(value as unknown as number);
   const plan = inputs.contribution_plan;
   const period = plan.frequency === "monthly" ? t.perMonth : plan.frequency === "quarterly" ? t.perQuarter : t.perYear;
-  const source = (value: { value: string; source: string }, unit = "%") => `${value.value}${unit} (${value.source === "server_default" ? t.defaultSource : t.callerSource})`;
-  const assumptions = [
-    [t.target, money(inputs.target_amount)],
-    [t.basis, inputs.target_basis === "real" ? t.real : t.nominal],
-    [t.nominalTarget, money(inputs.nominal_target_amount)],
-    [text.sidebar.initial, money(inputs.initial_principal)],
-    [text.sidebar.horizon, `${inputs.duration_years} ${text.sidebar.years}`],
-    [text.sidebar.return, `${inputs.expected_annual_return_percent}%`],
-    [text.sidebar.frequency, text.sidebar[plan.frequency]],
-    [text.sidebar.timing, `${plan.timing.value === "beginning" ? text.sidebar.beginning : text.sidebar.end} (${plan.timing.source === "server_default" ? t.defaultSource : t.callerSource})`],
-    [text.sidebar.increase, source(plan.annual_increase_percent)],
-    [text.sidebar.fee, source(inputs.annual_fee_percent)],
-    [text.sidebar.inflation, source(inputs.expected_annual_inflation_percent)],
-    [text.sidebar.range, source(inputs.scenario_range_percentage_points, " pp")],
-  ];
-  const disclosures: Record<string, string> = { PROJECTION_NOT_GUARANTEE: t.caveat, TAXES_EXCLUDED: t.taxes, FEES_MODELED: t.fees, RETURNS_ASSUMED_CONSTANT: t.constant };
   return <>
     <section aria-labelledby="target-contributions-title" className="space-y-4 border-b border-border-subtle p-4 sm:p-6">
       <h2 id="target-contributions-title" className="text-lg font-semibold">{t.contribution}</h2>
@@ -68,17 +52,6 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
           </tr>)}</tbody>
         </table>
       </div>
-    </section>
-    <section aria-labelledby="target-assumptions-title" className="space-y-4 border-b border-border-subtle p-4 sm:p-6">
-      <h2 id="target-assumptions-title" className="text-lg font-semibold">{t.assumptions}</h2>
-      <p className="text-sm text-secondary-foreground">{inputs.target_basis === "real" ? t.basisHelp : t.nominalHelp}</p>
-      <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">{assumptions.map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-sm text-secondary-foreground">{label}</dt><dd className="break-words text-sm font-medium">{value}</dd></div>)}</dl>
-    </section>
-    <section aria-labelledby="target-disclosures-title" className="space-y-3 p-4 sm:p-6">
-      <h2 id="target-disclosures-title" className="text-base font-semibold">{t.disclosures}</h2>
-      <p className="text-sm font-medium">{t.caveat}</p>
-      <ul className="list-disc space-y-1 ps-5 text-sm text-secondary-foreground">{result.disclosures.filter((code) => code !== "PROJECTION_NOT_GUARANTEE").map((code) => <li key={code}>{disclosures[code] ?? code}</li>)}</ul>
-      <p className="text-xs text-secondary-foreground">{t.calculated}: <time dateTime={result.metadata.calculated_at}>{result.metadata.calculated_at}</time></p>
     </section>
   </>;
 }
