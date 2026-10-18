@@ -145,7 +145,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
 
   return (
     <>
-    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={mode === "target" ? false : stale} staleText={mode === "target" ? targetText.stale : text.staleResults} onBeforeLanguageChange={(destination) => {
+    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={mode === "target" ? targetStatus.stale : stale} staleText={mode === "target" ? targetText.stale : text.staleResults} onBeforeLanguageChange={(destination) => {
       if (submitting || targetStatus.submitting) return { status: "pending" };
       const projectionSave = saveBeforeLocaleChange(destination);
       if (projectionSave.status !== "saved") return projectionSave;

@@ -81,7 +81,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
     setValues((previous) => ({ ...previous, [name]: value }));
     setErrors((previous) => previous.filter((error) => error.field !== name));
     setFailure("");
-    setStatus("");
+    setStatus(result ? t.stale : "");
     if (result) setStale(true);
   }
   function showErrors(next: ProblemDetail["errors"]) {
