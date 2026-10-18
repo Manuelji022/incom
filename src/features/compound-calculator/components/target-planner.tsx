@@ -15,21 +15,24 @@ import type { getTargetText } from "@/features/compound-calculator/lib/target-i1
 import type { Locale } from "@/lib/locales";
 import type { ProblemDetail, TargetResponse } from "@/features/compound-calculator/types/compound-interest-target";
 import { ProjectionSliderFields, ScenarioRangeField } from "@/features/compound-calculator/components/slider-fields";
+import { mockTarget } from "@/features/compound-calculator/lib/mock-target";
 
 type Props = { locale: Locale; text: ReturnType<typeof getDictionary>; targetText: ReturnType<typeof getTargetText>; saveRef?: MutableRefObject<() => boolean>; onStatusChange?: (status: { stale: boolean; submitting: boolean }) => void; className?: string; active?: boolean };
 const sessionKey = "incom:target-session:v1";
-const defaults: Record<string, string> = { target_amount: "100000", initial_principal: "0", duration_years: "20", expected_annual_return_percent: "7", "contribution_plan.frequency": "monthly", "contribution_plan.timing": "end", target_basis: "nominal" };
+const defaults: Record<string, string> = { target_amount: "1000000.00", initial_principal: "10000.00", duration_years: "20", expected_annual_return_percent: "7", "contribution_plan.frequency": "monthly", "contribution_plan.timing": "end", "contribution_plan.annual_increase_percent": "0", annual_fee_percent: "0.08", expected_annual_inflation_percent: "2.5", scenario_range_percentage_points: "2", target_basis: "nominal" };
 
 export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusChange, className = "", active = true }: Props) {
   const [values, setValues] = useState(defaults);
   const [currency, setCurrency] = useState<Currency>("EUR");
-  const [result, setResult] = useState<TargetResponse | null>(null);
+  const [result, setResult] = useState<TargetResponse | null>(mockTarget);
+  const [sample, setSample] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<ProblemDetail["errors"]>([]);
   const [failure, setFailure] = useState("");
   const [status, setStatus] = useState("");
   const [stale, setStale] = useState(false);
   const [advanced, setAdvanced] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [formVersion, setFormVersion] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
   const resultRef = useRef<HTMLElement>(null);
@@ -43,7 +46,8 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
       queueMicrotask(() => {
         setValues({ ...defaults, ...saved.values });
         if (isCurrency(saved.currency)) setCurrency(saved.currency);
-        setResult(restored);
+        setResult(restored ?? mockTarget);
+        setSample(!restored);
         setStale(saved.stale === true);
         setFormVersion((version) => version + 1);
       });
@@ -63,9 +67,9 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
         } else currentValues[element.name] = element.value;
       }
     }
-    try { sessionStorage.setItem(sessionKey, JSON.stringify({ values: currentValues, result, currency, stale })); return true; }
+    try { sessionStorage.setItem(sessionKey, JSON.stringify({ values: currentValues, result: sample ? null : result, currency, stale })); return true; }
     catch { return false; }
-  }, [values, result, currency, stale]);
+  }, [values, result, sample, currency, stale]);
   useEffect(() => {
     if (saveRef) saveRef.current = saveSession;
   }, [saveRef, saveSession]);
@@ -98,6 +102,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
     try {
       const next = await fetchTarget(input);
       setResult(next);
+      setSample(false);
       setStale(false);
       setStatus(t.ready);
       window.requestAnimationFrame(() => { resultRef.current?.focus(); });
@@ -142,10 +147,26 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
       {error ? <p id={`${id}-error`} className="text-sm text-danger-foreground">{error}</p> : null}
     </Field>;
   }
-  return <main id={active ? "main-content" : undefined} hidden={!active} tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:grid-cols-[18.25rem_minmax(0,1fr)] ${className}`}>
-      <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name) update(target.name, target.value); }} noValidate className="min-w-0 border-e border-border-default bg-container">
-        <div className="space-y-2 border-b border-border-subtle p-4"><h1 className="text-base font-semibold">{t.title}</h1><p className="text-sm text-secondary-foreground">{t.intro}</p></div>
-        <fieldset disabled={submitting} className="space-y-5 p-4">
+  return <main id={active ? "main-content" : undefined} hidden={!active} tabIndex={-1} className={`grid flex-1 grid-cols-1 ${collapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)]"} ${className}`}>
+      <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-default bg-container transition-[width] lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""}`}>
+        <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle p-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
+          <h1 className={`text-base font-semibold ${collapsed ? "lg:hidden" : ""}`}>{t.title}</h1>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            aria-label={collapsed ? text.sidebar.edit : text.sidebar.hide}
+            aria-expanded={!collapsed}
+            aria-controls="target-planner-fields"
+            onClick={() => setCollapsed((value) => !value)}
+            className={`min-h-11 shrink-0 lg:min-h-8 lg:px-2 ${collapsed ? "lg:absolute lg:start-0 lg:top-5 lg:z-20" : ""}`}
+          >
+            <span className="lg:hidden">{collapsed ? text.sidebar.edit : text.sidebar.hide}</span>
+            <span aria-hidden="true" className={`size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
+          </Button>
+          <p className={`col-span-2 text-sm leading-5 text-secondary-foreground ${collapsed ? "lg:hidden" : ""}`}>{t.intro}</p>
+        </header>
+        <fieldset id="target-planner-fields" disabled={submitting} className={`space-y-5 p-4 ${collapsed ? "hidden" : ""}`}>
           <Field><FieldLabel htmlFor="target-currency">{text.sidebar.currency}</FieldLabel><Select id="target-currency" value={currency} onChange={(event) => { if (isCurrency(event.currentTarget.value)) setCurrency(event.currentTarget.value); }} aria-describedby="target-currency-help">{currencies.map((value) => <option key={value} value={value}>{value} ({getCurrencySymbol(value)})</option>)}</Select><FieldDescription id="target-currency-help">{t.currencyHelp}</FieldDescription></Field>
           {field("target_amount", `${t.target} (${getCurrencySymbol(currency)})`, t.formatHelp)}
           {select("target_basis", t.basis, [{ value: "nominal", label: t.nominal }, { value: "real", label: t.real }], t.basisHelp)}
@@ -190,6 +211,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
       <section ref={resultRef} tabIndex={-1} aria-label={t.title} aria-busy={submitting} className="min-w-0 bg-page focus-visible:outline-2 focus-visible:outline-brand-border-focus">
         <p role="status" aria-atomic="true" className={status ? "p-4 text-sm text-secondary-foreground" : "sr-only"}>{status}</p>
         {failure ? <div role="alert" className="m-4 space-y-2 rounded-md border border-danger-border-default p-4 text-sm"><p>{failure}</p>{errors.length ? <ul className="list-disc ps-5">{errors.map((error, index) => <li key={`${error.field}-${index}`}>{fieldLabels[error.field] ? `${fieldLabels[error.field]}: ` : ""}{error.reason}</li>)}</ul> : null}<Button type="button" variant="outline" onClick={() => formRef.current?.requestSubmit()}>{text.retry}</Button></div> : null}
+        {sample ? <p className="px-4 pt-3 text-xs text-secondary-foreground">{t.sampleData}</p> : null}
         {result ? <TargetResults key={result.metadata.calculated_at} result={result} locale={locale} currency={currency} text={text} targetText={t} /> : <div className="mx-auto flex min-h-80 max-w-xl flex-col justify-center gap-4 p-6"><h2 className="text-xl font-semibold">{t.title}</h2><p className="text-secondary-foreground">{t.empty}</p><p className="text-sm text-secondary-foreground">{t.caveat}</p></div>}
       </section>
     </main>;
