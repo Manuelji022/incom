@@ -164,23 +164,32 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
             aria-describedby={errorFor("contribution_plan.frequency") ? "target-contribution_plan-frequency-error" : undefined}
           />
           {errorFor("contribution_plan.frequency") ? <p id="target-contribution_plan-frequency-error" className="text-sm text-danger-foreground">{errorFor("contribution_plan.frequency")}</p> : null}
-          <details open={advanced} onToggle={(event) => setAdvanced(event.currentTarget.open)} className="border-t border-border-subtle pt-4">
-            <summary className="cursor-pointer text-sm font-semibold">{t.advanced}</summary>
-            <div className="mt-4 space-y-5"><p className="text-sm text-secondary-foreground">{t.defaults}</p>
+          <section className="border-t border-border-subtle pt-4">
+            <button
+              type="button"
+              aria-expanded={advanced}
+              aria-controls="target-advanced-assumption-fields"
+              onClick={() => setAdvanced((open) => !open)}
+              className="flex min-h-11 w-full items-center justify-between gap-3 rounded-md text-start text-sm font-semibold lg:hidden"
+            >
+              <span>{advanced ? text.sidebar.closeAssumptions : text.sidebar.openAssumptions}</span>
+              <span aria-hidden="true">{advanced ? "−" : "+"}</span>
+            </button>
+            <div id="target-advanced-assumption-fields" className={`${advanced ? "" : "hidden"} space-y-5 pt-4 lg:block lg:pt-0`}>
+              <p className="text-sm text-secondary-foreground">{t.defaults}</p>
               {select("contribution_plan.timing", text.sidebar.timing, [{ value: "end", label: text.sidebar.end }, { value: "beginning", label: text.sidebar.beginning }])}
               <NumericField id="target-inflation" name="expected_annual_inflation_percent" label={`${text.sidebar.inflation} (%)`} unit="%" defaultValue={values.expected_annual_inflation_percent ?? ""} min="-100" step="0.1" description={t.inflationHelp} error={errorFor("expected_annual_inflation_percent")} required={values.target_basis === "real"} aria-required={values.target_basis === "real"} optional={values.target_basis !== "real"} optionalLabel={text.sidebar.optional} />
               <NumericField id="target-fee" name="annual_fee_percent" label={`${text.sidebar.fee} (%)`} unit="%" defaultValue={values.annual_fee_percent ?? ""} min="0" step="0.01" description={t.feeHelp} error={errorFor("annual_fee_percent")} optional optionalLabel={text.sidebar.optional} />
               <ScenarioRangeField id="scenario-range" idPrefix="target" name="scenario_range_percentage_points" label={text.sidebar.range} expectedReturn={Number(values.expected_annual_return_percent)} text={text.sidebar} locale={locale} initialValues={values} error={errorFor("scenario_range_percentage_points")} onValueChange={update} />
               {field("contribution_plan.annual_increase_percent", `${text.sidebar.increase} (%)`, t.increaseHelp, "0")}
             </div>
-          </details>
+          </section>
           <Button type="submit" disabled={submitting} className="min-h-12 w-full">{submitting ? text.sidebar.calculating : t.calculate}</Button>
         </fieldset>
       </form>
       <section ref={resultRef} tabIndex={-1} aria-label={t.title} aria-busy={submitting} className="min-w-0 bg-page focus-visible:outline-2 focus-visible:outline-brand-border-focus">
         <p role="status" aria-atomic="true" className={status ? "p-4 text-sm text-secondary-foreground" : "sr-only"}>{status}</p>
         {failure ? <div role="alert" className="m-4 space-y-2 rounded-md border border-danger-border-default p-4 text-sm"><p>{failure}</p>{errors.length ? <ul className="list-disc ps-5">{errors.map((error, index) => <li key={`${error.field}-${index}`}>{fieldLabels[error.field] ? `${fieldLabels[error.field]}: ` : ""}{error.reason}</li>)}</ul> : null}<Button type="button" variant="outline" onClick={() => formRef.current?.requestSubmit()}>{text.retry}</Button></div> : null}
-        {stale ? <p className="px-4 py-3 text-sm text-secondary-foreground">{t.stale}</p> : null}
         {result ? <TargetResults key={result.metadata.calculated_at} result={result} locale={locale} currency={currency} text={text} targetText={t} /> : <div className="mx-auto flex min-h-80 max-w-xl flex-col justify-center gap-4 p-6"><h2 className="text-xl font-semibold">{t.title}</h2><p className="text-secondary-foreground">{t.empty}</p><p className="text-sm text-secondary-foreground">{t.caveat}</p></div>}
       </section>
     </main>;
