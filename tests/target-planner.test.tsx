@@ -28,7 +28,7 @@ const props = { locale: "en" as const, text, targetText };
 const mount = () => render(<TargetPlanner {...props} />);
 const mountParent = () => render(<ProjectionScenarioView
   locale="en" languageLabel="Language" themeLabel="Toggle theme" targetText={targetText} dictionary={text}
-  text={{ sidebar: text.sidebar, header: text.header, chart: text.chart, summary: text.summary, composition: text.composition, scenarios: text.scenarios, unavailable: text.unavailable, invalidInputs: text.invalidInputs, staleResults: text.staleResults, retry: text.retry, validation: text.validation, resultsReady: text.resultsReady, validationMessages: text.validationMessages, sampleData: text.sampleData, languageHandoffPending: text.languageHandoffPending, languageHandoffStorage: text.languageHandoffStorage }}
+  text={{ sidebar: text.sidebar, header: text.header, chart: text.chart, summary: text.summary, composition: text.composition, scenarios: text.scenarios, unavailable: text.unavailable, rateLimited: text.rateLimited, invalidInputs: text.invalidInputs, staleResults: text.staleResults, retry: text.retry, validation: text.validation, resultsReady: text.resultsReady, validationMessages: text.validationMessages, sampleData: text.sampleData, languageHandoffPending: text.languageHandoffPending, languageHandoffStorage: text.languageHandoffStorage }}
 />);
 const submit = () => fireEvent.click(screen.getByRole("button", { name: "Calculate contributions" }));
 const change = (label: RegExp, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
@@ -83,7 +83,7 @@ describe("target planner", () => {
     submit();
     expect(screen.getByRole("button", { name: "Calculating…" }).hasAttribute("disabled")).toBe(true);
     expect(screen.getByRole("status").textContent).toBe("Calculating…");
-    expect(JSON.parse(mock.mock.calls[0][1].body)).toEqual({ target_amount: "100000.001234567890123456", initial_principal: "0", duration_years: 2, expected_annual_return_percent: "7", contribution_plan: { frequency: "monthly" }, scenario_range_percentage_points: "2" });
+    expect(JSON.parse(mock.mock.calls[0][1].body)).toEqual({ target_amount: "100000.001234567890123456", initial_principal: "10000", duration_years: 2, expected_annual_return_percent: "7", contribution_plan: { frequency: "monthly", annual_increase_percent: "0" }, annual_fee_percent: "0.08", expected_annual_inflation_percent: "2.5", scenario_range_percentage_points: "2" });
     await act(async () => resolve(Response.json(fixture)));
     expect(await screen.findByText("Target results are ready.")).toBeTruthy();
     expect(screen.getByRole("button", { name: /Expected · 7%.*3,902.11.*per month/ }).getAttribute("aria-pressed")).toBe("true");
@@ -111,7 +111,7 @@ describe("target planner", () => {
     const nominalInflation = screen.getByRole("textbox", { name: /Expected inflation/ });
     expect(nominalInflation.hasAttribute("required")).toBe(false);
     expect(nominalInflation.getAttribute("aria-required")).toBe("false");
-    change(/Target basis/, "real"); submit();
+    change(/Expected inflation/, ""); change(/Target basis/, "real"); submit();
     expect(mock).not.toHaveBeenCalled();
     const inflation = screen.getByRole("textbox", { name: /Expected inflation/ });
     expect(inflation.hasAttribute("required")).toBe(true);
@@ -182,7 +182,7 @@ describe("target planner", () => {
     render(<TargetPlanner {...props} saveRef={saveRef} />);
     change(/Target amount/, "123456.78900"); submit(); await screen.findByText("Target results are ready.");
     expect(saveRef.current()).toBe(true);
-    expect(JSON.parse(sessionStorage.getItem("incom:target-session:v1")!).values.target_amount).toBe("123456.78900");
+    expect(JSON.parse(sessionStorage.getItem("incom:target-session:v2")!).values.target_amount).toBe("123456.78900");
     cleanup(); mount();
     await waitFor(() => expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("123456.78900"));
     expect(screen.getByRole("table")).toBeTruthy();
