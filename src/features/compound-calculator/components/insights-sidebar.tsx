@@ -1,8 +1,8 @@
-import { PortfolioComposition } from "@/components/portfolio-composition";
-import { Scenarios } from "@/components/scenarios";
+import { PortfolioComposition } from "@/features/compound-calculator/components/portfolio-composition";
+import { Scenarios } from "@/features/compound-calculator/components/scenarios";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
-import type { ProjectionScenario } from "@/types/compound-interest";
+import type { ProjectionScenario } from "@/features/compound-calculator/types/compound-interest";
 import type { Currency } from "@/lib/currency";
 
 type Dictionary = ReturnType<typeof getDictionary>;

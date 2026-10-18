@@ -1,12 +1,12 @@
-import { Scenarios } from "@/components/scenarios";
-import { PortfolioComposition } from "@/components/portfolio-composition";
-import { InvestmentSummary } from "@/components/investment-summary";
-import { InvestmentSummaryCards } from "@/components/investment-summary-cards";
-import { ProjectionChart } from "@/components/projection-chart";
-import { ProjectionHeader } from "@/components/projection-header";
+import { Scenarios } from "@/features/compound-calculator/components/scenarios";
+import { PortfolioComposition } from "@/features/compound-calculator/components/portfolio-composition";
+import { InvestmentSummary } from "@/features/compound-calculator/components/investment-summary";
+import { InvestmentSummaryCards } from "@/features/compound-calculator/components/investment-summary-cards";
+import { ProjectionChart } from "@/features/compound-calculator/components/projection-chart";
+import { ProjectionHeader } from "@/features/compound-calculator/components/projection-header";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
-import type { ProjectionScenario } from "@/types/compound-interest";
+import type { ProjectionScenario } from "@/features/compound-calculator/types/compound-interest";
 import type { Currency } from "@/lib/currency";
 
 type Dictionary = ReturnType<typeof getDictionary>;

@@ -2,18 +2,18 @@
 
 import { useState, type ComponentProps } from "react";
 
-import { Button } from "@/components/ui/button";
-import { FieldGroup } from "@/components/ui/field";
-import { NumericField } from "@/components/ui/numeric-field";
-import { Select } from "@/components/ui/select";
-import { SegmentedControl } from "@/components/ui/segmented-control";
-import { ProjectionSliderFields, ScenarioRangeField } from "@/components/slider-fields";
+import { Button } from "@/components/primitives/button";
+import { FieldGroup } from "@/components/primitives/field";
+import { NumericField } from "@/components/primitives/numeric-field";
+import { Select } from "@/components/primitives/select";
+import { SegmentedControl } from "@/components/primitives/segmented-control";
+import { ProjectionSliderFields, ScenarioRangeField } from "@/features/compound-calculator/components/slider-fields";
 import { getCurrencyFormatter, currencies, getCurrencySymbol, isCurrency, type Currency } from "@/lib/currency";
-import { normalizeDecimalInput } from "@/lib/decimal-input";
+import { normalizeDecimalInput } from "@/features/compound-calculator/lib/decimal-input";
 import type {
   ContributionFrequency,
   ContributionTiming,
-} from "@/types/compound-interest";
+} from "@/features/compound-calculator/types/compound-interest";
 
 type CompoundInputSidebarProps = Pick<ComponentProps<"aside">, "className"> & {
   text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];

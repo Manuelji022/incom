@@ -1,5 +1,5 @@
 import type { Locale } from "@/lib/locales";
-import type { ProjectionPoint } from "@/types/compound-interest";
+import type { ProjectionPoint } from "@/features/compound-calculator/types/compound-interest";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 
 type SummaryText = {

@@ -1,7 +1,7 @@
-import { parseProjectionResponse } from "@/lib/compound-interest";
+import { parseProjectionResponse } from "@/features/compound-calculator/api/compound-interest";
 import { hasLocale, type Locale } from "@/lib/locales";
 import { isCurrency, type Currency } from "@/lib/currency";
-import type { CompoundInterestProjectionResponse, ProjectionScenario } from "@/types/compound-interest";
+import type { CompoundInterestProjectionResponse, ProjectionScenario } from "@/features/compound-calculator/types/compound-interest";
 
 const storageKey = "incom:projection-session:v1";
 

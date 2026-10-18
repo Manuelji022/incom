@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ProjectionPoint } from "@/types/compound-interest";
+import type { ProjectionPoint } from "@/features/compound-calculator/types/compound-interest";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/primitives/button";
 
 import type { Locale } from "@/lib/locales";
 type SummaryDictionary = ReturnType<

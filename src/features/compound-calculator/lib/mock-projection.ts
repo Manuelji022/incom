@@ -1,4 +1,4 @@
-import type { CompoundInterestProjectionResponse } from "@/types/compound-interest";
+import type { CompoundInterestProjectionResponse } from "@/features/compound-calculator/types/compound-interest";
 
 // Generated from the projection API using the form's sample assumptions.
 export const mockProjection: CompoundInterestProjectionResponse = {

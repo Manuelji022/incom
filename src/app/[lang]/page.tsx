@@ -1,5 +1,5 @@
 import { Footer } from "@/components/footer";
-import { ProjectionScenarioView } from "@/components/projection-scenario-view";
+import { ProjectionScenarioView } from "@/features/compound-calculator";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/i18n";
 import { hasLocale } from "@/lib/locales";

@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { ProjectionPoint } from "@/types/compound-interest";
+import type { ProjectionPoint } from "@/features/compound-calculator/types/compound-interest";
 import type { Currency } from "@/lib/currency";
 
 import type { Locale } from "@/lib/locales";
@@ -31,7 +31,7 @@ type ProjectionChartProps = {
 
 const ProjectionChartCanvas = dynamic(
   () =>
-    import("@/components/projection-chart-canvas").then(
+    import("@/features/compound-calculator/components/projection-chart-canvas").then(
       (module) => module.ProjectionChartCanvas,
     ),
   {

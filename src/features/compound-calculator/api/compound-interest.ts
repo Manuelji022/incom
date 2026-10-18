@@ -3,7 +3,7 @@ import type {
   CompoundInterestProjectionResponse,
   ProjectionPoint,
   ProjectionScenario,
-} from "@/types/compound-interest";
+} from "@/features/compound-calculator/types/compound-interest";
 
 const projectionEndpoint =
   typeof window === "undefined"

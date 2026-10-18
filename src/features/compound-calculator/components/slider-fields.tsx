@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { DecimalInput } from "@/components/ui/decimal-input";
-import { Slider } from "@/components/ui/slider";
-import { clearFieldValidation } from "@/lib/field-validation";
-import { normalizeDecimalInput } from "@/lib/decimal-input";
+import { Field, FieldDescription, FieldLabel } from "@/components/primitives/field";
+import { DecimalInput } from "@/components/primitives/decimal-input";
+import { Slider } from "@/components/primitives/slider";
+import { clearFieldValidation } from "@/features/compound-calculator/lib/field-validation";
+import { normalizeDecimalInput } from "@/features/compound-calculator/lib/decimal-input";
 
 export type SliderFieldProps = {
   optionalLabel?: string;

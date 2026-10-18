@@ -2,18 +2,18 @@
 
 import { Suspense, use, useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type SyntheticEvent } from "react";
 import { Header } from "@/components/header";
-import { InsightsSidebar } from "@/components/insights-sidebar";
-import { ProjectionResults } from "@/components/projection-results";
-import { CompoundInputSidebar } from "@/components/compound-input-sidebar";
-import { fetchProjection } from "@/lib/compound-interest";
-import { mockProjection } from "@/lib/mock-projection";
+import { InsightsSidebar } from "@/features/compound-calculator/components/insights-sidebar";
+import { ProjectionResults } from "@/features/compound-calculator/components/projection-results";
+import { CompoundInputSidebar } from "@/features/compound-calculator/components/compound-input-sidebar";
+import { fetchProjection } from "@/features/compound-calculator/api/compound-interest";
+import { mockProjection } from "@/features/compound-calculator/lib/mock-projection";
 import type { Currency } from "@/lib/currency";
 import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
-import type { CompoundInterestProjectionInput, CompoundInterestProjectionResponse, ProjectionScenario } from "@/types/compound-interest";
-import { clearFieldValidation, showFieldValidation } from "@/lib/field-validation";
-import { isValidDecimalInput, normalizeDecimalInput } from "@/lib/decimal-input";
-import { consumeProjectionSession, saveProjectionSession } from "@/lib/projection-session";
+import type { CompoundInterestProjectionInput, CompoundInterestProjectionResponse, ProjectionScenario } from "@/features/compound-calculator/types/compound-interest";
+import { clearFieldValidation, showFieldValidation } from "@/features/compound-calculator/lib/field-validation";
+import { isValidDecimalInput, normalizeDecimalInput } from "@/features/compound-calculator/lib/decimal-input";
+import { consumeProjectionSession, saveProjectionSession } from "@/features/compound-calculator/lib/projection-session";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 type ScenarioName = ProjectionScenario["name"];

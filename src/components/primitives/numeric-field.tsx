@@ -2,8 +2,8 @@
 
 import type { ComponentProps } from "react";
 
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { DecimalInput } from "@/components/ui/decimal-input";
+import { Field, FieldDescription, FieldLabel } from "@/components/primitives/field";
+import { DecimalInput } from "@/components/primitives/decimal-input";
 
 type NumericFieldProps = {
   id: string;

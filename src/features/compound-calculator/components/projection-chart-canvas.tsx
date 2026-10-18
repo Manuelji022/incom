@@ -5,7 +5,7 @@ import { areaY, defineChart, lineY } from "@tanstack/charts";
 import { Chart } from "@tanstack/charts/react";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { tooltip } from "@tanstack/charts/tooltip";
-import type { ProjectionPoint } from "@/types/compound-interest";
+import type { ProjectionPoint } from "@/features/compound-calculator/types/compound-interest";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 
 type ProjectionChartRow = {
