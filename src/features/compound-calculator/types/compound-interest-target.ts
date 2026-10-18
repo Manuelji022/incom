@@ -16,16 +16,23 @@ export type TargetInput = {
   scenario_range_percentage_points?: string;
 };
 
-type Resolved<T = string> = { value: T; source: "caller" | "server_default" };
+export type Money = string;
+export type Percent = string;
+export type ScenarioName = "low" | "expected" | "high";
+export type InputSource = "caller" | "server_default";
+export type DisclosureCode = "PROJECTION_NOT_GUARANTEE" | "TAXES_EXCLUDED" | "FEES_MODELED" | "RETURNS_ASSUMED_CONSTANT";
+
+type Resolved<T = Percent> = { value: T; source: InputSource };
 export type TargetValues = Omit<ProjectionPoint, "year"> & { fee_impact: string };
 export type TargetPoint = TargetValues & { year: number; contributions_during_year: string; fees_during_year: string };
-export type TargetScenario = Omit<ProjectionScenario, "final_summary" | "annual_points"> & {
+export type TargetScenario = Omit<ProjectionScenario, "name" | "final_summary" | "annual_points"> & {
+  name: ScenarioName;
   required_contribution_amount: string;
   final_summary: TargetValues;
   annual_points: TargetPoint[];
 };
 export type TargetResponse = {
-  metadata: { calculated_at: string; calculation_model_version: string; scenario_policy_version: string };
+  metadata: { calculated_at: string; calculation_model_version: "compound-interest-v2"; scenario_policy_version: "scenario-policy-v2" };
   resolved_inputs: {
     target_amount: string;
     target_basis: "nominal" | "real";
@@ -43,7 +50,7 @@ export type TargetResponse = {
     };
   };
   scenarios: TargetScenario[];
-  disclosures: string[];
+  disclosures: DisclosureCode[];
 };
 export type ProblemDetail = {
   type: string;

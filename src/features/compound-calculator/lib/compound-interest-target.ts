@@ -66,6 +66,24 @@ export function targetInputFromForm(values: FormData): TargetInput {
   return input;
 }
 
+/** Build the wire payload from the supported contract fields only. */
+export function serializeTargetInput(input: TargetInput): TargetInput {
+  const serialized: TargetInput = {
+    target_amount: input.target_amount,
+    initial_principal: input.initial_principal,
+    duration_years: input.duration_years,
+    expected_annual_return_percent: input.expected_annual_return_percent,
+    contribution_plan: { frequency: input.contribution_plan.frequency },
+  };
+  if (input.target_basis !== undefined) serialized.target_basis = input.target_basis;
+  if (input.annual_fee_percent !== undefined) serialized.annual_fee_percent = input.annual_fee_percent;
+  if (input.expected_annual_inflation_percent !== undefined) serialized.expected_annual_inflation_percent = input.expected_annual_inflation_percent;
+  if (input.scenario_range_percentage_points !== undefined) serialized.scenario_range_percentage_points = input.scenario_range_percentage_points;
+  if (input.contribution_plan.timing !== undefined) serialized.contribution_plan.timing = input.contribution_plan.timing;
+  if (input.contribution_plan.annual_increase_percent !== undefined) serialized.contribution_plan.annual_increase_percent = input.contribution_plan.annual_increase_percent;
+  return serialized;
+}
+
 export class TargetApiError extends Error {
   constructor(public readonly problem: ProblemDetail) {
     super(problem.detail);
@@ -96,8 +114,9 @@ export function parseTargetResponse(value: unknown): TargetResponse {
       typeof inputs.duration_years !== "number" || !Number.isInteger(inputs.duration_years) || inputs.duration_years < 1 || inputs.duration_years > 100 ||
       !["annual_fee_percent", "expected_annual_inflation_percent", "scenario_range_percentage_points"].every((key) => resolved(inputs[key])) ||
       !record(inputs.contribution_plan) || !frequency(inputs.contribution_plan.frequency) || !resolved(inputs.contribution_plan.timing, timing) || !resolved(inputs.contribution_plan.annual_increase_percent)) return invalid();
-  if (!["calculated_at", "calculation_model_version", "scenario_policy_version"].every((key) => typeof value.metadata === "object" && value.metadata !== null && typeof (value.metadata as Record<string, unknown>)[key] === "string") ||
-      !Array.isArray(value.disclosures) || !value.disclosures.every((item) => typeof item === "string")) return invalid();
+  if (typeof value.metadata.calculated_at !== "string" || value.metadata.calculation_model_version !== "compound-interest-v2" || value.metadata.scenario_policy_version !== "scenario-policy-v2") return invalid();
+  const disclosureCodes = ["PROJECTION_NOT_GUARANTEE", "TAXES_EXCLUDED", "FEES_MODELED", "RETURNS_ASSUMED_CONSTANT"];
+  if (!Array.isArray(value.disclosures) || !value.disclosures.every((item) => disclosureCodes.includes(item as string))) return invalid();
   const validValues = (item: unknown) => record(item) && ["nominal_balance", "initial_principal", "cumulative_contributions", "cumulative_investment_growth", "inflation_adjusted_balance", "cumulative_fees_paid", "fee_impact"].every((key) => decimal(item[key]));
   if (!Array.isArray(value.scenarios) || value.scenarios.length !== 3) return invalid();
   for (const [index, scenario] of value.scenarios.entries()) {
@@ -113,7 +132,7 @@ export function parseTargetResponse(value: unknown): TargetResponse {
 export async function fetchTarget(input: TargetInput, endpoint = "/api/compound-interest/targets"): Promise<TargetResponse> {
   const response = await fetch(endpoint, {
     method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json, application/problem+json" },
-    body: JSON.stringify(input), signal: AbortSignal.timeout(30_000), cache: "no-store",
+    body: JSON.stringify(serializeTargetInput(input)), signal: AbortSignal.timeout(30_000), cache: "no-store",
   });
   let body: unknown;
   try { body = await response.json(); } catch { throw new Error("invalid-response"); }

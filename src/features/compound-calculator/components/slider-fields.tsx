@@ -22,6 +22,8 @@ export type SliderFieldProps = {
   description?: string;
   valueText?: (value: number) => string;
   initialValues?: Record<string, string>;
+  error?: string;
+  onValueChange?: (name: string, value: string) => void;
 };
 
 function isStepAligned(value: number, min: number, step: number) {
@@ -43,6 +45,8 @@ export function SliderField({
   description,
   valueText,
   initialValues,
+  error,
+  onValueChange,
 }: SliderFieldProps) {
   const initialDraft = initialValues?.[name] ?? String(defaultValue);
   const parsedInitial = Number(normalizeDecimalInput(initialDraft));
@@ -50,10 +54,12 @@ export function SliderField({
   const [value, setValue] = useState(validInitial ? parsedInitial : defaultValue);
   const [draft, setDraft] = useState(initialDraft);
   const descriptionId = description ? `${id}-description` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [descriptionId, errorId].filter(Boolean).join(" ") || undefined;
   const labelId = `${id}-label`;
 
   return (
-    <Field>
+    <Field invalid={!!error}>
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
           <FieldLabel id={labelId} htmlFor={id}>
@@ -69,7 +75,8 @@ export function SliderField({
             max={inputMax}
             step={step}
             required
-            aria-describedby={descriptionId}
+            aria-describedby={describedBy}
+            aria-invalid={!!error}
             onChange={(event) => {
               const next = event.currentTarget.value;
               setDraft(next);
@@ -97,7 +104,7 @@ export function SliderField({
         id={`${id}-slider`}
         aria-label={`${label} (${unit})`}
         aria-labelledby={labelId}
-        aria-describedby={descriptionId}
+        aria-describedby={describedBy}
         min={min}
         max={max}
         step={step}
@@ -105,6 +112,7 @@ export function SliderField({
         onValueChange={(next) => {
           setValue(next);
           setDraft(String(next));
+          onValueChange?.(name, String(next));
           const field = document.getElementById(id);
           if (field instanceof HTMLInputElement) clearFieldValidation(field);
         }}
@@ -118,6 +126,7 @@ export function SliderField({
       {description ? (
         <FieldDescription id={descriptionId}>{description}</FieldDescription>
       ) : null}
+      {error ? <p id={errorId} className="text-sm text-danger-foreground">{error}</p> : null}
     </Field>
   );
 }
@@ -133,6 +142,9 @@ export type ScenarioRangeFieldProps = {
   step?: number;
   maxSpread?: number;
   initialValues?: Record<string, string>;
+  idPrefix?: string;
+  error?: string;
+  onValueChange?: (name: string, value: string) => void;
 };
 
 export function ScenarioRangeField({
@@ -146,14 +158,19 @@ export function ScenarioRangeField({
   text,
   locale,
   initialValues,
+  idPrefix,
+  error,
+  onValueChange,
 }: ScenarioRangeFieldProps) {
+  const controlId = idPrefix ? `${idPrefix}-${id}` : id;
   const initialDraft = initialValues?.[name] ?? String(defaultSpread);
   const parsedInitial = Number(normalizeDecimalInput(initialDraft));
   const validInitial = initialDraft !== "" && Number.isFinite(parsedInitial) && parsedInitial >= 0 && parsedInitial <= maxSpread && isStepAligned(parsedInitial, 0, step);
   const [spread, setSpread] = useState(validInitial ? parsedInitial : defaultSpread);
   const [draft, setDraft] = useState(initialDraft);
-  const labelId = `${id}-label`;
-  const descriptionId = `${id}-description`;
+  const labelId = `${controlId}-label`;
+  const descriptionId = `${controlId}-description`;
+  const errorId = error ? `${controlId}-error` : undefined;
   const format = (value: number) =>
     new Intl.NumberFormat(getIntlLocale(locale), {
       style: "percent",
@@ -175,12 +192,12 @@ export function ScenarioRangeField({
   };
 
   return (
-    <Field>
+    <Field invalid={!!error}>
       <div className="flex items-center justify-between gap-3">
-        <FieldLabel id={labelId} htmlFor={id}>{label}</FieldLabel>
+        <FieldLabel id={labelId} htmlFor={controlId}>{label}</FieldLabel>
         <div className="relative w-28 shrink-0">
           <DecimalInput
-            id={id}
+            id={controlId}
             name={name}
             aria-label={`${label} (${text.rangeAmount})`}
             min="0"
@@ -188,7 +205,8 @@ export function ScenarioRangeField({
             step={step}
             value={draft}
             required
-            aria-describedby={descriptionId}
+            aria-describedby={[descriptionId, errorId].filter(Boolean).join(" ") || undefined}
+            aria-invalid={!!error}
             onChange={(event) => {
               const next = event.currentTarget.value;
               setDraft(next);
@@ -201,9 +219,9 @@ export function ScenarioRangeField({
       </div>
       <div className="mt-2 grid gap-2">
         <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2">
-          <label htmlFor={`${id}-slider`} className="text-xs text-tertiary-foreground">{text.lowShort} / {text.highShort}</label>
+          <label htmlFor={`${controlId}-slider`} className="text-xs text-tertiary-foreground">{text.lowShort} / {text.highShort}</label>
           <Slider
-            id={`${id}-slider`}
+            id={`${controlId}-slider`}
             aria-label={label}
             min={0}
             max={maxSpread}
@@ -213,12 +231,14 @@ export function ScenarioRangeField({
               .replace("{low}", format(expectedReturn - spread))
               .replace("{expected}", format(expectedReturn))
               .replace("{high}", format(expectedReturn + spread))}
-            aria-describedby={descriptionId}
+            aria-describedby={[descriptionId, errorId].filter(Boolean).join(" ") || undefined}
+            aria-invalid={!!error}
             onValueChange={(next) => {
               const nextSpread = Number(next.toFixed(6));
               setSpread(nextSpread);
               setDraft(String(nextSpread));
-              const field = document.getElementById(id);
+              onValueChange?.(name, String(nextSpread));
+              const field = document.getElementById(controlId);
               if (field instanceof HTMLInputElement) clearFieldValidation(field);
             }}
           />
@@ -247,6 +267,7 @@ export function ScenarioRangeField({
       <FieldDescription id={descriptionId}>
         {text.rangeDescription}
       </FieldDescription>
+      {error ? <p id={errorId} className="text-sm text-danger-foreground">{error}</p> : null}
     </Field>
   );
 }
@@ -255,18 +276,29 @@ export function ProjectionSliderFields({
   text,
   locale,
   initialValues,
+  idPrefix,
+  errors = {},
+  onValueChange,
 }: {
   locale: "en" | "es";
   text: ReturnType<typeof import("@/lib/i18n").getDictionary>["sidebar"];
   initialValues?: Record<string, string>;
+  idPrefix?: string;
+  errors?: Record<string, string | undefined>;
+  onValueChange?: (name: string, value: string) => void;
 }) {
   const returnDraftInitial = initialValues?.expected_annual_return_percent ?? "8";
   const [returnDraft, setReturnDraft] = useState(returnDraftInitial);
+  const prefix = idPrefix ? `${idPrefix}-` : "";
+  const durationId = `${prefix}duration-years`;
+  const returnId = `${prefix}expected-annual-return`;
+  const returnLabelId = `${returnId}-label`;
+  const returnDescriptionId = `${returnId}-description`;
 
   return (
     <>
       <SliderField
-        id="duration-years"
+        id={durationId}
         name="duration_years"
         label={text.horizon}
         unit={text.years}
@@ -276,6 +308,8 @@ export function ProjectionSliderFields({
         inputMax={100}
         step={1}
         initialValues={initialValues}
+        error={errors.duration_years}
+        onValueChange={onValueChange}
         valueText={(value) =>
           new Intl.NumberFormat(getIntlLocale(locale), {
             style: "unit",
@@ -288,14 +322,14 @@ export function ProjectionSliderFields({
         <div className="flex items-center justify-between gap-3">
           <FieldLabel
             className="min-w-0 flex-1"
-            id="expected-annual-return-label"
-            htmlFor="expected-annual-return"
+            id={returnLabelId}
+            htmlFor={returnId}
           >
             {text.return}
           </FieldLabel>
           <div className="relative w-28 shrink-0">
             <DecimalInput
-              id="expected-annual-return"
+              id={returnId}
               name="expected_annual_return_percent"
               value={returnDraft}
               step="0.1"
@@ -303,7 +337,8 @@ export function ProjectionSliderFields({
               aria-label={`${text.return} (%)`}
               min="-100"
               max="100"
-              aria-describedby="expected-annual-return-description"
+              aria-describedby={[returnDescriptionId, errors.expected_annual_return_percent ? `${returnId}-error` : ""].filter(Boolean).join(" ") || undefined}
+              aria-invalid={!!errors.expected_annual_return_percent}
               onChange={(event) => {
                 const draft = event.currentTarget.value;
                 setReturnDraft(draft);
@@ -318,9 +353,10 @@ export function ProjectionSliderFields({
             </span>
           </div>
         </div>
-        <FieldDescription id="expected-annual-return-description">
+        <FieldDescription id={returnDescriptionId}>
           {text.beforeFees}
         </FieldDescription>
+        {errors.expected_annual_return_percent ? <p id={`${returnId}-error`} className="text-sm text-danger-foreground">{errors.expected_annual_return_percent}</p> : null}
       </Field>
 
     </>

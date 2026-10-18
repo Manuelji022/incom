@@ -13,6 +13,7 @@ type NumericFieldProps = {
   description?: string;
   optional?: boolean;
   optionalLabel?: string;
+  error?: string;
 } & Omit<ComponentProps<typeof DecimalInput>, "id" | "name" | "type">;
 
 function NumericField({
@@ -24,6 +25,7 @@ function NumericField({
   description,
   optional = false,
   optionalLabel = "Optional",
+  error,
   className = "",
   disabled,
   onWheel,
@@ -31,11 +33,11 @@ function NumericField({
   ...inputProps
 }: NumericFieldProps) {
   const descriptionId = description ? `${id}-description` : undefined;
-  const describedBy =
-    [ariaDescribedBy, descriptionId].filter(Boolean).join(" ") || undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [ariaDescribedBy, descriptionId, errorId].filter(Boolean).join(" ") || undefined;
 
   return (
-    <Field disabled={disabled}>
+    <Field disabled={disabled} invalid={!!error}>
       <div className="flex items-center justify-between gap-3">
         <FieldLabel htmlFor={id}>{label}</FieldLabel>
         {optional ? (
@@ -57,6 +59,7 @@ function NumericField({
             event.currentTarget.blur();
           }}
           aria-describedby={describedBy}
+          aria-invalid={!!error}
           className={`pe-14 tabular-nums ${className}`.trim()}
         />
         <span
@@ -69,6 +72,7 @@ function NumericField({
       {description ? (
         <FieldDescription id={descriptionId}>{description}</FieldDescription>
       ) : null}
+      {error ? <p id={errorId} className="text-sm text-danger-foreground">{error}</p> : null}
     </Field>
   );
 }

@@ -1,9 +1,9 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fetchTarget, parseTargetResponse, targetInputFromForm, TargetApiError, validateTargetInput } from "@/lib/compound-interest-target";
+import { fetchTarget, parseTargetResponse, serializeTargetInput, targetInputFromForm, TargetApiError, validateTargetInput } from "@/features/compound-calculator/lib/compound-interest-target";
 import { POST } from "@/app/api/compound-interest/targets/route";
 import fixture from "./fixtures/target-response.json";
-import type { TargetInput } from "@/types/compound-interest-target";
+import type { TargetInput } from "@/features/compound-calculator/types/compound-interest-target";
 
 const input: TargetInput = { target_amount: "100000.00", initial_principal: "0", duration_years: 2, expected_annual_return_percent: "7", contribution_plan: { frequency: "monthly" } };
 const problem = (status: number) => ({ type: "about:blank", title: "Cannot calculate target", status, detail: "This target cannot be reached with these assumptions.", instance: "/api/v1/compound-interest/targets", code: "UNREACHABLE_TARGET", errors: [{ field: "target_amount", reason: "Try a longer horizon or a smaller target." }] });
@@ -20,6 +20,10 @@ describe("target input serialization and validation", () => {
     const form = new FormData();
     Object.entries({ target_amount: "100", initial_principal: "0", duration_years: "1", expected_annual_return_percent: "0", "contribution_plan.frequency": "annual", "contribution_plan.timing": "beginning", "contribution_plan.annual_increase_percent": "-10.0000", target_basis: "real", expected_annual_inflation_percent: "0.0000", annual_fee_percent: "0.0800", scenario_range_percentage_points: "0" }).forEach(([key, value]) => form.set(key, value));
     expect(targetInputFromForm(form)).toEqual({ target_amount: "100", initial_principal: "0", duration_years: 1, expected_annual_return_percent: "0", contribution_plan: { frequency: "annual", timing: "beginning", annual_increase_percent: "-10.0000" }, target_basis: "real", expected_annual_inflation_percent: "0.0000", annual_fee_percent: "0.0800", scenario_range_percentage_points: "0" });
+  });
+  it("serializes only supported contract fields and omits absent optionals", () => {
+    const polluted = { ...input, target_amount: "100000.00", contribution_plan: { ...input.contribution_plan, timing: undefined, annual_increase_percent: undefined }, ignored: "nope" } as TargetInput & { ignored: string };
+    expect(serializeTargetInput(polluted)).toEqual(input);
   });
   it("requires explicit inflation for real targets, allowing zero", () => {
     expect(validateTargetInput(input)).toEqual([]);
@@ -58,6 +62,12 @@ describe("target response parsing", () => {
     if (kind === "bad-summary") body.scenarios[0].final_summary.nominal_balance = "garbage";
     expect(() => parseTargetResponse(body)).toThrow("invalid-response");
   });
+  it.each(["wrong-model", "unknown-disclosure"]) ("rejects unsupported contract metadata: %s", (kind) => {
+    const body = structuredClone(fixture);
+    if (kind === "wrong-model") body.metadata.calculation_model_version = "old";
+    else body.disclosures[0] = "SOMETHING_NEW";
+    expect(() => parseTargetResponse(body)).toThrow("invalid-response");
+  });
 });
 
 describe("client request and proxy", () => {
@@ -65,6 +75,11 @@ describe("client request and proxy", () => {
     const mock = vi.fn().mockResolvedValue(Response.json(fixture)); vi.stubGlobal("fetch", mock);
     expect(await fetchTarget(input)).toEqual(fixture);
     expect(mock).toHaveBeenCalledWith("/api/compound-interest/targets", expect.objectContaining({ method: "POST", body: JSON.stringify(input), cache: "no-store" }));
+  });
+  it("never sends unknown fields or explicit undefined optionals", async () => {
+    const mock = vi.fn().mockResolvedValue(Response.json(fixture)); vi.stubGlobal("fetch", mock);
+    await fetchTarget({ ...input, unexpected: "ignored" } as TargetInput & { unexpected: string });
+    expect(JSON.parse(mock.mock.calls[0][1].body)).toEqual(input);
   });
   it.each([400, 422, 500])("retains application/problem+json status %s and field errors", async (status) => {
     vi.stubGlobal("fetch", vi.fn().mockImplementation(() => Promise.resolve(Response.json(problem(status), { status, headers: { "Content-Type": "application/problem+json" } }))));
