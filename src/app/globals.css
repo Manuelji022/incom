@@ -33,8 +33,8 @@
 
   /* Foreground */
   --primary-foreground: light-dark(var(--charcoal), var(--cream));
-  --secondary-foreground: light-dark(color-mix(in srgb, var(--charcoal) 74%, var(--cream)), color-mix(in srgb, var(--cream) 70%, var(--charcoal)));
-  --tertiary-foreground: light-dark(color-mix(in srgb, var(--charcoal) 66%, var(--cream)), color-mix(in srgb, var(--cream) 62%, var(--charcoal)));
+  --secondary-foreground: light-dark(color-mix(in srgb, var(--charcoal) 84%, var(--cream)), color-mix(in srgb, var(--cream) 80%, var(--charcoal)));
+  --tertiary-foreground: light-dark(color-mix(in srgb, var(--charcoal) 76%, var(--cream)), color-mix(in srgb, var(--cream) 72%, var(--charcoal)));
   --disabled-foreground: light-dark(color-mix(in srgb, var(--charcoal) 38%, var(--cream)), color-mix(in srgb, var(--cream) 42%, var(--charcoal)));
 
   /* Brand */
@@ -211,7 +211,7 @@ html.theme-changing *::after {
 }
 
 :where([aria-invalid="true"]):focus-visible {
-  outline-color: var(--danger-border-default);
+  outline-color: var(--danger-foreground);
 }
 
 @media (forced-colors: active) {
