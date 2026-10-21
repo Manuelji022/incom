@@ -67,7 +67,7 @@ export function Scenarios({
         {scenarios.length > 0 ? (
           <ul
             aria-label={text.listLabel}
-            className={compact ? "mt-3 grid grid-cols-3 gap-2" : "mt-2 overflow-hidden rounded-lg border border-border-default"}
+            className={compact ? "mt-3 grid grid-cols-1 gap-2" : "mt-2 overflow-hidden rounded-lg border border-border-default"}
           >
             {scenarios.map((scenario) => {
               const annualReturn = percent.format(
@@ -79,9 +79,7 @@ export function Scenarios({
               const realBalance = formatter.format(
                 Number(scenario.final_summary.inflation_adjusted_balance),
               );
-              const returnLabel = compact
-                ? annualReturn
-                : text.return.replace("{percent}", annualReturn);
+              const returnLabel = text.return.replace("{percent}", annualReturn);
 
               return (
                 <li
@@ -90,17 +88,25 @@ export function Scenarios({
                 >
                   <button
                     type="button"
-                    aria-label={compact ? `${scenarioLabels[scenario.name]} · ${returnLabel} · ${nominalBalance}` : undefined}
+                    aria-label={compact ? `${scenarioLabels[scenario.name]} · ${returnLabel} · ${text.nominal.replace("{amount}", nominalBalance)} · ${text.real.replace("{amount}", realBalance)}` : undefined}
                     aria-pressed={scenario.name === selectedScenario}
                     onClick={() => onSelectScenario(scenario.name)}
-                    className={`${compact ? "flex min-h-16 w-full flex-col items-center justify-center gap-1 rounded-lg border px-1 py-3 text-center" : "flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-s-2 px-[0.6875rem] py-2 text-start"} transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
+                    className={`${compact ? "flex min-h-16 w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-start" : "flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-s-2 px-[0.6875rem] py-2 text-start"} cursor-pointer transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
                       scenario.name === selectedScenario
-                        ? "border-brand-solid bg-brand-subtle"
+                        ? "border-2 border-brand-border-default bg-brand-subtle"
                         : compact ? "border-border-default bg-card hover:bg-component-hover" : "border-transparent hover:bg-card"
                     }`}
                   >
                     <span className="min-w-0">
-                      <span className="block text-xs font-semibold leading-4 text-primary-foreground">
+                      <span className="flex items-center gap-1.5 text-xs font-semibold leading-4 text-primary-foreground">
+                        <span
+                          aria-hidden="true"
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${scenario.name === selectedScenario ? "border-brand-border-default bg-brand-foreground text-page" : "border-control-border bg-page text-transparent"}`}
+                        >
+                          <svg viewBox="0 0 12 12" className="h-2.5 w-2.5" fill="none">
+                            <path d="m2.5 6 2.2 2.2L9.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </span>
                         {scenarioLabels[scenario.name]}
                       </span>
                       <span className="block text-xs leading-4 text-secondary-foreground">
@@ -108,9 +114,9 @@ export function Scenarios({
                       </span>
                     </span>
 
-                    <span className={compact ? "hidden" : "min-w-0 text-end tabular-nums"}>
+                    <span className="min-w-0 text-end tabular-nums">
                       <span className="block break-words text-xs font-semibold leading-4 text-primary-foreground">
-                        {nominalBalance}
+                        {text.nominal.replace("{amount}", nominalBalance)}
                       </span>
                       <span className="block break-words text-xs leading-4 text-secondary-foreground">
                         {text.real.replace("{amount}", realBalance)}
