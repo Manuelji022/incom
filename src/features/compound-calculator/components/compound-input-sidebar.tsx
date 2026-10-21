@@ -212,19 +212,25 @@ export function CompoundInputSidebar({
             </FieldGroup>
           </section>
 
+          <div className="pt-6">
+            <Button type="submit" disabled={submitting || collapsed} className="min-h-12 w-full lg:min-h-10">
+              {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 motion-safe:animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
+            </Button>
+          </div>
+
           <section className="border-t border-border-subtle pt-5">
             <button
               type="button"
               aria-expanded={advancedOpen}
               aria-controls="advanced-assumption-fields"
               onClick={onToggleAdvanced}
-              className="flex min-h-11 w-full items-center justify-between gap-3 rounded-md text-start text-sm font-semibold lg:hidden"
+              className="flex min-h-11 w-full items-center justify-between gap-3 rounded-md text-start text-sm font-semibold"
             >
               <span>{advancedOpen ? text.closeAssumptions : text.openAssumptions}</span>
               <span aria-hidden="true">{advancedOpen ? "−" : "+"}</span>
             </button>
-            <p className="mt-1 text-xs leading-5 text-secondary-foreground lg:hidden">{advancedSummary}</p>
-            <div id="advanced-assumption-fields" className={`${advancedOpen ? "" : "hidden"} space-y-6 pt-5 lg:block lg:pt-0`}>
+            <p className="mt-1 text-xs leading-5 text-secondary-foreground">{advancedSummary}</p>
+            <div id="advanced-assumption-fields" hidden={!advancedOpen} className="space-y-6 pt-5">
               <FieldGroup className="gap-4">
               {parsed(summaryValues.recurring) > 0 ? <SegmentedControl
                 label={text.timing}
@@ -297,12 +303,6 @@ export function CompoundInputSidebar({
           </section>
         </div>
       </fieldset>
-
-      <footer inert={collapsed} aria-hidden={collapsed} className={`border-t border-border-subtle px-4 py-4 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
-        <Button type="submit" disabled={submitting || collapsed} className="min-h-12 w-full lg:min-h-10">
-          {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 motion-safe:animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
-        </Button>
-      </footer>
     </aside>
   );
 }
