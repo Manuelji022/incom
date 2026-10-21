@@ -72,7 +72,7 @@ export function PortfolioComposition({ point, locale, currency, text }: Portfoli
         <div
           role="img"
           aria-label={ariaLabel}
-          className="mt-6 flex h-4 w-full overflow-hidden rounded-full bg-brand-subtle"
+          className="mt-6 flex h-4 w-full overflow-hidden rounded-full bg-brand-subtle-hover"
         >
           <span aria-hidden="true" className="h-full bg-secondary-foreground" style={{ width: `${contributionWidth}%` }} />
         </div>
@@ -90,7 +90,7 @@ export function PortfolioComposition({ point, locale, currency, text }: Portfoli
         </li>
         <li className="grid min-w-0 grid-cols-1 gap-y-1 text-sm leading-5">
           <span className="flex min-w-0 items-start gap-2.5 text-primary-foreground">
-            <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full bg-brand-subtle" />
+            <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-full border border-brand-border-default bg-brand-foreground" />
             <span className="min-w-0 [overflow-wrap:anywhere]">{text.growth}</span>
           </span>
           <span className="ms-6 flex flex-wrap gap-x-1 text-xs tabular-nums text-primary-foreground sm:text-sm">

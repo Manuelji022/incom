@@ -89,15 +89,15 @@ export function ProjectionChartCanvas({
             x: "year",
             y1: "invested",
             y2: "balance",
-            fill: "var(--brand-subtle)",
-            fillOpacity: 0.85,
+            fill: "var(--brand-subtle-hover)",
+            fillOpacity: 0.9,
           }),
           lineY(rows, {
             id: "total-invested",
             x: "year",
             y: "invested",
             stroke: "var(--tertiary-foreground)",
-            strokeWidth: 1.75,
+            strokeWidth: 2.25,
             strokeDasharray: "2 3",
           }),
           lineY(rows, {
@@ -105,15 +105,15 @@ export function ProjectionChartCanvas({
             x: "year",
             y: "realBalance",
             stroke: "var(--secondary-foreground)",
-            strokeWidth: 2,
-            strokeDasharray: "5 5",
+            strokeWidth: 2.5,
+            strokeDasharray: "6 5",
           }),
           lineY(rows, {
             id: "portfolio-balance",
             x: "year",
             y: "balance",
             stroke: "var(--chart-balance)",
-            strokeWidth: 3,
+            strokeWidth: 3.5,
           }),
         ],
         scales: {
@@ -123,6 +123,7 @@ export function ProjectionChartCanvas({
             axis: {
               label: text.years,
               ticks: { count: 6, format: (value) => `${value}` },
+              tickLabels: { fontSize: 13, fontWeight: 500 },
             },
           },
           y: {
@@ -131,10 +132,11 @@ export function ProjectionChartCanvas({
             grid: { stroke: "var(--border-subtle)", strokeOpacity: 0.8 },
             axis: {
               ticks: { count: 5, format: (value) => compactEuro.format(value) },
+              tickLabels: { fontSize: 13, fontWeight: 500 },
             },
           },
         },
-        margin: { left: 64, right: 18, top: 14, bottom: 54 },
+        margin: { left: 78, right: 18, top: 14, bottom: 54 },
         theme: {
           foreground: "var(--primary-foreground)",
           muted: "var(--secondary-foreground)",
