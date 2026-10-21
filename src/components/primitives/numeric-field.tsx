@@ -36,8 +36,12 @@ function NumericField({
   const [uncontrolledValue, setUncontrolledValue] = useState(String(defaultValue ?? ""));
   const rawValue = String(controlledValue ?? uncontrolledValue);
   const formatValue = (value: string) => {
-    const [integer, ...fractionParts] = value.replaceAll(",", "").split(".");
-    const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    const normalized = value.replaceAll(",", "");
+    const [integer, ...fractionParts] = normalized.split(".");
+    // Keep a useful leading zero while the user enters a fractional amount,
+    // and preserve the fractional digits (including trailing zeroes).
+    const whole = integer || (fractionParts.length ? "0" : "");
+    const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return fractionParts.length ? `${grouped}.${fractionParts.join("")}` : grouped;
   };
   const { value: _value, onChange, ...restInputProps } = inputProps;
@@ -60,7 +64,7 @@ function NumericField({
           {...restInputProps}
           id={id}
           name={`${name}-display`}
-          aria-label={`${label} (${unit})`}
+          placeholder="0.00"
           value={formatValue(rawValue)}
           onChange={(event) => {
             const next = event.currentTarget.value.replaceAll(",", "");

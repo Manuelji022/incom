@@ -49,7 +49,7 @@ const dictionaries = {
       rangePreview: "Low {low}; expected {expected}; high {high}",
       other: "Other assumptions",
       fee: "Annual fee",
-      feeDescription: "0.08 means 0.08% per year.",
+      feeDescription: "0.05 means 0.05% per year.",
       inflation: "Expected inflation",
       calculate: "Calculate projection",
       calculating: "Calculating…",
