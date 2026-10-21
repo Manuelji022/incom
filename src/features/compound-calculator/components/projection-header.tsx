@@ -10,6 +10,8 @@ type ProjectionHeaderText = {
 
 type ProjectionHeaderProps = {
   nominalBalance?: string;
+  realBalance?: string;
+  realLabel: string;
   durationYears?: number;
   locale: Locale;
   currency: Currency;
@@ -18,6 +20,8 @@ type ProjectionHeaderProps = {
 
 export function ProjectionHeader({
   nominalBalance,
+  realBalance,
+  realLabel,
   durationYears = 25,
   locale,
   currency,
@@ -33,6 +37,7 @@ export function ProjectionHeader({
     unitDisplay: "long",
   }).format(durationYears);
   const balance = nominalBalance ? formatter.format(Number(nominalBalance)) : text.unavailable;
+  const realValue = realBalance ? formatter.format(Number(realBalance)) : text.unavailable;
   return (
     <section
       aria-labelledby="portfolio-value-title"
@@ -49,7 +54,11 @@ export function ProjectionHeader({
           <p className={`mt-2 [overflow-wrap:anywhere] leading-[1.08] font-semibold tracking-[-0.06em] tabular-nums text-primary-foreground ${balance.length > 14 ? "text-[clamp(1.25rem,6cqi,3rem)]" : "text-[clamp(1.75rem,10cqi,5.5rem)] lg:text-[clamp(3rem,12cqi,5.5rem)]"}`}>
             {balance}
           </p>
-          <p className="mt-2 text-sm leading-5 text-secondary-foreground">
+          <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm leading-5 text-secondary-foreground">
+            <span>{realLabel}</span>
+            <span className="text-lg font-semibold tabular-nums text-primary-foreground">{realValue}</span>
+          </p>
+          <p className="mt-1 text-sm leading-5 text-secondary-foreground">
             {text.projected.replace("{duration}", duration)}
           </p>
         </div>

@@ -15,7 +15,6 @@ type SummaryText = { [Key in keyof SummaryDictionary]: string };
 
 type ProjectionResultsProps = {
   isDesktop: boolean;
-  sidebarCollapsed: boolean;
   scenarios: readonly ProjectionScenario[];
   selectedName: ProjectionScenario["name"];
   onSelectScenario: (name: ProjectionScenario["name"]) => void;
@@ -35,7 +34,6 @@ type ProjectionResultsProps = {
 
 export function ProjectionResults({
   isDesktop,
-  sidebarCollapsed,
   scenarios,
   selectedName,
   onSelectScenario,
@@ -48,9 +46,11 @@ export function ProjectionResults({
   text,
 }: ProjectionResultsProps) {
   return (
-    <section className="projection-results-enter min-w-0 bg-page lg:border-e lg:border-border-subtle">
+    <section className="projection-results-enter min-w-0 bg-page">
       <ProjectionHeader
         nominalBalance={selectedScenario.final_summary.nominal_balance}
+        realBalance={selectedScenario.final_summary.inflation_adjusted_balance}
+        realLabel={text.summary.real}
         durationYears={durationYears}
         text={text.header}
         locale={locale}
@@ -72,7 +72,6 @@ export function ProjectionResults({
         locale={locale}
         currency={currency}
         text={text.summary}
-        sidebarCollapsed={sidebarCollapsed}
       /> : null}
       <ProjectionChart
         points={selectedScenario.annual_points}
@@ -91,7 +90,6 @@ export function ProjectionResults({
         locale={locale}
         currency={currency}
         text={text.summary}
-        sidebarCollapsed={sidebarCollapsed}
       />
         <PortfolioComposition
           point={selectedScenario.annual_points.at(-1)}
@@ -100,6 +98,24 @@ export function ProjectionResults({
           text={{ ...compositionText, subtitle: compositionText.subtitle.replace("{scenario}", text.scenarioLabel) }}
         />
       </> : null}
+      {isDesktop ? <div className="grid grid-cols-1 border-y border-border-subtle xl:grid-cols-2 [&>section]:min-w-0 [&>section]:border-b-0 [&>section]:py-4 [&>section]:lg:px-4 [&>section+section]:border-t xl:[&>section+section]:border-s xl:[&>section+section]:border-t-0">
+        <Scenarios
+          compact
+          scenarios={scenarios}
+          selectedScenario={selectedName}
+          onSelectScenario={onSelectScenario}
+          durationYears={durationYears}
+          locale={locale}
+          currency={currency}
+          text={scenarioText}
+        />
+        <PortfolioComposition
+          point={selectedScenario.annual_points.at(-1)}
+          locale={locale}
+          currency={currency}
+          text={{ ...compositionText, subtitle: compositionText.subtitle.replace("{scenario}", text.scenarioLabel) }}
+        />
+      </div> : null}
       <InvestmentSummary
         points={selectedScenario.annual_points}
         text={{
