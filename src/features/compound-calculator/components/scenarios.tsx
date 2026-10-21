@@ -91,7 +91,7 @@ export function Scenarios({
                     aria-label={compact ? `${scenarioLabels[scenario.name]} · ${returnLabel} · ${text.nominal.replace("{amount}", nominalBalance)} · ${text.real.replace("{amount}", realBalance)}` : undefined}
                     aria-pressed={scenario.name === selectedScenario}
                     onClick={() => onSelectScenario(scenario.name)}
-                    className={`${compact ? "flex min-h-16 w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-start" : "flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-s-2 px-[0.6875rem] py-2 text-start"} transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
+                    className={`${compact ? "flex min-h-16 w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-start" : "flex min-h-[3.0625rem] w-full items-center justify-between gap-3 border-s-2 px-[0.6875rem] py-2 text-start"} cursor-pointer transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
                       scenario.name === selectedScenario
                         ? "border-2 border-brand-border-default bg-brand-subtle"
                         : compact ? "border-border-default bg-card hover:bg-component-hover" : "border-transparent hover:bg-card"
