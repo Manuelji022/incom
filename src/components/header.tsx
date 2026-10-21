@@ -31,7 +31,7 @@ export function Header({
         className="rounded-xs font-sans text-[15px] leading-none font-bold tracking-[-0.045em] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-border-focus"
         href={`/${locale}`}
       >
-        COMPOUNDING
+        INCOM
       </Link>
       {stale ? (
         <p
