@@ -16,6 +16,6 @@ jobs:
   node-ci:
     uses: Manuelji022/github-workflows/.github/workflows/node-ci.yml@0da6d232cebc072d75c51306e8e0fef3c0487907
     with:
-      node-version: "22"
+      node-version: "24.22.1"
       package-manager: pnpm
       run-tests: true
