@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, use, useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type SyntheticEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatedAlert } from "@/components/animated-alert";
 import { Header } from "@/components/header";
 import { ProjectionResults } from "@/features/compound-calculator/components/projection-results";
@@ -9,7 +10,6 @@ import type { Locale } from "@/lib/locales";
 import type { getDictionary } from "@/lib/i18n";
 import { clearFieldValidation, showFieldValidation } from "@/features/compound-calculator/lib/field-validation";
 import { useProjectionController } from "@/features/compound-calculator/hooks/use-projection-controller";
-import { CalculatorModeToggle } from "@/features/compound-calculator/components/calculator-mode-toggle";
 import { TargetPlanner } from "@/features/compound-calculator/components/target-planner";
 import type { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
 
@@ -40,6 +40,31 @@ function getDesktopSnapshot() {
 }
 function getServerDesktopSnapshot() {
   return true;
+}
+
+// Keep URL-driven navigation in a small Suspense boundary so the calculator can
+// still be prerendered. Explicit menu links take priority over the saved mode.
+function CalculatorRouteMode({ mode, onModeChange }: { mode: "projection" | "target"; onModeChange: (mode: "projection" | "target") => void }) {
+  const searchParams = useSearchParams();
+  const requestedMode = searchParams.get("mode");
+  useEffect(() => {
+    let nextMode: "projection" | "target" = "projection";
+    try {
+      if (requestedMode === "projection" || requestedMode === "target") {
+        nextMode = requestedMode;
+        sessionStorage.setItem(modeSessionKey, nextMode);
+      } else if (sessionStorage.getItem(modeSessionKey) === "target") {
+        nextMode = "target";
+      }
+    } catch { /* URL navigation still works when storage is unavailable. */ }
+    onModeChange(nextMode);
+  }, [requestedMode, onModeChange]);
+  useEffect(() => {
+    // Focus only after the requested view has committed; focusing the previous
+    // main before it becomes hidden would leave focus on the document body.
+    if (mode === requestedMode) document.getElementById("main-content")?.focus({ preventScroll: true });
+  }, [mode, requestedMode]);
+  return null;
 }
 
 function RequestGate({ promise }: { promise: Promise<void> | null }) {
@@ -81,19 +106,6 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   const selectedScenario = projection?.scenarios.find((scenario) => scenario.name === selectedName);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      try {
-        if (sessionStorage.getItem(modeSessionKey) === "target") setMode("target");
-      } catch { /* Storage can be unavailable; projection remains the safe default. */ }
-    });
-  }, []);
-
-  const changeMode = (nextMode: "projection" | "target") => {
-    try { sessionStorage.setItem(modeSessionKey, nextMode); } catch { /* The current view still changes without storage. */ }
-    setMode(nextMode);
-  };
-
-  useEffect(() => {
     if (submitting || pendingPromise || !revealResults.current) return;
     revealResults.current = false;
     if (!window.matchMedia(desktopQuery).matches) {
@@ -131,22 +143,13 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
 
   return (
     <>
+    <Suspense fallback={null}><CalculatorRouteMode mode={mode} onModeChange={setMode} /></Suspense>
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={mode === "target" ? targetStatus.stale : stale} staleText={mode === "target" ? targetText.stale : text.staleResults} onBeforeLanguageChange={(destination) => {
       if (submitting || targetStatus.submitting) return { status: "pending" };
       const projectionSave = saveBeforeLocaleChange(destination);
       if (projectionSave.status !== "saved") return projectionSave;
       return targetSaveRef.current() ? { status: "saved" } : { status: "storage" };
     }} submitting={mode === "target" ? targetStatus.submitting : submitting} languageHandoffText={{ pending: text.languageHandoffPending, storage: text.languageHandoffStorage }} />
-    <CalculatorModeToggle locale={locale} mode={mode} onModeChange={changeMode} onBeforeSwitch={() => {
-      if (mode === "target") {
-        if (targetStatus.submitting) return false;
-        targetSaveRef.current();
-      } else {
-        if (submitting) return false;
-        controller.saveBeforeLocaleChange(locale, formRef.current);
-      }
-      return true;
-    }} />
     <TargetPlanner locale={locale} text={dictionary} targetText={targetText} saveRef={targetSaveRef} onStatusChange={setTargetStatus} active={mode === "target"} />
     <main id={mode === "projection" ? "main-content" : undefined} hidden={mode !== "projection"} tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)]"}`}>
     <form key={formVersion} ref={formRef} noValidate onSubmit={handleSubmit} onInput={(event) => {

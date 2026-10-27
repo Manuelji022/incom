@@ -3,12 +3,13 @@ import { act, cleanup, fireEvent, render, screen, within, waitFor } from "@testi
 import userEvent from "@testing-library/user-event";
 import { TargetPlanner } from "@/features/compound-calculator/components/target-planner";
 import { TargetResults } from "@/features/compound-calculator/components/target-results";
-import { CalculatorModeToggle } from "@/features/compound-calculator/components/calculator-mode-toggle";
 import { ProjectionScenarioView } from "@/features/compound-calculator/components/projection-scenario-view";
 import { getDictionary } from "@/lib/i18n";
 import { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
 import { parseTargetResponse } from "@/features/compound-calculator/lib/compound-interest-target";
 import fixture from "./fixtures/target-response.json";
+
+vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams(window.location.search) }));
 
 vi.mock("@/features/compound-calculator/hooks/use-projection-controller", () => ({
   useProjectionController: () => ({
@@ -26,25 +27,51 @@ const text = getDictionary("en");
 const targetText = getTargetText("en");
 const props = { locale: "en" as const, text, targetText };
 const mount = () => render(<TargetPlanner {...props} />);
-const mountParent = () => render(<ProjectionScenarioView
+const parentView = () => <ProjectionScenarioView
   locale="en" languageLabel="Language" themeLabel="Toggle theme" targetText={targetText} dictionary={text}
   text={{ sidebar: text.sidebar, header: text.header, chart: text.chart, summary: text.summary, composition: text.composition, scenarios: text.scenarios, unavailable: text.unavailable, rateLimited: text.rateLimited, invalidInputs: text.invalidInputs, staleResults: text.staleResults, retry: text.retry, validation: text.validation, resultsReady: text.resultsReady, validationMessages: text.validationMessages, sampleData: text.sampleData, languageHandoffPending: text.languageHandoffPending, languageHandoffStorage: text.languageHandoffStorage }}
-/>);
+/>;
+const mountParent = () => render(parentView());
 const submit = () => fireEvent.click(screen.getByRole("button", { name: "Calculate contributions" }));
 const change = (label: RegExp, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
-beforeEach(() => { sessionStorage.clear(); });
+beforeEach(() => { sessionStorage.clear(); window.history.replaceState(null, "", "/en"); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe("target planner", () => {
-  it("switches both mounted calculator modes in place and reports target stale state", async () => {
+  it.each(["projection", "target"] as const)("opens the %s calculator from an explicit menu URL instead of the saved mode", async (mode) => {
     window.matchMedia = vi.fn().mockImplementation(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    sessionStorage.setItem("incom:calculator-mode:v1", mode === "projection" ? "target" : "projection");
+    window.history.replaceState(null, "", `/en?mode=${mode}`);
     mountParent();
-    expect((document.querySelector("main#main-content") as HTMLElement | null)?.hidden).toBe(false);
-    const toggle = screen.getByRole("group", { name: "Calculation mode" });
-    await userEvent.click(within(toggle).getByRole("button", { name: "Plan a target" }));
+    if (mode === "target") {
+      await screen.findByRole("heading", { level: 1, name: targetText.title });
+      expect(screen.getByRole("heading", { level: 1, name: targetText.title }).closest("main")?.hidden).toBe(false);
+    } else {
+      await waitFor(() => expect(document.querySelector("main#main-content")?.hidden).toBe(false));
+      expect(screen.getByRole("heading", { level: 2, name: text.sidebar.title })).toBeTruthy();
+    }
+    expect(sessionStorage.getItem("incom:calculator-mode:v1")).toBe(mode);
+    expect(screen.queryByRole("group", { name: "Calculation mode" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Project growth" })).toBeNull();
+    expect(document.querySelectorAll("main#main-content")).toHaveLength(1);
+    await waitFor(() => expect(document.activeElement).toBe(document.getElementById("main-content")));
+  });
+
+  it("switches both mounted calculator modes through menu URLs, reports stale state, and restores drafts", async () => {
+    window.matchMedia = vi.fn().mockImplementation(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    const view = mountParent();
+    expect(document.querySelector("main#main-content")?.hidden).toBe(false);
+    const navigate = (mode: "projection" | "target") => {
+      window.history.pushState(null, "", `/en?mode=${mode}`);
+      view.rerender(parentView());
+    };
+    navigate("target");
+    await screen.findByRole("heading", { level: 1, name: targetText.title });
     const targetMain = screen.getByRole("heading", { level: 1, name: targetText.title }).closest("main");
     expect(targetMain?.hidden).toBe(false);
-    expect(document.querySelectorAll("main#main-content")).toHaveLength(1);
+    expect(targetMain?.id).toBe("main-content");
+    expect(document.querySelectorAll("main")).toHaveLength(2);
+    expect(Array.from(document.querySelectorAll("main")).find((main) => main !== targetMain)?.hidden).toBe(true);
     expect(document.querySelectorAll("#duration-years")).toHaveLength(1);
     expect(document.querySelectorAll("#target-duration-years")).toHaveLength(1);
     expect(document.querySelectorAll("#scenario-range")).toHaveLength(1);
@@ -57,24 +84,13 @@ describe("target planner", () => {
     await screen.findByText(targetText.ready);
     change(/Target amount/, "125000");
     expect(screen.getByTestId("header-stale").textContent).toBe(targetText.stale);
-    await userEvent.click(within(toggle).getByRole("button", { name: "Project growth" }));
-    expect((document.querySelector("main#main-content") as HTMLElement | null)?.hidden).toBe(false);
-    await userEvent.click(within(toggle).getByRole("button", { name: "Plan a target" }));
-    expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("125,000");
-    expect(sessionStorage.getItem("incom:calculator-mode:v1")).toBe("target");
-    cleanup();
-    mountParent();
-    await waitFor(() => expect(within(screen.getByRole("group", { name: "Calculation mode" })).getByRole("button", { name: "Plan a target" }).getAttribute("aria-pressed")).toBe("true"));
-    expect((screen.getByLabelText(/Target amount/) as HTMLInputElement).value).toBe("125,000");
+    navigate("projection");
+    await waitFor(() => expect(document.querySelector("main#main-content")?.hidden).toBe(false));
+    navigate("target");
+    expect((await screen.findByLabelText(/Target amount/) as HTMLInputElement).value).toBe("125,000");
+    await waitFor(() => expect(document.activeElement).toBe(document.getElementById("main-content")));
   });
-  it("offers an accessible in-page mode toggle", async () => {
-    const onModeChange = vi.fn();
-    render(<CalculatorModeToggle locale="en" mode="projection" onModeChange={onModeChange} />);
-    const toggle = screen.getByRole("group", { name: "Calculation mode" });
-    expect(within(toggle).getByRole("button", { name: "Project growth" }).getAttribute("aria-pressed")).toBe("true");
-    await userEvent.click(within(toggle).getByRole("button", { name: "Plan a target" }));
-    expect(onModeChange).toHaveBeenCalledWith("target");
-  });
+
   it("submits exact decimals, shows loading, then scenario results and the annual schedule", async () => {
     let resolve!: (response: Response) => void;
     const mock = vi.fn().mockImplementation(() => new Promise<Response>((done) => { resolve = done; }));

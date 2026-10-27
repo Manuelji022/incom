@@ -8,6 +8,7 @@ import { ProjectionScenarioView } from "@/features/compound-calculator/component
 import { getDictionary } from "@/lib/i18n";
 import { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
 
+vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams() }));
 vi.mock("@/components/header", () => ({ Header: () => <div /> }));
 vi.mock("@/features/compound-calculator/components/projection-chart", () => ({ ProjectionChart: () => <div /> }));
 
