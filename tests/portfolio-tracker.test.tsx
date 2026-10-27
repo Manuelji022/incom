@@ -12,7 +12,7 @@ const renderTracker = () => render(<PortfolioTracker locale="en" copy={getDictio
 
 async function addFund(user: ReturnType<typeof userEvent.setup>, { code = "OWN-FUND", name = "My Fund", target = "100" } = {}) {
   await user.click(screen.getByRole("button", { name: "Add fund" }));
-  await user.type(screen.getByRole("textbox", { name: "Fund code" }), code);
+  if (code) await user.type(screen.getByRole("textbox", { name: "Fund code (optional)" }), code);
   await user.type(screen.getByRole("textbox", { name: "Fund name" }), name);
   await user.type(screen.getByRole("textbox", { name: "Invested (€)" }), "100");
   await user.type(screen.getByRole("textbox", { name: "Current (€)" }), "120");
@@ -46,7 +46,7 @@ describe("portfolio tracker interactions", () => {
     expect(screen.queryByRole("row", { name: /MOCK-GLOBAL/ })).toBeNull();
     expect(screen.getAllByText("+20.00%")).toHaveLength(2);
     await user.click(screen.getByRole("button", { name: "Add fund" }));
-    await user.type(screen.getByRole("textbox", { name: "Fund code" }), "BETA");
+    await user.type(screen.getByRole("textbox", { name: "Fund code (optional)" }), "BETA");
     await user.type(screen.getByRole("textbox", { name: "Fund name" }), "Beta Fund");
     await user.type(screen.getByRole("textbox", { name: "Invested (€)" }), "0");
     await user.type(screen.getByRole("textbox", { name: "Current (€)" }), "0");
@@ -63,6 +63,15 @@ describe("portfolio tracker interactions", () => {
     expect(screen.getByRole("button", { name: "Undo delete" })).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Undo delete" }));
     expect(screen.getByRole("textbox", { name: "Code, ALPHA" })).toBeTruthy();
+  });
+
+  it("adds and persists a fund without a code", async () => {
+    const user = userEvent.setup();
+    renderTracker();
+    await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
+    await addFund(user, { code: "", name: "Uncoded Fund" });
+    expect(screen.getByRole("textbox", { name: /^Code,/ })).toBeTruthy();
+    await waitFor(() => expect(JSON.parse(localStorage.getItem(PORTFOLIO_STORAGE_KEY) ?? "{}").funds[0].code).toBe(""));
   });
 
   it("loads committed values on mount and persists edits without resetting stored data", async () => {
@@ -114,23 +123,17 @@ describe("portfolio tracker interactions", () => {
     await user.type(screen.getByRole("textbox", { name: "Invested (€)" }), "100");
     await user.type(screen.getByRole("textbox", { name: "Current (€)" }), "100");
     await user.click(screen.getAllByRole("button", { name: "Add fund" }).at(-1)!);
-    const code = screen.getByRole("textbox", { name: "Fund code" });
+    const code = screen.getByRole("textbox", { name: "Fund code (optional)" });
     const target = screen.getByRole("textbox", { name: "Target (%)" });
-    expect(document.activeElement).toBe(code);
-    expect(code.getAttribute("aria-invalid")).toBe("true");
-    expect(code.getAttribute("aria-describedby")).toBe("add-code-error");
-    expect(screen.getByText("Enter a unique fund code.")).toBeTruthy();
+    expect(document.activeElement).toBe(target);
+    expect(code.getAttribute("aria-invalid")).toBeNull();
+    expect(code.getAttribute("aria-describedby")).toBeNull();
     expect(target.getAttribute("aria-invalid")).toBe("true");
     expect(target.getAttribute("aria-describedby")).toBe("add-target-error");
     expect(screen.getByText("Enter a target from 0% to 100%, with up to two decimal places.")).toBeTruthy();
     expect(screen.getByRole("textbox", { name: "Fund name" }).getAttribute("aria-invalid")).toBeNull();
     expect(screen.getByRole("textbox", { name: "Invested (€)" }).getAttribute("aria-invalid")).toBeNull();
-    await user.keyboard("{Enter}");
-    expect(screen.getByText("Fund code: Enter a unique fund code.")).toBeTruthy();
     await user.type(code, "ALPHA");
-    expect(code.getAttribute("aria-invalid")).toBeNull();
-    expect(screen.queryByText("Enter a unique fund code.")).toBeNull();
-    expect(screen.queryByText("Fund code: Enter a unique fund code.")).toBeNull();
     await user.type(target, "100");
     expect(target.getAttribute("aria-invalid")).toBeNull();
     expect(screen.queryByText("Enter a target from 0% to 100%, with up to two decimal places.")).toBeNull();
@@ -185,10 +188,9 @@ describe("portfolio tracker interactions", () => {
     await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
     await user.click(screen.getByRole("button", { name: "Añadir fondo" }));
     await user.click(screen.getAllByRole("button", { name: "Añadir fondo" }).at(-1)!);
-    expect(screen.getByText("Introduce un código único.")).toBeTruthy();
+    expect(screen.queryByText("Introduce un código único.")).toBeNull();
     expect(screen.getByText("Introduce un objetivo entre 0 % y 100 %, con hasta dos decimales.")).toBeTruthy();
-    await user.keyboard("{Enter}");
-    expect(screen.getByText("Código del fondo: Introduce un código único.")).toBeTruthy();
+    expect(screen.getByRole("textbox", { name: "Código del fondo (opcional)" }).getAttribute("aria-invalid")).toBeNull();
   });
 
   it("ignores malformed storage instead of crashing", async () => {

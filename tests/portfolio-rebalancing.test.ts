@@ -64,8 +64,13 @@ describe("portfolio input and persistence validation", () => {
     expect(parseTargetToBps("")).toBeNull();
   });
 
-  it("rejects duplicate codes and malformed or unsupported stored data", () => {
+  it("allows omitted codes while rejecting duplicate non-empty codes", () => {
+    expect(validateFunds([{ ...fixture[0], code: "" }, { ...fixture[1], code: "" }])).toBe(true);
+    expect(validateFunds([{ ...fixture[0], code: "  " }, { ...fixture[1], code: "" }])).toBe(true);
     expect(validateFunds([{ ...fixture[0] }, { ...fixture[1], code: "fund-a" }])).toBe(false);
+  });
+
+  it("rejects malformed or unsupported stored data", () => {
     expect(loadPortfolio("not json")).toBeNull();
     expect(loadPortfolio(JSON.stringify({ version: 2, funds: fixture }))).toBeNull();
     expect(loadPortfolio(JSON.stringify({ version: 1, funds: fixture }))).toEqual(fixture);
