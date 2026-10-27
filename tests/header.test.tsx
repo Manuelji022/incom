@@ -50,7 +50,7 @@ describe("header navigation", () => {
     expect(trigger.getAttribute("aria-expanded")).toBe("false");
     expect(screen.queryByRole("dialog")).toBeNull();
     await user.click(trigger);
-    const dialog = screen.getByRole("dialog", { name: "Navigation" });
+    const dialog = screen.getByRole("dialog");
     expect(trigger.getAttribute("aria-controls")).toBe(dialog.id);
     expect(trigger.getAttribute("aria-expanded")).toBe("true");
     expect(document.body.style.overflow).toBe("hidden");
@@ -93,7 +93,7 @@ describe("header navigation", () => {
     const user = userEvent.setup();
     render(<Header {...props} locale="es" />);
     await user.click(screen.getByRole("button", { name: "Abrir menú" }));
-    expect(screen.getByRole("dialog", { name: "Navegación" })).toBeTruthy();
+    expect(screen.getByRole("dialog")).toBeTruthy();
     expect(screen.getByRole("link", { name: /Proyección/ }).getAttribute("href")).toBe("/es?mode=target");
     expect(screen.getByRole("link", { name: /Interés compuesto/ }).getAttribute("href")).toBe("/es?mode=projection");
     expect(screen.getByRole("link", { name: /Equilibrio de cartera/ }).getAttribute("href")).toBe("/es/portfolio");

@@ -120,6 +120,54 @@ html.theme-changing *::after {
   transition: none !important;
 }
 
+.navigation-dialog {
+  display: none;
+  transition: display 160ms allow-discrete, overlay 160ms allow-discrete;
+}
+
+.navigation-dialog[open] {
+  display: block;
+}
+
+.menu-icon {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.menu-icon > span {
+  position: absolute;
+  top: 11px;
+  left: 4px;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.menu-icon > span:first-child { transform: translateY(-7px); }
+.menu-icon > span:last-child { transform: translateY(7px); }
+.navigation-dialog[open] .menu-icon > span:first-child { transform: rotate(45deg); }
+.navigation-dialog[open] .menu-icon > span:nth-child(2) { opacity: 0; }
+.navigation-dialog[open] .menu-icon > span:last-child { transform: rotate(-45deg); }
+
+@starting-style {
+  .navigation-dialog[open] .menu-icon > span:nth-child(2) { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .menu-icon > span {
+    transition: transform 160ms var(--ease-in-out), opacity 160ms var(--ease-out);
+  }
+
+  @starting-style {
+    .navigation-dialog[open] .menu-icon > span:first-child { transform: translateY(-7px); }
+    .navigation-dialog[open] .menu-icon > span:last-child { transform: translateY(7px); }
+  }
+}
+
 .projection-results-enter {
   opacity: 1;
   transform: translateY(0);
@@ -445,6 +493,7 @@ html.light .theme-toggle__icon--sun {
 
   /* Motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 
   /* Box shadows */
   --shadow-border: 0 0 0 1px var(--border-default);
