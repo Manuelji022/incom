@@ -33,6 +33,33 @@ afterEach(() => {
 });
 
 describe("portfolio tracker interactions", () => {
+  it("shows allocation below the table without a visibility toggle", async () => {
+    renderTracker();
+    await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
+
+    const tableRegion = screen.getByRole("region", { name: /Portfolio table/ });
+    const distribution = screen.getByRole("region", { name: "Portfolio allocation" });
+    expect(tableRegion.compareDocumentPosition(distribution) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Show allocation" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Hide allocation" })).toBeNull();
+    expect(distribution.querySelectorAll("li")).toHaveLength(3);
+    expect(screen.getByText("Scroll horizontally to see all columns.")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Portfolio allocation" })).toBeTruthy();
+  });
+
+  it("preserves long fund names in the allocation chart and mirrors target markers", async () => {
+    const name = "International sustainability and emerging markets investment fund";
+    localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify({
+      version: 2, mode: "custom", funds: [{ id: "long-name", code: "LONG", name, investedCents: 10000, currentCents: 12000, targetBps: 4000 }],
+    }));
+    renderTracker();
+    const chart = await screen.findByRole("img", { name: `${name}: Current 100.00%, Target 40.00%` });
+    expect(chart.parentElement?.textContent).toContain(name);
+    const marker = chart.lastElementChild as HTMLElement;
+    expect(marker.style.insetInlineStart).toContain("40%");
+    expect(marker.style.left).toBe("");
+  });
+
   it("shows three sample funds, replaces them on the first add, sorts, edits and deletes", async () => {
     const user = userEvent.setup();
     renderTracker();
