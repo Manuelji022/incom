@@ -158,8 +158,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
     let value: string | number = draft.value.trim();
     let error = "";
     if (field === "code") {
-      if (!value) error = copy.codeRequired;
-      else if (funds.some((other) => other.id !== fund.id && other.code.trim().toUpperCase() === String(value).toUpperCase())) error = copy.duplicate;
+      if (value && funds.some((other) => other.id !== fund.id && other.code.trim().toUpperCase() === String(value).toUpperCase())) error = copy.duplicate;
     } else if (field === "name") {
       if (!value) error = copy.nameRequired;
     } else if (field === "investedCents" || field === "currentCents") {
@@ -210,13 +209,12 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
     const currentCents = parseMoneyToCents(addDraft.current);
     const targetBps = parseTargetToBps(addDraft.target);
     const errors: Partial<Record<keyof AddDraft, string>> = {};
-    if (!code) errors.code = copy.codeRequired;
     if (!name) errors.name = copy.nameRequired;
     if (investedCents === null) errors.invested = copy.moneyRequired;
     if (currentCents === null) errors.current = copy.moneyRequired;
     if (targetBps === null) errors.target = copy.targetRequired;
-    if (!errors.code && mode !== "sample" && funds.some((fund) => fund.code.trim().toUpperCase() === code)) errors.code = copy.duplicate;
-    if (!code || !name || investedCents === null || currentCents === null || targetBps === null || errors.code) {
+    if (code && mode !== "sample" && funds.some((fund) => fund.code.trim().toUpperCase() === code)) errors.code = copy.duplicate;
+    if (!name || investedCents === null || currentCents === null || targetBps === null || errors.code) {
       setAddErrors(errors);
       const firstInvalid = (["code", "name", "invested", "current", "target"] as const).find((field) => errors[field]);
       if (firstInvalid) {
