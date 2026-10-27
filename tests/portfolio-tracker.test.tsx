@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PortfolioTracker } from "@/features/portfolio-rebalancing/components/portfolio-tracker";
@@ -24,6 +24,12 @@ beforeEach(() => {
   cleanup();
   localStorage.clear();
   vi.stubGlobal("confirm", vi.fn(() => true));
+});
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("portfolio tracker interactions", () => {
@@ -79,7 +85,7 @@ describe("portfolio tracker interactions", () => {
     renderTracker();
     expect((await screen.findByRole("textbox", { name: "Target weight (%), OWN-FUND" }) as HTMLInputElement).value).toBe("60.00");
     expect((await screen.findByRole("textbox", { name: "Invested capital, OWN-FUND" }) as HTMLInputElement).value).toBe("8500.00");
-    expect(document.querySelector("p[aria-live='polite']")?.textContent).toContain("40.00 pp below");
+    expect(screen.getByText(/40\.00 pp below/)).toBeTruthy();
   });
 
   it("retains invalid draft text and announces validation without committing it", async () => {
@@ -97,6 +103,92 @@ describe("portfolio tracker interactions", () => {
     await user.click(input);
     await user.keyboard("{Escape}");
     expect((input as HTMLInputElement).value).toBe("100.00");
+  });
+
+  it("validates each add field, describes only failures, and focuses the first invalid field", async () => {
+    const user = userEvent.setup();
+    renderTracker();
+    await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
+    await user.click(screen.getByRole("button", { name: "Add fund" }));
+    await user.type(screen.getByRole("textbox", { name: "Fund name" }), "My fund");
+    await user.type(screen.getByRole("textbox", { name: "Invested (€)" }), "100");
+    await user.type(screen.getByRole("textbox", { name: "Current (€)" }), "100");
+    await user.click(screen.getAllByRole("button", { name: "Add fund" }).at(-1)!);
+    const code = screen.getByRole("textbox", { name: "Fund code" });
+    const target = screen.getByRole("textbox", { name: "Target (%)" });
+    expect(document.activeElement).toBe(code);
+    expect(code.getAttribute("aria-invalid")).toBe("true");
+    expect(code.getAttribute("aria-describedby")).toBe("add-code-error");
+    expect(screen.getByText("Enter a unique fund code.")).toBeTruthy();
+    expect(target.getAttribute("aria-invalid")).toBe("true");
+    expect(target.getAttribute("aria-describedby")).toBe("add-target-error");
+    expect(screen.getByText("Enter a target from 0% to 100%, with up to two decimal places.")).toBeTruthy();
+    expect(screen.getByRole("textbox", { name: "Fund name" }).getAttribute("aria-invalid")).toBeNull();
+    expect(screen.getByRole("textbox", { name: "Invested (€)" }).getAttribute("aria-invalid")).toBeNull();
+    await user.keyboard("{Enter}");
+    expect(screen.getByText("Fund code: Enter a unique fund code.")).toBeTruthy();
+    await user.type(code, "ALPHA");
+    expect(code.getAttribute("aria-invalid")).toBeNull();
+    expect(screen.queryByText("Enter a unique fund code.")).toBeNull();
+    expect(screen.queryByText("Fund code: Enter a unique fund code.")).toBeNull();
+    await user.type(target, "100");
+    expect(target.getAttribute("aria-invalid")).toBeNull();
+    expect(screen.queryByText("Enter a target from 0% to 100%, with up to two decimal places.")).toBeNull();
+  });
+
+  it("exposes calculation help through the focusable column header", async () => {
+    renderTracker();
+    await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
+    const difference = screen.getByRole("button", { name: "Difference (€)" });
+    expect(difference.getAttribute("aria-describedby")).toBe("portfolio-help-differenceCents");
+    expect(document.getElementById("portfolio-help-differenceCents")?.textContent).toContain("Positive euro difference means overweight.");
+  });
+
+  it("restores focus to the add trigger after cancel and successful add", async () => {
+    const user = userEvent.setup();
+    renderTracker();
+    await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
+    const trigger = screen.getByRole("button", { name: "Add fund" });
+    await user.click(trigger);
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+    await addFund(user);
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
+  it("offers a current in-memory backup when persistence fails", async () => {
+    const originalSetItem = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (key, value) {
+      if (key === PORTFOLIO_STORAGE_KEY) throw new DOMException("Unavailable", "QuotaExceededError");
+      return originalSetItem.call(this, key, value);
+    });
+    const createObjectURL = vi.fn(() => "blob:portfolio-backup");
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    const user = userEvent.setup();
+    renderTracker();
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("Browser storage is unavailable"));
+    expect(screen.queryByText("Your data is saved only in this browser.")).toBeNull();
+    await addFund(user, { code: "LATEST" });
+    await user.click(screen.getByRole("button", { name: "Download backup" }));
+    const blob = createObjectURL.mock.calls[0][0] as Blob;
+    const backup = JSON.parse(await blob.text());
+    expect(backup).toMatchObject({ version: 2, mode: "custom", funds: [expect.objectContaining({ code: "LATEST" })] });
+    expect(click).toHaveBeenCalled();
+    await waitFor(() => expect(revokeObjectURL).toHaveBeenCalledWith("blob:portfolio-backup"));
+  });
+
+  it("localizes field errors in Spanish", async () => {
+    const user = userEvent.setup();
+    render(<PortfolioTracker locale="es" copy={getDictionary("es").portfolio} languageLabel="Idioma" themeLabel="Tema" />);
+    await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
+    await user.click(screen.getByRole("button", { name: "Añadir fondo" }));
+    await user.click(screen.getAllByRole("button", { name: "Añadir fondo" }).at(-1)!);
+    expect(screen.getByText("Introduce un código único.")).toBeTruthy();
+    expect(screen.getByText("Introduce un objetivo entre 0 % y 100 %, con hasta dos decimales.")).toBeTruthy();
+    await user.keyboard("{Enter}");
+    expect(screen.getByText("Código del fondo: Introduce un código único.")).toBeTruthy();
   });
 
   it("ignores malformed storage instead of crashing", async () => {

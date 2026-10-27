@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   createColumnHelper,
   createSortedRowModel,
@@ -75,7 +75,10 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
   const [storageUnavailable, setStorageUnavailable] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [addDraft, setAddDraft] = useState<AddDraft>(emptyAdd);
-  const [addError, setAddError] = useState("");
+  const [addErrors, setAddErrors] = useState<Partial<Record<keyof AddDraft, string>>>({});
+  const [addErrorAnnouncement, setAddErrorAnnouncement] = useState("");
+  const addTriggerRef = useRef<HTMLButtonElement>(null);
+  const addInputRefs = useRef<Partial<Record<keyof AddDraft, HTMLInputElement | null>>>({});
   const [showAdd, setShowAdd] = useState(false);
   const [showDistribution, setShowDistribution] = useState(false);
   const [deleted, setDeleted] = useState<PortfolioFund | null>(null);
@@ -182,6 +185,23 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
     setDrafts((current) => { const next = { ...current }; delete next[key]; return next; });
   }
 
+  function updateAddField(field: keyof AddDraft, value: string) {
+    setAddErrorAnnouncement("");
+    setAddDraft((current) => ({ ...current, [field]: value }));
+    setAddErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }
+
+  function closeAddForm() {
+    setShowAdd(false);
+    setAddErrorAnnouncement("");
+    addTriggerRef.current?.focus();
+  }
+
   function addFund(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const code = addDraft.code.trim().toUpperCase();
@@ -189,12 +209,26 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
     const investedCents = parseMoneyToCents(addDraft.invested);
     const currentCents = parseMoneyToCents(addDraft.current);
     const targetBps = parseTargetToBps(addDraft.target);
-    if (!code || !name || investedCents === null || currentCents === null || targetBps === null) {
-      setAddError(copy.validation);
-      return;
-    }
-    if (mode !== "sample" && funds.some((fund) => fund.code.trim().toUpperCase() === code)) {
-      setAddError(copy.duplicate);
+    const errors: Partial<Record<keyof AddDraft, string>> = {};
+    if (!code) errors.code = copy.codeRequired;
+    if (!name) errors.name = copy.nameRequired;
+    if (investedCents === null) errors.invested = copy.moneyRequired;
+    if (currentCents === null) errors.current = copy.moneyRequired;
+    if (targetBps === null) errors.target = copy.targetRequired;
+    if (!errors.code && mode !== "sample" && funds.some((fund) => fund.code.trim().toUpperCase() === code)) errors.code = copy.duplicate;
+    if (!code || !name || investedCents === null || currentCents === null || targetBps === null || errors.code) {
+      setAddErrors(errors);
+      const firstInvalid = (["code", "name", "invested", "current", "target"] as const).find((field) => errors[field]);
+      if (firstInvalid) {
+        const input = addInputRefs.current[firstInvalid];
+        if (input === document.activeElement) {
+          const label = { code: copy.addCode, name: copy.addName, invested: copy.addInvested, current: copy.addCurrent, target: copy.addTarget }[firstInvalid];
+          setAddErrorAnnouncement(`${label}: ${errors[firstInvalid]}`);
+        } else {
+          setAddErrorAnnouncement("");
+          input?.focus();
+        }
+      }
       return;
     }
     const newFund = { id: newId(), code, name, investedCents, currentCents, targetBps };
@@ -202,8 +236,20 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
     else setFunds((current) => [...current, newFund]);
     setMode("custom");
     setAddDraft(emptyAdd);
-    setAddError("");
-    setShowAdd(false);
+    setAddErrors({});
+    closeAddForm();
+  }
+
+  function downloadPortfolioBackup() {
+    const blob = new Blob([JSON.stringify({ version: 2, mode, funds }, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "portfolio-backup.json";
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
   }
 
   const allocationComplete = computed.totals.targetBps === 10_000;
@@ -216,33 +262,25 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
     <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1600px] min-w-0 flex-1 px-4 py-8 focus-visible:outline-none sm:px-6 lg:px-8">
       <header className="mb-7 border-b border-border-subtle pb-5">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{copy.title}</h1>
-        <p className="mt-2 text-sm text-secondary-foreground">{copy.subtitle}</p>
-        <p className="mt-1 text-sm text-secondary-foreground">{copy.savedNotice}</p>
       </header>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Button onClick={() => { setShowAdd((value) => !value); setAddError(""); }} variant="outline">{copy.addFund}</Button>
+        <Button ref={addTriggerRef} onClick={() => { setShowAdd((value) => !value); setAddErrors({}); setAddErrorAnnouncement(""); }} variant="outline">{copy.addFund}</Button>
         {mode === "custom" && funds.length === 0 ? <Button onClick={() => { setFunds(SAMPLE_FUNDS); setMode("sample"); setDeleted(null); }} variant="secondary">{copy.loadDemo}</Button> : null}
         {funds.length > 0 ? <Button onClick={() => setShowDistribution((value) => !value)} variant="ghost">{showDistribution ? copy.hideDistribution : copy.distribution}</Button> : null}
-        {storageUnavailable ? <span role="status" className="text-sm text-danger-foreground">{copy.storageUnavailable}</span> : null}
+        <span role="status" aria-live="polite" className="text-sm text-danger-foreground">{storageUnavailable ? copy.storageUnavailable : ""}</span>
+        {storageUnavailable ? <Button onClick={downloadPortfolioBackup} size="xs" variant="outline">{copy.downloadBackup}</Button> : null}
       </div>
 
       {mode === "sample" ? <p className="mb-4 text-sm text-secondary-foreground" role="note">{copy.sampleNotice}</p> : null}
 
       {showAdd ? <form onSubmit={addFund} className="mb-5 grid grid-cols-1 gap-3 border-y border-border-subtle py-4 sm:grid-cols-2 lg:grid-cols-5" noValidate>
         {([ ["code", copy.addCode], ["name", copy.addName], ["invested", copy.addInvested], ["current", copy.addCurrent], ["target", copy.addTarget] ] as const).map(([key, label]) => <label key={key} className="grid gap-1 text-sm font-medium">
-          {label}{key === "code" || key === "name" ? <Input aria-label={label} aria-invalid={Boolean(addError)} className="min-h-10 w-full rounded-md border border-control-border bg-container px-3 py-2 font-normal" value={addDraft[key]} onChange={(event) => { const value = event.currentTarget.value; setAddDraft((current) => ({ ...current, [key]: value })); }} /> : <DecimalInput aria-label={label} aria-invalid={Boolean(addError)} className="min-h-10 w-full rounded-md border border-control-border bg-container px-3 py-2 font-normal tabular-nums" value={addDraft[key]} onChange={(event) => { const value = event.currentTarget.value; setAddDraft((current) => ({ ...current, [key]: value })); }} />}
+          {label}{key === "code" || key === "name" ? <Input ref={(node) => { addInputRefs.current[key] = node; }} aria-label={label} aria-invalid={addErrors[key] ? true : undefined} aria-describedby={addErrors[key] ? `add-${key}-error` : undefined} className="min-h-10 w-full rounded-md border border-control-border bg-container px-3 py-2 font-normal" value={addDraft[key]} onChange={(event) => updateAddField(key, event.currentTarget.value)} /> : <DecimalInput ref={(node) => { addInputRefs.current[key] = node; }} aria-label={label} aria-invalid={addErrors[key] ? true : undefined} aria-describedby={addErrors[key] ? `add-${key}-error` : undefined} className="min-h-10 w-full rounded-md border border-control-border bg-container px-3 py-2 font-normal tabular-nums" value={addDraft[key]} onChange={(event) => updateAddField(key, event.currentTarget.value)} />}{addErrors[key] ? <span id={`add-${key}-error`} className="text-xs text-danger-foreground">{addErrors[key]}</span> : null}
         </label>)}
-        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-5"><Button type="submit">{copy.addFund}</Button><Button onClick={() => setShowAdd(false)} variant="ghost">{copy.cancel}</Button>{addError ? <span role="alert" className="text-sm text-danger-foreground">{addError}</span> : null}</div>
+        <span role="status" aria-live="polite" className="sr-only">{addErrorAnnouncement}</span>
+        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-5"><Button type="submit">{copy.addFund}</Button><Button onClick={() => { setAddErrors({}); closeAddForm(); }} variant="ghost">{copy.cancel}</Button></div>
       </form> : null}
-
-      <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-border-subtle py-3 text-sm">
-        <p aria-live="polite" className={allocationComplete ? "text-positive-foreground" : "text-warning-foreground"}>
-          {copy.targetSum.replace("{sum}", targetSumText)} {allocationComplete ? copy.allocationValid : copy.allocationIncomplete.replace("{amount}", percentFormatter.format(remainder)).replace("{direction}", differenceDirection)}
-        </p>
-        <p className="text-secondary-foreground">{copy.rebalanceNote}</p>
-        <p className="text-secondary-foreground">{copy.growthNote}</p>
-      </div>
 
       {funds.length === 0 ? <p className="border-y border-border-subtle py-10 text-center text-secondary-foreground">{copy.empty}</p> : <>
         {showDistribution ? <section aria-label={copy.distribution} className="mb-5 border-b border-border-subtle pb-4">
@@ -256,8 +294,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
           </li>)}</ul>
         </section> : null}
 
-        <p className="mb-2 text-sm text-secondary-foreground">{locale === "es" ? "Desplázate horizontalmente para ver todas las columnas." : "Scroll horizontally to see all columns."}</p>
-        <div className="max-h-[70vh] max-w-full overflow-auto overscroll-contain border-y border-border-subtle" role="region" aria-label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"} tabIndex={0}>
+        <div className="max-h-[70vh] max-w-full contain-paint overflow-auto overscroll-contain border-y border-border-subtle" role="region" aria-label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"} tabIndex={0}>
           <table className="w-full min-w-[1380px] border-collapse text-sm">
             <caption className="sr-only">{locale === "es" ? "Cartera de fondos y objetivos de asignación" : "Fund portfolio and target allocations"}</caption>
             <thead>
@@ -269,12 +306,14 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
                   const activeSort = table.state.sorting.find((sort) => sort.id === id);
                   const sortState = activeSort ? (activeSort.desc ? "desc" : "asc") : false;
                   const label = groupLabels[id] ?? id;
+                  const helpText = id === "differenceCents" ? `${copy.overweightHelp} ${copy.underweightHelp}` : id === "differencePp" ? copy.ppHelp : undefined;
+                  const helpId = helpText ? `portfolio-help-${id}` : undefined;
                   if (isGroup) return <th key={header.id} id={`portfolio-header-${id}`} colSpan={header.colSpan} scope="colgroup" className="border-b border-border-strong bg-sunken px-3 py-2 text-start text-xs font-semibold uppercase tracking-wide text-secondary-foreground">{label}</th>;
                   const sortable = header.column.getCanSort();
-                  return <th key={header.id} id={`portfolio-header-${id}`} rowSpan={header.rowSpan} scope="col" aria-sort={sortState === "asc" ? "ascending" : sortState === "desc" ? "descending" : "none"} className={`border-b border-border-strong px-3 py-2 font-medium ${["code", "name"].includes(id) ? "text-start" : "text-end"} ${id === "code" ? "sticky start-0 z-20 bg-page shadow-[1px_0_0_var(--border-subtle)]" : ""}`} >
-                    {sortable ? <button className="inline-flex min-h-8 items-center gap-1 rounded-sm text-inherit hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus" onClick={header.column.getToggleSortingHandler()} type="button">{label}<span aria-hidden="true">{sortState === "asc" ? "↑" : sortState === "desc" ? "↓" : "↕"}</span></button> : label}
-                    {id === "differenceCents" ? <span className="ms-1 cursor-help" title={`${copy.overweightHelp} ${copy.underweightHelp}`} aria-label={`${copy.overweightHelp} ${copy.underweightHelp}`}>ⓘ</span> : null}
-                    {id === "differencePp" ? <span className="ms-1 cursor-help" title={copy.ppHelp} aria-label={copy.ppHelp}>ⓘ</span> : null}
+                  return <th key={header.id} id={`portfolio-header-${id}`} rowSpan={header.rowSpan} scope="col" aria-sort={sortState === "asc" ? "ascending" : sortState === "desc" ? "descending" : "none"} className={`border-b border-border-strong px-3 py-2 font-medium ${["code", "name"].includes(id) ? "text-start" : "text-end"} ${id === "code" ? "sticky start-0 z-20 border-e border-border-subtle bg-page" : ""}`} >
+                    {sortable ? <button aria-describedby={helpId} className="inline-flex min-h-8 items-center gap-1 rounded-sm text-inherit hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus" onClick={header.column.getToggleSortingHandler()} type="button">{label}<span aria-hidden="true">{sortState === "asc" ? "↑" : sortState === "desc" ? "↓" : "↕"}</span></button> : label}
+                    {helpText ? <span aria-hidden="true" className="ms-1 inline-flex cursor-help" title={helpText}><svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="8" cy="8" r="6.25" /><path d="M8 7v4m0-6h.01" /></svg></span> : null}
+                    {helpText ? <span id={helpId} className="sr-only">{helpText}</span> : null}
                   </th>;
                 })}
                 {group.depth === 0 && mode === "custom" ? <th id="portfolio-header-actions" rowSpan={2} scope="col" className="border-b border-border-strong px-3 py-2 text-end font-medium">{copy.actions}</th> : null}
@@ -298,7 +337,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
                       const key = `${row.id}:${dataField}`;
                       const draft = drafts[key];
                       const fieldLabel = groupLabels[id] ?? id;
-                      return <td key={cell.id} headers={`portfolio-header-${group} portfolio-header-${id}`} className={`px-3 py-2 ${identity ? "text-start" : "text-end tabular-nums"} ${id === "code" ? "sticky start-0 z-10 bg-container shadow-[1px_0_0_var(--border-subtle)]" : ""}`}>
+                      return <td key={cell.id} headers={`portfolio-header-${group} portfolio-header-${id}`} className={`px-3 py-2 ${identity ? "text-start" : "text-end tabular-nums"} ${id === "code" ? "sticky start-0 z-10 border-e border-border-subtle bg-container" : ""}`}>
                         <DraftInput aria-label={`${fieldLabel}, ${row.code}`} aria-invalid={Boolean(draft?.error)} aria-describedby={draft?.error ? `${key}-error` : undefined} className={`min-h-9 w-full rounded-sm border border-transparent bg-transparent px-2 py-1 text-inherit tabular-nums hover:border-border-default focus:border-control-border focus:bg-container ${identity ? "text-start" : "text-end"}`} value={editValue(row, dataField)} onFocus={() => startDraft(row, dataField)} onChange={(event) => { const value = event.currentTarget.value; setDrafts((current) => ({ ...current, [key]: { value } })); }} onBlur={(event) => { if (event.currentTarget.dataset.skipCommit) { delete event.currentTarget.dataset.skipCommit; return; } commitDraft(row, dataField); }} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); commitDraft(row, dataField); event.currentTarget.dataset.skipCommit = "true"; event.currentTarget.blur(); } if (event.key === "Escape") { event.preventDefault(); cancelDraft(row, dataField); event.currentTarget.dataset.skipCommit = "true"; event.currentTarget.blur(); } }} />
                         {draft?.error ? <span id={`${key}-error`} role="alert" className="block max-w-40 text-start text-xs text-danger-foreground">{draft.error}</span> : null}
                       </td>;
@@ -326,7 +365,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
             </tfoot>
           </table>
         </div>
-        {!allocationComplete ? <p className="mt-3 text-sm text-warning-foreground">{copy.allocationIncomplete.replace("{amount}", percentFormatter.format(remainder)).replace("{direction}", differenceDirection)}</p> : null}
+        {!allocationComplete ? <p className="mt-3 text-sm tabular-nums text-warning-foreground">{copy.allocationIncomplete.replace("{amount}", percentFormatter.format(remainder)).replace("{direction}", differenceDirection)}</p> : null}
       </>}
       {deleted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm">{deleted.code} <Button onClick={() => { setFunds((current) => [...current, deleted]); setDeleted(null); }} size="xs" variant="outline">{copy.undo}</Button></p> : null}
     </main>
