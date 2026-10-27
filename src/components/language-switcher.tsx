@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "@/lib/locales";
+import { locales, type Locale } from "@/lib/locales";
 
 type LanguageSwitcherProps = {
   locale: Locale;
@@ -42,7 +42,8 @@ export function LanguageSwitcher({ locale, label, onBeforeLanguageChange, submit
     const secureAttribute = location.protocol === "https:" ? "; Secure" : "";
     document.cookie = `incom-locale=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax${secureAttribute}`;
 
-    const suffix = pathname.replace(/^\/(en|es)(?=\/|$)/, "") || "/";
+    const localePrefix = new RegExp(`^/(${locales.join("|")})(?=/|$)`);
+    const suffix = pathname.replace(localePrefix, "") || "/";
     const query = window.location.search;
     router.push(`/${nextLocale}${suffix}${query}${location.hash}`);
   }
