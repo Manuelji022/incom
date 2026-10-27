@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { NavigationMenu } from "@/components/navigation-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { Locale } from "@/lib/locales";
 import type { LanguageChangeResult } from "@/components/language-switcher";
@@ -50,6 +53,7 @@ export function Header({
           handoffText={languageHandoffText}
         />
         <ThemeToggle label={themeLabel} />
+        <NavigationMenu locale={locale} />
       </div>
     </header>
   );
