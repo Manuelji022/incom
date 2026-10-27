@@ -80,7 +80,6 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
   const addTriggerRef = useRef<HTMLButtonElement>(null);
   const addInputRefs = useRef<Partial<Record<keyof AddDraft, HTMLInputElement | null>>>({});
   const [showAdd, setShowAdd] = useState(false);
-  const [showDistribution, setShowDistribution] = useState(false);
   const [deleted, setDeleted] = useState<PortfolioFund | null>(null);
   const formatter = useMemo(() => getCurrencyFormatter(locale, "EUR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), [locale]);
   const percentFormatter = useMemo(() => new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-IE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), [locale]);
@@ -257,7 +256,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
 
   return <div className="flex min-h-svh flex-col bg-page text-primary-foreground">
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={false} staleText="" onBeforeLanguageChange={() => ({ status: "saved" })} submitting={false} languageHandoffText={{ pending: "", storage: "" }} />
-    <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1600px] min-w-0 flex-1 px-4 py-8 focus-visible:outline-none sm:px-6 lg:px-8">
+    <main id="main-content" tabIndex={-1} className="@container/portfolio mx-auto w-full max-w-[1600px] min-w-0 flex-1 px-4 py-8 focus-visible:outline-none sm:px-6 lg:px-8">
       <header className="mb-7 border-b border-border-subtle pb-5">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{copy.title}</h1>
       </header>
@@ -265,34 +264,23 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Button ref={addTriggerRef} onClick={() => { setShowAdd((value) => !value); setAddErrors({}); setAddErrorAnnouncement(""); }} variant="outline">{copy.addFund}</Button>
         {mode === "custom" && funds.length === 0 ? <Button onClick={() => { setFunds(SAMPLE_FUNDS); setMode("sample"); setDeleted(null); }} variant="secondary">{copy.loadDemo}</Button> : null}
-        {funds.length > 0 ? <Button onClick={() => setShowDistribution((value) => !value)} variant="ghost">{showDistribution ? copy.hideDistribution : copy.distribution}</Button> : null}
         <span role="status" aria-live="polite" className="text-sm text-danger-foreground">{storageUnavailable ? copy.storageUnavailable : ""}</span>
         {storageUnavailable ? <Button onClick={downloadPortfolioBackup} size="xs" variant="outline">{copy.downloadBackup}</Button> : null}
       </div>
 
       {mode === "sample" ? <p className="mb-4 text-sm text-secondary-foreground" role="note">{copy.sampleNotice}</p> : null}
 
-      {showAdd ? <form onSubmit={addFund} className="mb-5 grid grid-cols-1 gap-3 border-y border-border-subtle py-4 sm:grid-cols-2 lg:grid-cols-5" noValidate>
-        {([ ["code", copy.addCode], ["name", copy.addName], ["invested", copy.addInvested], ["current", copy.addCurrent], ["target", copy.addTarget] ] as const).map(([key, label]) => <label key={key} className="grid gap-1 text-sm font-medium">
-          {label}{key === "code" || key === "name" ? <Input ref={(node) => { addInputRefs.current[key] = node; }} aria-label={label} aria-invalid={addErrors[key] ? true : undefined} aria-describedby={addErrors[key] ? `add-${key}-error` : undefined} className="min-h-10 w-full rounded-md border border-control-border bg-container px-3 py-2 font-normal" value={addDraft[key]} onChange={(event) => updateAddField(key, event.currentTarget.value)} /> : <DecimalInput ref={(node) => { addInputRefs.current[key] = node; }} aria-label={label} aria-invalid={addErrors[key] ? true : undefined} aria-describedby={addErrors[key] ? `add-${key}-error` : undefined} className="min-h-10 w-full rounded-md border border-control-border bg-container px-3 py-2 font-normal tabular-nums" value={addDraft[key]} onChange={(event) => updateAddField(key, event.currentTarget.value)} />}{addErrors[key] ? <span id={`add-${key}-error`} className="text-xs text-danger-foreground">{addErrors[key]}</span> : null}
+      {showAdd ? <form onSubmit={addFund} className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-x-4 gap-y-1 rounded-lg bg-sunken p-4" noValidate>
+        {([ ["code", copy.addCode], ["name", copy.addName], ["invested", copy.addInvested], ["current", copy.addCurrent], ["target", copy.addTarget] ] as const).map(([key, label]) => <label key={key} className="row-span-3 mb-3 grid min-w-0 grid-rows-subgrid text-sm font-medium">
+          <span>{label}</span>{key === "code" || key === "name" ? <Input ref={(node) => { addInputRefs.current[key] = node; }} aria-label={label} aria-invalid={addErrors[key] ? true : undefined} aria-describedby={addErrors[key] ? `add-${key}-error` : undefined} className="min-h-10 w-full rounded-md border border-control-border bg-container px-3 py-2 font-normal" value={addDraft[key]} onChange={(event) => updateAddField(key, event.currentTarget.value)} /> : <DecimalInput ref={(node) => { addInputRefs.current[key] = node; }} aria-label={label} aria-invalid={addErrors[key] ? true : undefined} aria-describedby={addErrors[key] ? `add-${key}-error` : undefined} className="min-h-10 w-full rounded-md border border-control-border bg-container px-3 py-2 font-normal tabular-nums" value={addDraft[key]} onChange={(event) => updateAddField(key, event.currentTarget.value)} />}{addErrors[key] ? <span id={`add-${key}-error`} className="text-xs text-danger-foreground">{addErrors[key]}</span> : null}
         </label>)}
         <span role="status" aria-live="polite" className="sr-only">{addErrorAnnouncement}</span>
-        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-5"><Button type="submit">{copy.addFund}</Button><Button onClick={() => { setAddErrors({}); closeAddForm(); }} variant="ghost">{copy.cancel}</Button></div>
+        <div className="col-span-full flex flex-wrap items-end gap-3"><Button type="submit">{copy.addFund}</Button><Button onClick={() => { setAddErrors({}); closeAddForm(); }} variant="ghost">{copy.cancel}</Button></div>
       </form> : null}
 
       {funds.length === 0 ? <p className="border-y border-border-subtle py-10 text-center text-secondary-foreground">{copy.empty}</p> : <>
-        {showDistribution ? <section aria-label={copy.distribution} className="mb-5 border-b border-border-subtle pb-4">
-          <ul className="space-y-3">{computed.rows.map((row) => <li key={row.id} className="grid grid-cols-[minmax(9rem,14rem)_minmax(8rem,1fr)_auto] items-center gap-3 text-sm">
-            <span className="truncate">{row.name}</span>
-            <div className="relative h-3 rounded-sm bg-component" role="img" aria-label={`${row.name}: ${copy.currentLabel.replace("{value}", row.currentWeight === null ? "—" : percentFormatter.format(row.currentWeight))}, ${copy.targetLabel.replace("{value}", percentFormatter.format(row.targetBps / 100))}`}>
-              <div className="absolute inset-y-0 start-0 rounded-sm bg-brand-solid" style={{ width: `${Math.max(0, Math.min(100, row.currentWeight ?? 0))}%` }} />
-              <span className="absolute -top-1 h-5 border-s-2 border-primary-foreground" style={{ left: `${row.targetBps / 100}%` }} />
-            </div>
-            <span className="tabular-nums text-secondary-foreground">{row.currentWeight === null ? "—" : percentFormatter.format(row.currentWeight)}% / {percentFormatter.format(row.targetBps / 100)}%</span>
-          </li>)}</ul>
-        </section> : null}
-
-        <div className="max-h-[70vh] max-w-full contain-paint overflow-auto overscroll-contain border-y border-border-subtle" role="region" aria-label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"} tabIndex={0}>
+        <p id="portfolio-scroll-hint" className="mb-2 text-sm text-secondary-foreground @min-[90rem]/portfolio:hidden">{copy.scrollHint}</p>
+        <div aria-describedby="portfolio-scroll-hint" className="max-h-[70dvh] max-w-full contain-paint overflow-auto overscroll-contain border-y border-border-subtle" role="region" aria-label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"} tabIndex={0}>
           <table className="w-full min-w-[1380px] border-collapse text-sm">
             <caption className="sr-only">{locale === "es" ? "Cartera de fondos y objetivos de asignación" : "Fund portfolio and target allocations"}</caption>
             <thead>
@@ -364,6 +352,23 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
           </table>
         </div>
         {!allocationComplete ? <p className="mt-3 text-sm tabular-nums text-warning-foreground">{copy.allocationIncomplete.replace("{amount}", percentFormatter.format(remainder)).replace("{direction}", differenceDirection)}</p> : null}
+        <section aria-labelledby="portfolio-distribution-title" className="@container/allocation mt-8 w-full min-w-0">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+            <h2 id="portfolio-distribution-title" className="text-lg font-semibold">{copy.distribution}</h2>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-secondary-foreground">
+              <span className="inline-flex items-center gap-2"><span aria-hidden="true" className="h-2 w-5 rounded-sm bg-brand-solid" />{copy.currentAllocation}</span>
+              <span className="inline-flex items-center gap-2"><span aria-hidden="true" className="h-4 border-s-2 border-primary-foreground" />{copy.targetAllocation}</span>
+            </div>
+          </div>
+          <ul className="space-y-6">{computed.rows.map((row) => <li key={row.id} className="grid min-w-0 grid-cols-[minmax(0,1fr)] items-center gap-x-4 gap-y-2 text-sm @2xl/allocation:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto]">
+            <span className="min-w-0 [overflow-wrap:anywhere]">{row.name}</span>
+            <div className="relative h-3 rounded-sm bg-component" role="img" aria-label={`${row.name}: ${copy.currentLabel.replace("{value}", row.currentWeight === null ? "—" : percentFormatter.format(row.currentWeight))}, ${copy.targetLabel.replace("{value}", percentFormatter.format(row.targetBps / 100))}`}>
+              <div className="absolute inset-y-0 start-0 rounded-sm bg-brand-solid" style={{ width: `${Math.max(0, Math.min(100, row.currentWeight ?? 0))}%` }} />
+              <span className="absolute -top-1 h-5 border-s-2 border-primary-foreground" style={{ insetInlineStart: `clamp(0px, ${row.targetBps / 100}%, calc(100% - 2px))` }} />
+            </div>
+            <span className="text-end tabular-nums text-secondary-foreground">{row.currentWeight === null ? "—" : percentFormatter.format(row.currentWeight)}% / {percentFormatter.format(row.targetBps / 100)}%</span>
+          </li>)}</ul>
+        </section>
       </>}
       {deleted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm">{deleted.code} <Button onClick={() => { setFunds((current) => [...current, deleted]); setDeleted(null); }} size="xs" variant="outline">{copy.undo}</Button></p> : null}
     </main>
