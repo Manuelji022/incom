@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-const supported = ["en", "es"] as const;
-type Locale = (typeof supported)[number];
+import { hasLocale, type Locale } from "@/lib/locales";
 
 function preferredLocale(header: string | null): Locale {
   const preferences = (header ?? "")
@@ -30,7 +28,7 @@ function preferredLocale(header: string | null): Locale {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (supported.some((locale) => locale === pathname.split("/")[1]))
+  if (hasLocale(pathname.split("/")[1] ?? ""))
     return NextResponse.next();
   if (
     pathname.startsWith("/api/") ||
@@ -40,7 +38,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   const cookieLocale = request.cookies.get("incom-locale")?.value;
   const locale =
-    supported.find((item) => item === cookieLocale) ??
+    (cookieLocale && hasLocale(cookieLocale) ? cookieLocale : undefined) ??
     preferredLocale(request.headers.get("accept-language"));
   const destination = request.nextUrl.clone();
   destination.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;

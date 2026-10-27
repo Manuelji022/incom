@@ -99,12 +99,14 @@ export function validateFunds(value: unknown): value is PortfolioFund[] {
     if (!fund || typeof fund !== "object") return false;
     const item = fund as Record<string, unknown>;
     if (typeof item.id !== "string" || item.id.length === 0 || ids.has(item.id)) return false;
-    if (typeof item.code !== "string" || !item.code.trim() || codes.has(item.code.trim().toUpperCase())) return false;
+    if (typeof item.code !== "string") return false;
+    const normalizedCode = item.code.trim().toUpperCase();
+    if (normalizedCode && codes.has(normalizedCode)) return false;
     if (typeof item.name !== "string" || !item.name.trim()) return false;
     if (![item.investedCents, item.currentCents].every((n) => typeof n === "number" && Number.isSafeInteger(n) && n >= 0 && n <= MAX_SAFE_CENTS)) return false;
     if (typeof item.targetBps !== "number" || !Number.isInteger(item.targetBps) || item.targetBps < 0 || item.targetBps > 10_000) return false;
     ids.add(item.id);
-    codes.add(item.code.trim().toUpperCase());
+    if (normalizedCode) codes.add(normalizedCode);
   }
   return true;
 }
