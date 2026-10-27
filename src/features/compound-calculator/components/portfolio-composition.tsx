@@ -59,9 +59,6 @@ export function PortfolioComposition({ point, locale, currency, text }: Portfoli
         >
           {text.title}
         </h2>
-        <p className="mt-1 text-sm leading-5 text-secondary-foreground">
-          {text.subtitle.replace("{duration}", duration)}
-        </p>
       </div>
 
       {hasLoss ? (

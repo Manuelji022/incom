@@ -43,7 +43,7 @@ function buttonVariants({
   className?: string;
 } = {}) {
   return [
-    "group/button inline-flex min-w-0 shrink-0 items-center justify-center whitespace-normal border transition-colors",
+    "group/button inline-flex min-w-0 shrink-0 cursor-pointer items-center justify-center whitespace-normal border transition-colors",
     "focus-visible:ring-2 focus-visible:ring-brand-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-page",
     "disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     variant !== "outline" ? "border-transparent" : "",

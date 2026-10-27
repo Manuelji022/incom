@@ -52,7 +52,7 @@
   --positive-solid: #53a274;
   --positive-solid-hover: #60b080;
   --positive-subtle: light-dark(#e8f5ec, #192c22);
-  --positive-foreground: light-dark(#2e8853, #61ad7e);
+  --positive-foreground: light-dark(#205f39, #61ad7e);
   --on-positive-solid-foreground: #ffffff;
   --on-positive-subtle-foreground: light-dark(#267449, #83d1a0);
 
@@ -60,7 +60,7 @@
   --warning-solid: #eb762f;
   --warning-solid-hover: #f77d34;
   --warning-subtle: light-dark(#fff1e5, #342110);
-  --warning-foreground: light-dark(#c85d1c, #f28a40);
+  --warning-foreground: light-dark(#98440f, #f28a40);
   --on-warning-solid-foreground: #ffffff;
   --on-warning-subtle-foreground: light-dark(#a74916, #ffa15c);
 

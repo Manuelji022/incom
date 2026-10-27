@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useRef, useState, type RefObject } from "react";
 import type { ProjectionPoint } from "@/features/compound-calculator/types/compound-interest";
 import { getCurrencyFormatter, type Currency } from "@/lib/currency";
 import { Button } from "@/components/primitives/button";
@@ -78,19 +78,16 @@ function YearlyProjectionTable({
   formatter,
   text,
   tableContainerRef,
-  tableOverflows,
 }: {
   points: readonly ProjectionPoint[];
   finalYear: number | undefined;
   formatter: Intl.NumberFormat;
   text: SummaryText;
   tableContainerRef: RefObject<HTMLDivElement | null>;
-  tableOverflows: boolean;
 }) {
   return (
     <>
       <p className="mb-3 text-xs leading-5 text-secondary-foreground">{text.columnHelp}</p>
-      {tableOverflows ? <p className="mb-2 text-xs text-secondary-foreground">{text.horizontalScrollHint}</p> : null}
       <div role="region" ref={tableContainerRef} aria-label={text.tableRegionLabel} tabIndex={0} className="overflow-x-auto rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus">
         <table id="yearly-projection-table" className="w-full min-w-[660px] border-collapse text-start text-xs sm:text-sm">
           <caption className="sr-only">{text.caption}</caption>
@@ -132,7 +129,6 @@ export function InvestmentSummary({
   });
   const [showTable, setShowTable] = useState(false);
   const [showAllYears, setShowAllYears] = useState(false);
-  const [tableOverflows, setTableOverflows] = useState(false);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const checkpoints = getCheckpointPoints(points);
@@ -143,21 +139,6 @@ export function InvestmentSummary({
     : checkpoints;
   const firstVisibleYear = visiblePoints[0]?.year;
   const lastVisibleYear = visiblePoints.at(-1)?.year;
-
-  useEffect(() => {
-    const container = tableContainerRef.current;
-    const table = container?.querySelector("table");
-    if (!container || !table) return;
-
-    const updateOverflow = () => {
-      setTableOverflows(container.scrollWidth > container.clientWidth);
-    };
-    updateOverflow();
-    const observer = new ResizeObserver(updateOverflow);
-    observer.observe(container);
-    observer.observe(table);
-    return () => observer.disconnect();
-  }, [visiblePoints.length]);
 
   return (
     <section
@@ -212,7 +193,7 @@ export function InvestmentSummary({
         </div>
         {!showTable ? <MobileYearSummary points={visiblePoints} formatter={formatter} text={text} /> : null}
       <div className={showTable ? "" : "hidden lg:block"}>
-        <YearlyProjectionTable points={visiblePoints} finalYear={points.at(-1)?.year} formatter={formatter} text={text} tableContainerRef={tableContainerRef} tableOverflows={tableOverflows} />
+        <YearlyProjectionTable points={visiblePoints} finalYear={points.at(-1)?.year} formatter={formatter} text={text} tableContainerRef={tableContainerRef} />
       </div>
       </div>
       {showAllYears && pageCount > 1 ? (
