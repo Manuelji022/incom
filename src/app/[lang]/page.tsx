@@ -20,7 +20,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           header: text.header,
           chart: text.chart,
           summary: text.summary,
-          composition: text.composition,
           scenarios: text.scenarios,
           unavailable: text.unavailable,
           rateLimited: text.rateLimited,

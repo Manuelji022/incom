@@ -29,7 +29,7 @@ const props = { locale: "en" as const, text, targetText };
 const mount = () => render(<TargetPlanner {...props} />);
 const parentView = () => <ProjectionScenarioView
   locale="en" languageLabel="Language" themeLabel="Toggle theme" targetText={targetText} dictionary={text}
-  text={{ sidebar: text.sidebar, header: text.header, chart: text.chart, summary: text.summary, composition: text.composition, scenarios: text.scenarios, unavailable: text.unavailable, rateLimited: text.rateLimited, invalidInputs: text.invalidInputs, staleResults: text.staleResults, retry: text.retry, validation: text.validation, resultsReady: text.resultsReady, validationMessages: text.validationMessages, sampleData: text.sampleData, languageHandoffPending: text.languageHandoffPending, languageHandoffStorage: text.languageHandoffStorage }}
+  text={{ sidebar: text.sidebar, header: text.header, chart: text.chart, summary: text.summary, scenarios: text.scenarios, unavailable: text.unavailable, rateLimited: text.rateLimited, invalidInputs: text.invalidInputs, staleResults: text.staleResults, retry: text.retry, validation: text.validation, resultsReady: text.resultsReady, validationMessages: text.validationMessages, sampleData: text.sampleData, languageHandoffPending: text.languageHandoffPending, languageHandoffStorage: text.languageHandoffStorage }}
 />;
 const mountParent = () => render(parentView());
 const submit = () => fireEvent.click(screen.getByRole("button", { name: "Calculate contributions" }));
@@ -57,7 +57,7 @@ describe("target planner", () => {
     await waitFor(() => expect(document.activeElement).toBe(document.getElementById("main-content")));
   });
 
-  it("switches both mounted calculator modes through menu URLs, reports stale state, and restores drafts", async () => {
+  it("switches calculator modes through menu URLs, keeps target stale status in results, and restores drafts", async () => {
     window.matchMedia = vi.fn().mockImplementation(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
     const view = mountParent();
     expect(document.querySelector("main#main-content")?.hidden).toBe(false);
@@ -82,8 +82,13 @@ describe("target planner", () => {
     change(/Target amount/, "120000");
     submit();
     await screen.findByText(targetText.ready);
+    expect(screen.getByRole("status").textContent).toBe(targetText.ready);
     change(/Target amount/, "125000");
-    expect(screen.getByTestId("header-stale").textContent).toBe(targetText.stale);
+    const resultsStatus = screen.getByRole("status");
+    expect(resultsStatus.textContent).toBe(targetText.stale);
+    expect(resultsStatus.closest("section")?.getAttribute("aria-label")).toBe(targetText.title);
+    expect(screen.getByTestId("header-stale").textContent).toBe("");
+    expect(screen.getAllByText(targetText.stale)).toHaveLength(1);
     navigate("projection");
     await waitFor(() => expect(document.querySelector("main#main-content")?.hidden).toBe(false));
     navigate("target");
@@ -190,6 +195,16 @@ describe("target planner", () => {
     expect(screen.queryByText(/private stack trace/)).toBeNull();
     expect(screen.getByRole("button", { name: "Calculate contributions" }).hasAttribute("disabled")).toBe(false);
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+  it("restores a stale status beside the results exactly once", async () => {
+    sessionStorage.setItem("incom:target-session:v2", JSON.stringify({ values: { target_amount: "120000" }, result: fixture, stale: true, currency: "EUR" }));
+    mount();
+
+    await screen.findByText(targetText.stale);
+    const status = screen.getByRole("status");
+    expect(status.textContent).toBe(targetText.stale);
+    expect(status.closest("section")?.getAttribute("aria-label")).toBe(targetText.title);
+    expect(screen.getAllByText(targetText.stale)).toHaveLength(1);
   });
   it("saves target inputs and results for a mode or language change", async () => {
     const saveRef = { current: () => false };

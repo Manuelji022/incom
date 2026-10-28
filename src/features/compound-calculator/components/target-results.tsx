@@ -62,7 +62,6 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
     <section aria-labelledby="target-schedule-title" className="space-y-3 border-b border-border-subtle p-4 sm:p-6">
       <h2 id="target-schedule-title" className="text-lg font-semibold">{t.schedule} · {text.scenarios[scenario.name]}</h2>
       <p className="text-sm text-secondary-foreground">{t.scheduleHelp}</p>
-      <p className="text-sm text-secondary-foreground">{t.scheduleScrollHelp}</p>
       <div tabIndex={0} role="region" aria-labelledby="target-schedule-title" className="max-h-[32rem] overflow-auto rounded-md border border-border-subtle focus-visible:outline-2 focus-visible:outline-brand-border-focus">
         <table className="w-full min-w-[54rem] text-start text-sm tabular-nums">
           <caption className="sr-only">{t.schedule} · {text.scenarios[scenario.name]} · {period}</caption>

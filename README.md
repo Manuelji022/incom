@@ -37,8 +37,9 @@ Keep Next.js route files in `src/app`. Pages should compose feature entry points
 
 ## Target planning
 
-Use the **Project growth / Plan a target** toggle on `/en` or `/es` to switch
-calculators without leaving the page. Draft inputs and results are kept in the
+Use the **Calculators** card in the header menu to switch calculators:
+**Compound interest** opens `/{lang}?mode=projection`, and **Projection** opens
+`/{lang}?mode=target` (`/en` or `/es`). Draft inputs and results are kept in the
 current browser session when switching calculators or languages.
 
 The browser posts to `/api/compound-interest/targets`; the Next.js route validates
