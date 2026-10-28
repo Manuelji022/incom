@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, use, useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type SyntheticEvent } from "react";
+import { Suspense, use, useEffect, useRef, useState, type FormEvent, type SyntheticEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatedAlert } from "@/components/animated-alert";
 import { Header } from "@/components/header";
@@ -15,32 +15,14 @@ import type { getTargetText } from "@/features/compound-calculator/lib/target-i1
 import { calculatorModeSessionKey } from "@/features/compound-calculator/lib/calculator-mode";
 
 type Dictionary = ReturnType<typeof getDictionary>;
-type CompositionDictionary = Dictionary["composition"];
-type CompositionText = { [Key in keyof CompositionDictionary]: string };
 type ProjectionScenarioViewProps = {
   locale: Locale;
   targetText: ReturnType<typeof getTargetText>;
   dictionary: Dictionary;
   languageLabel: string;
   themeLabel: string;
-  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "rateLimited" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady" | "validationMessages" | "sampleData" | "languageHandoffPending" | "languageHandoffStorage"> & {
-    composition: CompositionText;
-  };
+  text: Pick<Dictionary, "header" | "chart" | "summary" | "scenarios" | "sidebar" | "unavailable" | "rateLimited" | "invalidInputs" | "staleResults" | "retry" | "validation" | "resultsReady" | "validationMessages" | "sampleData" | "languageHandoffPending" | "languageHandoffStorage">;
 };
-
-// One responsive presentation, sharing all calculation and form state.
-const desktopQuery = "(min-width: 64rem)";
-function subscribeDesktop(onChange: () => void) {
-  const media = window.matchMedia(desktopQuery);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-}
-function getDesktopSnapshot() {
-  return window.matchMedia(desktopQuery).matches;
-}
-function getServerDesktopSnapshot() {
-  return true;
-}
 
 // Keep URL-driven navigation in a small Suspense boundary so the calculator can
 // still be prerendered. Explicit menu links take priority over the saved mode.
@@ -95,10 +77,9 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
     rateLimited: text.rateLimited,
   });
   const { projection, sample, pendingPromise, selectedName, setSelectedName, currency, setCurrency, sidebarCollapsed, setSidebarCollapsed, submitting, error, stale, setStale, status, restoredValues, formVersion } = controller;
-  const isDesktop = useSyncExternalStore(subscribeDesktop, getDesktopSnapshot, getServerDesktopSnapshot);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [mode, setMode] = useState<"projection" | "target">("projection");
-  const [targetStatus, setTargetStatus] = useState({ stale: false, submitting: false });
+  const [targetStatus, setTargetStatus] = useState({ submitting: false });
   const formRef = useRef<HTMLFormElement>(null);
   const targetSaveRef = useRef<() => boolean>(() => true);
   const resultsRef = useRef<HTMLElement>(null);
@@ -108,7 +89,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   useEffect(() => {
     if (submitting || pendingPromise || !revealResults.current) return;
     revealResults.current = false;
-    if (!window.matchMedia(desktopQuery).matches) {
+    if (!window.matchMedia("(min-width: 64rem)").matches) {
       // Scroll after the collapsed form and resolved Suspense content commit.
       resultsRef.current?.focus({ preventScroll: true });
       resultsRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
@@ -144,7 +125,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
   return (
     <>
     <Suspense fallback={null}><CalculatorRouteMode mode={mode} onModeChange={setMode} /></Suspense>
-    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={mode === "target" ? targetStatus.stale : stale} staleText={mode === "target" ? targetText.stale : text.staleResults} onBeforeLanguageChange={(destination) => {
+    <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={mode === "projection" && stale} staleText={text.staleResults} onBeforeLanguageChange={(destination) => {
       if (submitting || targetStatus.submitting) return { status: "pending" };
       const projectionSave = saveBeforeLocaleChange(destination);
       if (projectionSave.status !== "saved") return projectionSave;
@@ -171,11 +152,9 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
         <Suspense fallback={<ProjectionSkeleton />}>
           <RequestGate promise={pendingPromise} />
           {selectedScenario ? <ProjectionResults
-            isDesktop={isDesktop}
             scenarios={projection.scenarios}
             selectedName={selectedName}
             onSelectScenario={setSelectedName}
-            compositionText={text.composition}
             scenarioText={text.scenarios}
             selectedScenario={selectedScenario}
             durationYears={projection.resolved_inputs.duration_years}

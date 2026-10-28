@@ -6,7 +6,6 @@ import { getIntlLocale } from "@/lib/locales";
 
 type SummaryText = {
   cardsLabel: string;
-  initialPrincipal: string;
   totalContributions: string;
   investmentGrowth: string;
   totalFeesPaid: string;
@@ -39,11 +38,6 @@ export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, curr
     );
   const cards = [
     {
-      label: text.initialPrincipal,
-      value: formatter.format(Number(point.initial_principal)),
-      detail: formatShare(Number(point.initial_principal)),
-    },
-    {
       label: text.totalContributions,
       value: formatter.format(getTotalInvested(point)),
       detail: formatShare(getTotalInvested(point)),
@@ -62,7 +56,7 @@ export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, curr
   return (
     <dl
       aria-label={text.cardsLabel}
-      className="grid grid-cols-1 gap-px border-y border-border-subtle bg-border-subtle sm:grid-cols-2 lg:grid-cols-4"
+      className="grid grid-cols-1 gap-px border-y border-border-subtle bg-border-subtle sm:grid-cols-3"
     >
       {cards.map((card) => (
         <div key={card.label} className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,50%)] items-baseline gap-x-3 gap-y-0 bg-page px-4 py-3 sm:flex sm:flex-col sm:items-start sm:gap-0 lg:px-3 lg:py-3">

@@ -102,7 +102,6 @@ describe("compound input sidebar", () => {
         header: dictionary.header,
         chart: dictionary.chart,
         summary: dictionary.summary,
-        composition: dictionary.composition,
         scenarios: dictionary.scenarios,
         unavailable: dictionary.unavailable,
         rateLimited: dictionary.rateLimited,

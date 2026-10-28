@@ -19,7 +19,7 @@ import { ProjectionSliderFields, ScenarioRangeField } from "@/features/compound-
 import { mockTarget } from "@/features/compound-calculator/lib/mock-target";
 import { usePresence } from "@/hooks/use-presence";
 
-type Props = { locale: Locale; text: ReturnType<typeof getDictionary>; targetText: ReturnType<typeof getTargetText>; saveRef?: MutableRefObject<() => boolean>; onStatusChange?: (status: { stale: boolean; submitting: boolean }) => void; className?: string; active?: boolean };
+type Props = { locale: Locale; text: ReturnType<typeof getDictionary>; targetText: ReturnType<typeof getTargetText>; saveRef?: MutableRefObject<() => boolean>; onStatusChange?: (status: { submitting: boolean }) => void; className?: string; active?: boolean };
 const sessionKey = "incom:target-session:v2";
 const defaults: Record<string, string> = { target_amount: "1000000", initial_principal: "10000", duration_years: "20", expected_annual_return_percent: "7", "contribution_plan.frequency": "monthly", "contribution_plan.timing": "end", "contribution_plan.annual_increase_percent": "0", annual_fee_percent: "0.08", expected_annual_inflation_percent: "2.5", scenario_range_percentage_points: "2", target_basis: "nominal" };
 
@@ -53,12 +53,13 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
         setResult(restored ?? mockTarget);
         setSample(!restored);
         setStale(saved.stale === true);
+        if (saved.stale === true && restored) setStatus(t.stale);
         setFormVersion((version) => version + 1);
       });
     } catch { /* A missing or outdated saved session leaves the default form intact. */ }
-  }, []);
+  }, [t.stale]);
 
-  useEffect(() => onStatusChange?.({ stale, submitting }), [stale, submitting, onStatusChange]);
+  useEffect(() => onStatusChange?.({ submitting }), [submitting, onStatusChange]);
 
   const saveSession = useCallback(() => {
     if (inFlight.current) return false;
