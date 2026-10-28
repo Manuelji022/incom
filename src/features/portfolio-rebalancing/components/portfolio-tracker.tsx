@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  columnVisibilityFeature,
   createColumnHelper,
   createSortedRowModel,
+  metaHelper,
   rowSortingFeature,
   sortFn_basic,
   tableFeatures,
@@ -11,9 +13,11 @@ import {
 } from "@tanstack/react-table";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { DataTable, type DataTableColumnMeta } from "@/components/data-table";
 import { Button } from "@/components/primitives/button";
 import { DecimalInput } from "@/components/primitives/decimal-input";
 import { Input } from "@/components/primitives/input";
+import { TableCellInput, TableEmpty } from "@/components/primitives/table";
 import type { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/locales";
 import { getCurrencyFormatter } from "@/lib/currency";
@@ -35,30 +39,38 @@ import {
 type Copy = ReturnType<typeof getDictionary>["portfolio"];
 const portfolioTableFeatures = tableFeatures({
   rowSortingFeature,
+  columnVisibilityFeature,
   sortedRowModel: createSortedRowModel(),
   sortFns: { basic: sortFn_basic },
+  columnMeta: metaHelper<DataTableColumnMeta>(),
 });
 const columnHelper = createColumnHelper<typeof portfolioTableFeatures, PortfolioRow>();
-const columns = [
-  columnHelper.group({ id: "identification", header: "identification", columns: columnHelper.columns([
-    columnHelper.accessor("code", { header: "code", sortFn: "basic" }),
-    columnHelper.accessor("name", { header: "fund", sortFn: "basic" }),
-  ]) }),
+const numeric = { align: "end", numeric: true } as const;
+const columns = columnHelper.columns([
+  columnHelper.accessor("name", { header: "fund", sortFn: "basic", meta: { sticky: true, rowHeader: true, className: "w-44 min-w-44 sm:w-64 sm:min-w-64" } }),
+  columnHelper.accessor("code", { header: "code", sortFn: "basic", meta: { className: "min-w-28" } }),
   columnHelper.group({ id: "valuation", header: "valuation", columns: columnHelper.columns([
-    columnHelper.accessor("investedCents", { header: "invested", sortFn: "basic" }),
-    columnHelper.accessor("currentCents", { header: "current", sortFn: "basic" }),
+    columnHelper.accessor("investedCents", { header: "invested", sortFn: "basic", meta: { ...numeric, className: "min-w-36" } }),
+    columnHelper.accessor("currentCents", { header: "current", sortFn: "basic", meta: { ...numeric, className: "min-w-36" } }),
   ]) }),
   columnHelper.group({ id: "allocation", header: "allocation", columns: columnHelper.columns([
-    columnHelper.accessor((row) => row.currentWeight, { id: "currentWeight", header: "currentWeight", sortFn: "basic" }),
-    columnHelper.accessor("targetBps", { header: "targetBps", sortFn: "basic" }),
-    columnHelper.accessor((row) => row.differenceCents, { id: "differenceCents", header: "differenceCents", sortFn: "basic" }),
-    columnHelper.accessor((row) => row.differencePp, { id: "differencePp", header: "differencePp", sortFn: "basic" }),
+    columnHelper.accessor((row) => row.currentWeight, { id: "currentWeight", header: "currentWeight", sortFn: "basic", meta: numeric }),
+    columnHelper.accessor("targetBps", { header: "targetBps", sortFn: "basic", meta: { ...numeric, className: "min-w-28" } }),
+    columnHelper.accessor((row) => row.differenceCents, { id: "differenceCents", header: "differenceCents", sortFn: "basic", meta: numeric }),
+    columnHelper.accessor((row) => row.differencePp, { id: "differencePp", header: "differencePp", sortFn: "basic", meta: numeric }),
   ]) }),
   columnHelper.group({ id: "return", header: "return", columns: columnHelper.columns([
-    columnHelper.accessor((row) => row.growthPercent, { id: "growthPercent", header: "growthPercent", sortFn: "basic" }),
-    columnHelper.accessor("growthCents", { header: "growthCents", sortFn: "basic" }),
+    columnHelper.accessor((row) => row.growthPercent, { id: "growthPercent", header: "growthPercent", sortFn: "basic", meta: numeric }),
+    columnHelper.accessor("growthCents", { header: "growthCents", sortFn: "basic", meta: numeric }),
   ]) }),
-];
+]);
+
+const statusTone = {
+  overweight: "text-warning-foreground",
+  underweight: "text-brand-foreground",
+  balanced: "text-secondary-foreground",
+  unavailable: "text-secondary-foreground",
+} as const;
 
 type Draft = { value: string; error?: string };
 type AddDraft = { code: string; name: string; invested: string; current: string; target: string };
@@ -115,9 +127,11 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
     }
   }, [funds, loaded, mode]);
 
-  const table = useTable({ features: portfolioTableFeatures, columns, data: computed.rows, getRowId: (row) => row.id }, (state) => ({ sorting: state.sorting }));
+  // Codes are optional; the column only appears once at least one fund has one.
+  const hasCodes = funds.some((fund) => fund.code.trim() !== "");
+  const table = useTable({ features: portfolioTableFeatures, columns, data: computed.rows, getRowId: (row) => row.id, state: { columnVisibility: { code: hasCodes } } }, (state) => ({ sorting: state.sorting }));
   const groupLabels: Record<string, string> = {
-    identification: copy.identification, valuation: copy.valuation, allocation: copy.allocation, return: copy.return,
+    valuation: copy.valuation, allocation: copy.allocation, return: copy.return,
     code: copy.code, name: copy.fund, investedCents: copy.invested, currentCents: copy.current, currentWeight: copy.currentWeight,
     targetBps: copy.targetWeight, differenceCents: copy.difference, differencePp: copy.differencePp,
     growthPercent: copy.growth, growthCents: copy.growthEuro,
@@ -134,6 +148,61 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
     if (id === "growthPercent") return row.growthPercent === null ? "—" : `${row.growthPercent > 0 ? "+" : ""}${percentFormatter.format(row.growthPercent)}%`;
     if (id === "growthCents") return signedMoney(row.growthCents);
     return "—";
+  }
+
+  function fundLabel(fund: PortfolioFund) {
+    return fund.code || fund.name;
+  }
+
+  function renderCell(row: PortfolioRow, id: string) {
+    const dataField = id === "code" || id === "name" || id === "investedCents" || id === "currentCents" || id === "targetBps" ? id : null;
+    if (mode === "custom" && dataField) {
+      const key = `${row.id}:${dataField}`;
+      const draft = drafts[key];
+      const textField = dataField === "code" || dataField === "name";
+      return <>
+        <TableCellInput
+          aria-label={`${groupLabels[id] ?? id}, ${fundLabel(row)}`}
+          aria-invalid={draft?.error ? true : undefined}
+          aria-describedby={draft?.error ? `${key}-error` : undefined}
+          align={textField ? "start" : "end"}
+          numeric={!textField}
+          className={dataField === "name" ? "font-medium" : dataField === "code" ? "font-mono text-xs uppercase" : ""}
+          value={editValue(row, dataField)}
+          title={textField ? editValue(row, dataField) : undefined}
+          onFocus={() => startDraft(row, dataField)}
+          onChange={(event) => { const value = event.currentTarget.value; setDrafts((current) => ({ ...current, [key]: { value } })); }}
+          onBlur={(event) => { if (event.currentTarget.dataset.skipCommit) { delete event.currentTarget.dataset.skipCommit; return; } commitDraft(row, dataField); }}
+          onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); commitDraft(row, dataField); event.currentTarget.dataset.skipCommit = "true"; event.currentTarget.blur(); } if (event.key === "Escape") { event.preventDefault(); cancelDraft(row, dataField); event.currentTarget.dataset.skipCommit = "true"; event.currentTarget.blur(); } }}
+        />
+        {draft?.error ? <span id={`${key}-error`} role="alert" className="mt-1 block max-w-48 text-start text-xs font-normal whitespace-normal text-danger-foreground">{draft.error}</span> : null}
+      </>;
+    }
+    const display = renderValue(row, id);
+    if (id === "name") return <span className="block [overflow-wrap:anywhere]">{display}</span>;
+    if (id === "code") return <span className="font-mono text-xs text-secondary-foreground">{display}</span>;
+    if (id === "differencePp") {
+      const statusText = row.status === "overweight" ? copy.overweight : row.status === "underweight" ? copy.underweight : row.status === "balanced" ? copy.balanced : copy.unavailable;
+      return <>
+        <span className={row.status === "balanced" || row.status === "unavailable" ? "text-primary-foreground" : statusTone[row.status]}>{display}</span>
+        <span className={`mt-0.5 flex items-center justify-end gap-1.5 text-xs ${statusTone[row.status]}`}><span aria-hidden="true" className="size-1.5 rounded-full bg-current" />{statusText}</span>
+      </>;
+    }
+    if (id === "growthPercent" || id === "growthCents") return <span className={row.growthCents > 0 ? "text-positive-foreground" : row.growthCents < 0 ? "text-danger-foreground" : ""}>{display}</span>;
+    return display;
+  }
+
+  function renderFooterCell(id: string) {
+    const { totals } = computed;
+    if (id === "name") return copy.totals;
+    if (id === "investedCents") return formatter.format(totals.investedCents / 100);
+    if (id === "currentCents") return formatter.format(totals.currentCents / 100);
+    if (id === "currentWeight") return totals.currentCents ? `${percentFormatter.format(100)}%` : "—";
+    if (id === "targetBps") return <span className={allocationComplete ? "" : "text-warning-foreground"}>{targetSumText}</span>;
+    if (id === "growthPercent") return totals.growthPercent === null ? "—" : `${totals.growthPercent > 0 ? "+" : ""}${percentFormatter.format(totals.growthPercent)}%`;
+    if (id === "growthCents") return <span className={totals.growthCents > 0 ? "text-positive-foreground" : totals.growthCents < 0 ? "text-danger-foreground" : ""}>{signedMoney(totals.growthCents)}</span>;
+    if (id === "code") return null;
+    return <span className="text-tertiary-foreground">—</span>;
   }
 
   function editValue(fund: PortfolioFund, field: "code" | "name" | "investedCents" | "currentCents" | "targetBps") {
@@ -278,78 +347,31 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
         <div className="col-span-full flex flex-wrap items-end gap-3"><Button type="submit">{copy.addFund}</Button><Button onClick={() => { setAddErrors({}); closeAddForm(); }} variant="ghost">{copy.cancel}</Button></div>
       </form> : null}
 
-      {funds.length === 0 ? <p className="border-y border-border-subtle py-10 text-center text-secondary-foreground">{copy.empty}</p> : <>
-        <div className="max-h-[70dvh] max-w-full contain-paint overflow-auto overscroll-contain border-y border-border-subtle" role="region" aria-label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"} tabIndex={0}>
-          <table className="w-full min-w-[1380px] border-collapse text-sm">
-            <caption className="sr-only">{locale === "es" ? "Cartera de fondos y objetivos de asignación" : "Fund portfolio and target allocations"}</caption>
-            <thead>
-              {table.getHeaderGroups().map((group) => <tr key={group.id}>
-                {group.headers.map((header) => {
-                  if (header.isPlaceholder) return null;
-                  const isGroup = header.subHeaders.length > 0;
-                  const id = header.column.id;
-                  const activeSort = table.state.sorting.find((sort) => sort.id === id);
-                  const sortState = activeSort ? (activeSort.desc ? "desc" : "asc") : false;
-                  const label = groupLabels[id] ?? id;
-                  const helpText = id === "differenceCents" ? `${copy.overweightHelp} ${copy.underweightHelp}` : id === "differencePp" ? copy.ppHelp : undefined;
-                  const helpId = helpText ? `portfolio-help-${id}` : undefined;
-                  if (isGroup) return <th key={header.id} id={`portfolio-header-${id}`} colSpan={header.colSpan} scope="colgroup" className="border-b border-border-strong bg-sunken px-3 py-2 text-start text-xs font-semibold uppercase tracking-wide text-secondary-foreground">{label}</th>;
-                  const sortable = header.column.getCanSort();
-                  return <th key={header.id} id={`portfolio-header-${id}`} rowSpan={header.rowSpan} scope="col" aria-sort={sortState === "asc" ? "ascending" : sortState === "desc" ? "descending" : "none"} className={`border-b border-border-strong px-3 py-2 font-medium ${["code", "name"].includes(id) ? "text-start" : "text-end"} ${id === "code" ? "sticky start-0 z-20 border-e border-border-subtle bg-page" : ""}`} >
-                    {sortable ? <button aria-describedby={helpId} className="inline-flex min-h-8 items-center gap-1 rounded-sm text-inherit hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus" onClick={header.column.getToggleSortingHandler()} type="button">{label}<span aria-hidden="true">{sortState === "asc" ? "↑" : sortState === "desc" ? "↓" : "↕"}</span></button> : label}
-                    {helpText ? <span aria-hidden="true" className="ms-1 inline-flex cursor-help" title={helpText}><svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="8" cy="8" r="6.25" /><path d="M8 7v4m0-6h.01" /></svg></span> : null}
-                    {helpText ? <span id={helpId} className="sr-only">{helpText}</span> : null}
-                  </th>;
-                })}
-                {group.depth === 0 && mode === "custom" ? <th id="portfolio-header-actions" rowSpan={2} scope="col" className="border-b border-border-strong px-3 py-2 text-end font-medium">{copy.actions}</th> : null}
-              </tr>)}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((tableRow) => {
-                const row = tableRow.original;
-                const statusText = row.status === "overweight" ? copy.overweight : row.status === "underweight" ? copy.underweight : row.status === "balanced" ? copy.balanced : copy.unavailable;
-                return <tr key={row.id} className="border-b border-border-subtle align-middle last:border-b-0">
-                  {tableRow.getAllCells().map((cell) => {
-                    const id = cell.column.id;
-                    const identity = id === "code" || id === "name";
-                    // Column ids are the stable field keys declared by the table helper.
-                    const editable = mode === "custom" && ["code", "name", "investedCents", "currentCents", "targetBps"].includes(id);
-                    const dataField = (id === "investedCents" || id === "currentCents" || id === "targetBps" || id === "code" || id === "name") ? id : null;
-                    const display = renderValue(row, id);
-                    const group = id === "code" || id === "name" ? "identification" : id === "investedCents" || id === "currentCents" ? "valuation" : id === "currentWeight" || id === "targetBps" || id === "differenceCents" || id === "differencePp" ? "allocation" : "return";
-                    if (editable && dataField) {
-                      const DraftInput = identity ? Input : DecimalInput;
-                      const key = `${row.id}:${dataField}`;
-                      const draft = drafts[key];
-                      const fieldLabel = groupLabels[id] ?? id;
-                      return <td key={cell.id} headers={`portfolio-header-${group} portfolio-header-${id}`} className={`px-3 py-2 ${identity ? "text-start" : "text-end tabular-nums"} ${id === "code" ? "sticky start-0 z-10 border-e border-border-subtle bg-container" : ""}`}>
-                        <DraftInput aria-label={`${fieldLabel}, ${row.code}`} aria-invalid={Boolean(draft?.error)} aria-describedby={draft?.error ? `${key}-error` : undefined} className={`min-h-9 w-full rounded-sm border border-transparent bg-transparent px-2 py-1 text-inherit tabular-nums hover:border-border-default focus:border-control-border focus:bg-container ${identity ? "text-start" : "text-end"}`} value={editValue(row, dataField)} onFocus={() => startDraft(row, dataField)} onChange={(event) => { const value = event.currentTarget.value; setDrafts((current) => ({ ...current, [key]: { value } })); }} onBlur={(event) => { if (event.currentTarget.dataset.skipCommit) { delete event.currentTarget.dataset.skipCommit; return; } commitDraft(row, dataField); }} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); commitDraft(row, dataField); event.currentTarget.dataset.skipCommit = "true"; event.currentTarget.blur(); } if (event.key === "Escape") { event.preventDefault(); cancelDraft(row, dataField); event.currentTarget.dataset.skipCommit = "true"; event.currentTarget.blur(); } }} />
-                        {draft?.error ? <span id={`${key}-error`} role="alert" className="block max-w-40 text-start text-xs text-danger-foreground">{draft.error}</span> : null}
-                      </td>;
-                    }
-                    return <td key={cell.id} headers={`portfolio-header-${group} portfolio-header-${id}`} className={`px-3 py-2 ${identity ? "text-start" : "text-end tabular-nums"}`}>
-                      {id === "differencePp" ? <><span className={row.status === "overweight" ? "text-warning-foreground" : row.status === "underweight" ? "text-brand-foreground" : "text-primary-foreground"}>{display}</span><span className={`mt-0.5 block text-xs ${row.status === "overweight" ? "text-warning-foreground" : row.status === "underweight" ? "text-brand-foreground" : "text-secondary-foreground"}`}>{statusText}</span></> : id === "growthPercent" || id === "growthCents" ? <span className={row.growthCents > 0 ? "text-positive-foreground" : row.growthCents < 0 ? "text-danger-foreground" : ""}>{display}</span> : display}
-                    </td>;
-                  })}
-                  {mode === "custom" ? <td headers="portfolio-header-actions" className="px-2 py-2 text-end"><Button aria-label={`${copy.delete} ${row.code}`} onClick={() => { if (window.confirm(copy.deleteConfirm)) { setDeleted(row); setFunds((current) => current.filter((fund) => fund.id !== row.id)); } }} size="icon-xs" variant="ghost">×</Button></td> : null}
-                </tr>;
-              })}
-            </tbody>
-            <tfoot className="sticky bottom-0 z-10 bg-container font-semibold">
-              <tr className="border-t-2 border-border-strong">
-                <th colSpan={2} scope="row" className="px-3 py-3 text-start">{copy.totals}</th>
-                <td className="px-3 py-3 text-end tabular-nums">{formatter.format(computed.totals.investedCents / 100)}</td>
-                <td className="px-3 py-3 text-end tabular-nums">{formatter.format(computed.totals.currentCents / 100)}</td>
-                <td className="px-3 py-3 text-end tabular-nums">{computed.totals.currentCents ? "100.00%" : "—"}</td>
-                <td className="px-3 py-3 text-end tabular-nums">{targetSumText}</td>
-                <td className="px-3 py-3 text-end">—</td><td className="px-3 py-3 text-end">—</td>
-                <td className="px-3 py-3 text-end tabular-nums">{computed.totals.growthPercent === null ? "—" : `${computed.totals.growthPercent > 0 ? "+" : ""}${percentFormatter.format(computed.totals.growthPercent)}%`}</td>
-                <td className={`px-3 py-3 text-end tabular-nums ${computed.totals.growthCents > 0 ? "text-positive-foreground" : computed.totals.growthCents < 0 ? "text-danger-foreground" : ""}`}>{signedMoney(computed.totals.growthCents)}</td>
-                {mode === "custom" ? <td /> : null}
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+      {funds.length === 0 ? <TableEmpty>{copy.empty}</TableEmpty> : <>
+        <p id="portfolio-scroll-hint" className="mb-2 text-sm text-secondary-foreground @min-[80rem]/portfolio:hidden">{copy.scrollHint}</p>
+        <DataTable
+          table={table}
+          id="portfolio"
+          label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"}
+          caption={locale === "es" ? "Cartera de fondos y objetivos de asignación" : "Fund portfolio and target allocations"}
+          describedBy="portfolio-scroll-hint"
+          className="max-h-[70dvh]"
+          tableClassName="min-w-[64rem]"
+          headerLabel={(id) => groupLabels[id]}
+          headerHint={(id) => id === "differenceCents" ? `${copy.overweightHelp} ${copy.underweightHelp}` : id === "differencePp" ? copy.ppHelp : undefined}
+          renderCell={(cell) => renderCell(cell.row.original, cell.column.id)}
+          renderFooterCell={renderFooterCell}
+          trailingColumn={mode === "custom" ? {
+            id: "actions",
+            header: copy.actions,
+            cell: (tableRow) => {
+              const row = tableRow.original;
+              return <Button aria-label={`${copy.delete} ${fundLabel(row)}`} onClick={() => { if (window.confirm(copy.deleteConfirm)) { setDeleted(row); setFunds((current) => current.filter((fund) => fund.id !== row.id)); } }} size="icon-sm" variant="ghost" className="text-secondary-foreground hover:text-danger-foreground">
+                <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 4.5h11M6.5 4.5V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1.5m-6 0 .6 8.6a1 1 0 0 0 1 .9h4.8a1 1 0 0 0 1-.9l.6-8.6" /></svg>
+              </Button>;
+            },
+          } : undefined}
+        />
         {!allocationComplete ? <p className="mt-3 text-sm tabular-nums text-warning-foreground">{copy.allocationIncomplete.replace("{amount}", percentFormatter.format(remainder)).replace("{direction}", differenceDirection)}</p> : null}
         <section aria-labelledby="portfolio-distribution-title" className="@container/allocation mt-8 w-full min-w-0">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
@@ -369,7 +391,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
           </li>)}</ul>
         </section>
       </>}
-      {deleted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm">{deleted.code} <Button onClick={() => { setFunds((current) => [...current, deleted]); setDeleted(null); }} size="xs" variant="outline">{copy.undo}</Button></p> : null}
+      {deleted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm">{fundLabel(deleted)} <Button onClick={() => { setFunds((current) => [...current, deleted]); setDeleted(null); }} size="xs" variant="outline">{copy.undo}</Button></p> : null}
     </main>
     <Footer label={locale === "es" ? "Diseñado por" : "Designed by"} />
   </div>;

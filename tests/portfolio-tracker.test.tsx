@@ -97,8 +97,24 @@ describe("portfolio tracker interactions", () => {
     renderTracker();
     await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
     await addFund(user, { code: "", name: "Uncoded Fund" });
-    expect(screen.getByRole("textbox", { name: /^Code,/ })).toBeTruthy();
+    expect(screen.getByRole("textbox", { name: "Fund, Uncoded Fund" })).toBeTruthy();
+    expect(screen.queryByRole("textbox", { name: /^Code,/ })).toBeNull();
+    expect(screen.queryByRole("columnheader", { name: "Code" })).toBeNull();
     await waitFor(() => expect(JSON.parse(localStorage.getItem(PORTFOLIO_STORAGE_KEY) ?? "{}").funds[0].code).toBe(""));
+    await addFund(user, { code: "BETA", name: "Beta Fund" });
+    expect(screen.getByRole("columnheader", { name: "Code" })).toBeTruthy();
+    expect(screen.getAllByRole("textbox", { name: /^Code,/ })).toHaveLength(2);
+  });
+
+  it("keeps the fund name as the first, sticky row header", async () => {
+    renderTracker();
+    const row = await screen.findByRole("row", { name: /MOCK-GLOBAL/ });
+    const rowHeader = row.firstElementChild as HTMLElement;
+    expect(rowHeader.tagName).toBe("TH");
+    expect(rowHeader.getAttribute("scope")).toBe("row");
+    expect(rowHeader.textContent).toBe("Northstar Global Equity");
+    expect(rowHeader.className).toContain("sticky");
+    expect((row.children[1] as HTMLElement).className).not.toContain("sticky");
   });
 
   it("loads committed values on mount and persists edits without resetting stored data", async () => {
