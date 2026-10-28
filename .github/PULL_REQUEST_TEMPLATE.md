@@ -31,3 +31,7 @@ PRs over the oversized LOC threshold also need a "Large PR justification" sectio
 ## Risk
 
 <!-- Describe potential risks and mitigations. Write "None" if applicable. -->
+
+## Large PR justification
+
+<!-- Required only when the PR exceeds the oversized LOC threshold; otherwise optional. Explain why the change should remain together. -->
