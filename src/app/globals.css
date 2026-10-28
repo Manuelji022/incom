@@ -120,13 +120,78 @@ html.theme-changing *::after {
   transition: none !important;
 }
 
+/* Keep the dialog and its backdrop rendered until the cards finish fading out. */
 .navigation-dialog {
   display: none;
-  transition: display 160ms allow-discrete, overlay 160ms allow-discrete;
+  transition: display 200ms allow-discrete, overlay 200ms allow-discrete;
 }
 
 .navigation-dialog[open] {
   display: block;
+}
+
+.navigation-dialog::backdrop {
+  background-color: rgb(0 0 0 / 0%);
+  backdrop-filter: blur(0);
+  transition:
+    background-color 200ms var(--ease-out),
+    backdrop-filter 200ms var(--ease-out),
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
+}
+
+.navigation-dialog[open]::backdrop {
+  background-color: rgb(0 0 0 / 40%);
+  backdrop-filter: blur(4px);
+}
+
+@starting-style {
+  .navigation-dialog[open]::backdrop {
+    background-color: rgb(0 0 0 / 0%);
+    backdrop-filter: blur(0);
+  }
+}
+
+/* The trigger sits under the blurred backdrop, where it would ghost behind the
+   close button; reappear only once the dialog has finished closing. */
+.navigation-trigger {
+  transition: opacity 0s 200ms;
+}
+
+.navigation-trigger[aria-expanded="true"] {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+/* Cards stagger in by their --i index and leave together, faster. */
+.navigation-card {
+  transition: opacity 200ms var(--ease-out);
+}
+
+.navigation-dialog:not([open]) .navigation-card {
+  opacity: 0;
+  transition-duration: 150ms;
+}
+
+@starting-style {
+  .navigation-dialog[open] .navigation-card {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .navigation-dialog[open] .navigation-card {
+    transition:
+      opacity 360ms var(--ease-out),
+      translate 360ms var(--ease-out);
+    transition-delay: calc(60ms + var(--i, 0) * 80ms);
+  }
+
+  @starting-style {
+    .navigation-dialog[open] .navigation-card {
+      translate: 24px 0;
+    }
+  }
 }
 
 .menu-icon {
