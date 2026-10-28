@@ -12,6 +12,7 @@ import { clearFieldValidation, showFieldValidation } from "@/features/compound-c
 import { useProjectionController } from "@/features/compound-calculator/hooks/use-projection-controller";
 import { TargetPlanner } from "@/features/compound-calculator/components/target-planner";
 import type { getTargetText } from "@/features/compound-calculator/lib/target-i18n";
+import { calculatorModeSessionKey } from "@/features/compound-calculator/lib/calculator-mode";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 type CompositionDictionary = Dictionary["composition"];
@@ -29,7 +30,6 @@ type ProjectionScenarioViewProps = {
 
 // One responsive presentation, sharing all calculation and form state.
 const desktopQuery = "(min-width: 64rem)";
-const modeSessionKey = "incom:calculator-mode:v1";
 function subscribeDesktop(onChange: () => void) {
   const media = window.matchMedia(desktopQuery);
   media.addEventListener("change", onChange);
@@ -52,8 +52,8 @@ function CalculatorRouteMode({ mode, onModeChange }: { mode: "projection" | "tar
     try {
       if (requestedMode === "projection" || requestedMode === "target") {
         nextMode = requestedMode;
-        sessionStorage.setItem(modeSessionKey, nextMode);
-      } else if (sessionStorage.getItem(modeSessionKey) === "target") {
+        sessionStorage.setItem(calculatorModeSessionKey, nextMode);
+      } else if (sessionStorage.getItem(calculatorModeSessionKey) === "target") {
         nextMode = "target";
       }
     } catch { /* URL navigation still works when storage is unavailable. */ }
