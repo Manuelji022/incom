@@ -111,9 +111,11 @@ export function NavigationMenu({ locale }: { locale: Locale }) {
         }}
       >
         <div className="flex min-h-full flex-col">
-          <div className="flex min-h-16 items-center justify-between gap-4 px-4 py-3 sm:min-h-[72px] sm:px-6">
+          {/* Keep the close button reachable while the cards scroll; the empty
+              strip lets clicks through to the cards beneath it. */}
+          <div className="pointer-events-none sticky top-0 z-10 flex min-h-16 items-center justify-between gap-4 px-4 py-3 sm:min-h-[72px] sm:px-6">
             <span aria-hidden="true" />
-            <button type="button" aria-label={text.close} onClick={closeMenu} className="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus">
+            <button type="button" aria-label={text.close} onClick={closeMenu} className="pointer-events-auto inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus">
               <MenuIcon />
             </button>
           </div>
