@@ -130,41 +130,48 @@ html.theme-changing *::after {
 }
 
 .menu-icon {
-  position: relative;
   display: block;
   width: 24px;
   height: 24px;
+  overflow: visible;
 }
 
-.menu-icon > span {
-  position: absolute;
-  top: 11px;
-  left: 4px;
-  width: 16px;
-  height: 2px;
-  border-radius: 999px;
-  background: currentColor;
-  transition: opacity 160ms var(--ease-out);
+.menu-icon .line {
+  transform: scale(1.25);
+  translate: -13px -14px;
+  stroke-dasharray: 61 29 60 300;
 }
 
-.menu-icon > span:first-child { transform: translateY(-7px); }
-.menu-icon > span:last-child { transform: translateY(7px); }
-.navigation-dialog[open] .menu-icon > span:first-child { transform: rotate(45deg); }
-.navigation-dialog[open] .menu-icon > span:nth-child(2) { opacity: 0; }
-.navigation-dialog[open] .menu-icon > span:last-child { transform: rotate(-45deg); }
+:is([aria-expanded="true"] > .menu-icon, .navigation-dialog[open] .menu-icon) {
+  translate: 6.667% -6.667%;
+  rotate: 0.125turn;
+}
 
-@starting-style {
-  .navigation-dialog[open] .menu-icon > span:nth-child(2) { opacity: 1; }
+:is([aria-expanded="true"] > .menu-icon, .navigation-dialog[open] .menu-icon) .line {
+  stroke-dasharray: 60 105 60 300;
+  stroke-dashoffset: -90;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .menu-icon > span {
-    transition: transform 160ms var(--ease-in-out), opacity 160ms var(--ease-out);
+  .menu-icon {
+    transition: translate 400ms var(--ease-in-out), rotate 400ms var(--ease-in-out);
   }
 
+  .menu-icon .line {
+    transition: stroke-dasharray 400ms var(--ease-in-out), stroke-dashoffset 400ms var(--ease-in-out);
+  }
+
+  /* The close button mounts already open, so morph it in from the hamburger. */
   @starting-style {
-    .navigation-dialog[open] .menu-icon > span:first-child { transform: translateY(-7px); }
-    .navigation-dialog[open] .menu-icon > span:last-child { transform: translateY(7px); }
+    .navigation-dialog[open] .menu-icon {
+      translate: 0 0;
+      rotate: 0turn;
+    }
+
+    .navigation-dialog[open] .menu-icon .line {
+      stroke-dasharray: 61 29 60 300;
+      stroke-dashoffset: 0;
+    }
   }
 }
 
