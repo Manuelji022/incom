@@ -279,8 +279,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
       </form> : null}
 
       {funds.length === 0 ? <p className="border-y border-border-subtle py-10 text-center text-secondary-foreground">{copy.empty}</p> : <>
-        <p id="portfolio-scroll-hint" className="mb-2 text-sm text-secondary-foreground @min-[90rem]/portfolio:hidden">{copy.scrollHint}</p>
-        <div aria-describedby="portfolio-scroll-hint" className="max-h-[70dvh] max-w-full contain-paint overflow-auto overscroll-contain border-y border-border-subtle" role="region" aria-label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"} tabIndex={0}>
+        <div className="max-h-[70dvh] max-w-full contain-paint overflow-auto overscroll-contain border-y border-border-subtle" role="region" aria-label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"} tabIndex={0}>
           <table className="w-full min-w-[1380px] border-collapse text-sm">
             <caption className="sr-only">{locale === "es" ? "Cartera de fondos y objetivos de asignación" : "Fund portfolio and target allocations"}</caption>
             <thead>
