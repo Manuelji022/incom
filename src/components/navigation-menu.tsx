@@ -66,9 +66,17 @@ export function NavigationMenu({ locale }: { locale: Locale }) {
 
   useEffect(() => {
     if (!menuOpen) return;
+    const root = document.documentElement;
     const previousOverflow = document.body.style.overflow;
+    const previousGutter = root.style.scrollbarGutter;
+    // Hiding overflow removes the page scrollbar; keep its gutter so the
+    // content doesn't shift sideways when the menu opens and closes.
+    if (window.innerWidth > root.clientWidth) root.style.scrollbarGutter = "stable";
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previousOverflow; };
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      root.style.scrollbarGutter = previousGutter;
+    };
   }, [menuOpen]);
 
   const closeMenu = () => menuRef.current?.close();
