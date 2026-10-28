@@ -80,3 +80,7 @@ curl -X POST 'https://incom-api.manuelji.dev/api/v1/compound-interest/projection
 Also test a request with recurring contributions, and validation failures such as an unsupported contribution frequency or a duration outside 1–100. Invalid fields generally return 422; inconsistent inputs, such as a zero initial principal with no recurring contribution, return 400. Error responses use `application/problem+json`.
 
 Interactive API documentation may be available at <https://incom-api.manuelji.dev/docs>; the OpenAPI document may be at <https://incom-api.manuelji.dev/openapi.json>.
+
+## Pull request descriptions
+
+Use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) when preparing PR descriptions. Keep its required section headings exactly as written: Summary, Why, Scope, Out of scope, How to test, and Risk. Fill each with meaningful content; use `None` for Out of scope or Risk only when appropriate. Add a meaningful Large PR justification when the PR exceeds the oversized LOC threshold.
