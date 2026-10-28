@@ -3,9 +3,9 @@ Use a conventional PR title: type(scope): description
 Allowed types: feat, fix, refactor, test, docs, build, ci, chore, perf.
 The scope and breaking-change marker (!) are optional. Keep a non-empty description after the colon.
 
-Complete every section below with meaningful information. Do not leave TODO/TBD placeholders.
-For Out of scope and Risk, write "None" when there is nothing to report.
-PRs over the oversized LOC threshold also need a "Large PR justification" section.
+Keep the section headings below exactly as written; PR policy checks require Summary, Why, Scope, Out of scope, How to test, and Risk. Complete every required section with meaningful information. Do not leave TODO/TBD placeholders.
+For Out of scope and Risk, write "None" when there is nothing to report. Use "How to test" (not "Testing") for verification steps.
+PRs over the oversized LOC threshold also need a meaningful "Large PR justification" section.
 -->
 
 ## Summary
