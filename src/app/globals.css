@@ -346,16 +346,27 @@ html.theme-changing *::after {
   touch-action: pan-y;
 }
 
+/* Filled green up to the thumb, stone after it (the Slider sets --slider-fill). */
 .native-slider::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 9999px;
-  background: var(--border-default);
+  background: linear-gradient(to right, var(--brand-solid) var(--slider-fill, 0%), var(--border-strong) var(--slider-fill, 0%));
+}
+
+.native-slider:dir(rtl)::-webkit-slider-runnable-track {
+  background: linear-gradient(to left, var(--brand-solid) var(--slider-fill, 0%), var(--border-strong) var(--slider-fill, 0%));
 }
 
 .native-slider::-moz-range-track {
   height: 4px;
   border-radius: 9999px;
-  background: var(--border-default);
+  background: var(--border-strong);
+}
+
+.native-slider::-moz-range-progress {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--brand-solid);
 }
 
 .native-slider::-webkit-slider-thumb {
@@ -363,19 +374,27 @@ html.theme-changing *::after {
   height: 20px;
   margin-top: -8px;
   appearance: none;
-  border: 1px solid var(--control-border);
+  border: 2px solid var(--container);
   border-radius: 9999px;
-  background: var(--inverted-solid);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+  background: var(--brand-solid);
+  box-shadow: 0 0 0 1px var(--brand-solid);
 }
 
 .native-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border: 1px solid var(--control-border);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--container);
   border-radius: 9999px;
-  background: var(--inverted-solid);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+  background: var(--brand-solid);
+  box-shadow: 0 0 0 1px var(--brand-solid);
+}
+
+.native-slider:hover::-webkit-slider-thumb {
+  background: var(--brand-solid-hover);
+}
+
+.native-slider:hover::-moz-range-thumb {
+  background: var(--brand-solid-hover);
 }
 
 @media (forced-colors: active) {
