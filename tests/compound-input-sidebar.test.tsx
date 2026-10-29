@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { CompoundInputSidebar } from "@/features/compound-calculator/components/compound-input-sidebar";
@@ -39,6 +39,17 @@ function SidebarHarness() {
 }
 
 describe("compound input sidebar", () => {
+  it("groups fields under labelled eyebrow sections in tab order", () => {
+    render(<SidebarHarness />);
+    const text = getDictionary("en").sidebar;
+
+    const groups = [text.startingPoint, text.contributions, text.assumptions].map((name) => screen.getByRole("region", { name }));
+    expect(within(groups[0]).getByLabelText(text.initial)).toBeTruthy();
+    expect(within(groups[1]).getByLabelText(new RegExp(text.recurring))).toBeTruthy();
+    expect(within(groups[2]).getAllByLabelText(new RegExp(text.horizon)).length).toBeTruthy();
+    expect(screen.getByRole("heading", { name: text.startingPoint }).className).toContain("uppercase");
+  });
+
   it("keeps advanced assumptions collapsed on desktop with an available disclosure", () => {
     render(<SidebarHarness />);
     const text = getDictionary("en").sidebar;
@@ -51,7 +62,8 @@ describe("compound input sidebar", () => {
     expect(advancedFields?.hasAttribute("hidden")).toBe(true);
 
     const calculate = screen.getByRole("button", { name: text.calculate });
-    expect(calculate.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(calculate.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    expect(advancedFields && calculate.compareDocumentPosition(advancedFields) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
 
     fireEvent.click(toggle);
     expect(screen.getByRole("button", { name: text.closeAssumptions }).getAttribute("aria-expanded")).toBe("true");

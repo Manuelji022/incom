@@ -38,6 +38,16 @@ beforeEach(() => { sessionStorage.clear(); window.history.replaceState(null, "",
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe("target planner", () => {
+  it("groups sidebar fields under eyebrow headings", async () => {
+    window.matchMedia = vi.fn().mockImplementation(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    window.history.replaceState(null, "", "/en?mode=target");
+    mountParent();
+    await screen.findByRole("heading", { level: 1, name: targetText.title });
+    for (const name of [text.sidebar.startingPoint, text.sidebar.assumptions, text.sidebar.contributions]) {
+      expect(screen.getByRole("region", { name })).toBeTruthy();
+    }
+  });
+
   it.each(["projection", "target"] as const)("opens the %s calculator from an explicit menu URL instead of the saved mode", async (mode) => {
     window.matchMedia = vi.fn().mockImplementation(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
     sessionStorage.setItem("incom:calculator-mode:v1", mode === "projection" ? "target" : "projection");
