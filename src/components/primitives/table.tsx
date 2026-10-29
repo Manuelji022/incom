@@ -273,7 +273,7 @@ function TableCellInput({ align = "start", numeric = false, className = "", ...p
       type="text"
       inputMode={numeric ? "decimal" : undefined}
       className={cx(
-        "-mx-2 h-9 w-[calc(100%+1rem)] min-w-0 rounded-md border border-transparent bg-transparent px-2 text-sm text-inherit transition-colors",
+        "-mx-2 h-9 w-[calc(100%+1rem)] min-w-0 rounded-md border border-transparent bg-transparent px-2 text-base text-inherit sm:text-sm transition-colors",
         "hover:border-border-default hover:bg-container focus-visible:border-brand-border-focus focus-visible:bg-container focus-visible:ring-2 focus-visible:ring-brand-border-focus/30 focus-visible:outline-none",
         "aria-invalid:border-danger-border-default aria-invalid:bg-danger-subtle",
         numeric && "tabular-nums",
