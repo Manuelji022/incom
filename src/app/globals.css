@@ -4,16 +4,20 @@
   color-scheme: light dark;
 
   /* Reference palette primitives */
-  --cream: #f2f0e3;
-  --charcoal: #242424;
-  --coral: #f76f53;
-  --coral-ink: #b43f2a;
+  --cream: #fbf7f0;
+  --charcoal: #1b1917;
+  --stone: #aeada9;
+  --green: #007354;
+  /* Lighter green for dark mode; #007354 is only 3:1 on charcoal. */
+  --green-bright: #3dbd96;
+  /* Dark-mode panel surface: lifted from the charcoal page so panels read as separate, as white does on cream. */
+  --raised: #24211f;
 
   /* Surfaces */
   --page: light-dark(var(--cream), var(--charcoal));
   --shell: light-dark(color-mix(in srgb, var(--cream) 97%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 95%, black));
-  --container: light-dark(color-mix(in srgb, var(--cream) 94%, white), color-mix(in srgb, var(--charcoal) 97%, var(--cream)));
-  --card: light-dark(color-mix(in srgb, var(--cream) 97%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 94%, var(--cream)));
+  --container: light-dark(white, var(--raised));
+  --card: var(--container);
   --sunken: light-dark(color-mix(in srgb, var(--cream) 94%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 95%, black));
   --modal: light-dark(color-mix(in srgb, var(--cream) 88%, white), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
   --standout: light-dark(var(--charcoal), var(--cream));
@@ -38,23 +42,24 @@
   --disabled-foreground: light-dark(color-mix(in srgb, var(--charcoal) 38%, var(--cream)), color-mix(in srgb, var(--cream) 42%, var(--charcoal)));
 
   /* Brand */
-  --brand-solid: var(--coral);
-  --brand-solid-hover: color-mix(in srgb, var(--coral) 75%, var(--coral-ink));
-  --brand-solid-active: color-mix(in srgb, var(--coral) 74%, var(--coral-ink));
-  --chart-balance: light-dark(var(--coral-ink), var(--coral));
-  --brand-subtle: light-dark(color-mix(in srgb, var(--cream) 88%, var(--coral)), color-mix(in srgb, var(--charcoal) 78%, var(--coral)));
-  --brand-subtle-hover: light-dark(color-mix(in srgb, var(--cream) 78%, var(--coral)), color-mix(in srgb, var(--charcoal) 68%, var(--coral)));
-  --brand-foreground: light-dark(var(--coral-ink), var(--coral));
-  --on-brand-solid-foreground: var(--charcoal);
-  --on-brand-subtle-foreground: light-dark(color-mix(in srgb, var(--coral-ink) 90%, var(--charcoal)), color-mix(in srgb, var(--coral) 50%, var(--cream)));
+  --brand-solid: light-dark(var(--green), var(--green-bright));
+  --brand-solid-hover: light-dark(color-mix(in srgb, var(--green) 85%, var(--charcoal)), color-mix(in srgb, var(--green-bright) 85%, var(--cream)));
+  --brand-solid-active: light-dark(color-mix(in srgb, var(--green) 74%, var(--charcoal)), color-mix(in srgb, var(--green-bright) 74%, var(--cream)));
+  --chart-balance: light-dark(var(--green), var(--green-bright));
+  --brand-subtle: light-dark(color-mix(in srgb, var(--cream) 90%, var(--green)), color-mix(in srgb, var(--charcoal) 80%, var(--green-bright)));
+  --brand-subtle-hover: light-dark(color-mix(in srgb, var(--cream) 82%, var(--green)), color-mix(in srgb, var(--charcoal) 70%, var(--green-bright)));
+  --brand-foreground: light-dark(var(--green), var(--green-bright));
+  /* White on green is 5.9:1; charcoal on green would be 3:1. */
+  --on-brand-solid-foreground: light-dark(white, var(--charcoal));
+  --on-brand-subtle-foreground: light-dark(color-mix(in srgb, var(--green) 90%, var(--charcoal)), color-mix(in srgb, var(--green-bright) 50%, var(--cream)));
 
-  /* Positive */
-  --positive-solid: #53a274;
-  --positive-solid-hover: #60b080;
-  --positive-subtle: light-dark(#e8f5ec, #192c22);
-  --positive-foreground: light-dark(#205f39, #61ad7e);
-  --on-positive-solid-foreground: #ffffff;
-  --on-positive-subtle-foreground: light-dark(#267449, #83d1a0);
+  /* Positive shares the brand green so gains don't introduce a second, near-identical green. */
+  --positive-solid: var(--brand-solid);
+  --positive-solid-hover: var(--brand-solid-hover);
+  --positive-subtle: var(--brand-subtle);
+  --positive-foreground: var(--brand-foreground);
+  --on-positive-solid-foreground: var(--on-brand-solid-foreground);
+  --on-positive-subtle-foreground: var(--on-brand-subtle-foreground);
 
   /* Warning */
   --warning-solid: #eb762f;
@@ -86,12 +91,13 @@
   --border-default: light-dark(color-mix(in srgb, var(--cream) 86%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 86%, var(--cream)));
   --control-border: light-dark(color-mix(in srgb, var(--cream) 38%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 42%, var(--cream)));
   --border-subtle: light-dark(color-mix(in srgb, var(--cream) 92%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
-  --border-strong: light-dark(color-mix(in srgb, var(--cream) 76%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 76%, var(--cream)));
+  /* Stone is for dividers only: 2.1:1 on cream is too low for text or control borders. */
+  --border-strong: light-dark(var(--stone), color-mix(in srgb, var(--charcoal) 76%, var(--cream)));
   --border-inverted: light-dark(var(--cream), var(--charcoal));
-  --brand-border-default: var(--coral-ink);
-  --brand-border-subtle: light-dark(color-mix(in srgb, var(--cream) 62%, var(--coral)), color-mix(in srgb, var(--charcoal) 58%, var(--coral)));
-  --brand-border-focus: light-dark(var(--coral-ink), var(--coral));
-  --positive-border-default: light-dark(#8bc9a3, #365a44);
+  --brand-border-default: light-dark(var(--green), var(--green-bright));
+  --brand-border-subtle: light-dark(color-mix(in srgb, var(--cream) 62%, var(--green)), color-mix(in srgb, var(--charcoal) 58%, var(--green-bright)));
+  --brand-border-focus: light-dark(var(--green), var(--green-bright));
+  --positive-border-default: var(--brand-border-subtle);
   --warning-border-default: light-dark(#f2b47e, #694321);
   --danger-border-default: light-dark(#e8a08e, #67372d);
   --danger-border-subtle: light-dark(#f2d2c9, #472922);
