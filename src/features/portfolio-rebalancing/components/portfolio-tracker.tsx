@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-table";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { PageShell } from "@/components/page-shell";
 import { DataTable, type DataTableColumnMeta } from "@/components/data-table";
 import { Button } from "@/components/primitives/button";
 import { DecimalInput } from "@/components/primitives/decimal-input";
@@ -323,11 +324,11 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
   const remainder = Math.abs(computed.targetDifferenceBps / 100);
   const differenceDirection = computed.targetDifferenceBps > 0 ? copy.below : copy.above;
 
-  return <div className="flex min-h-svh flex-col bg-page text-primary-foreground">
+  return <PageShell>
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={false} staleText="" onBeforeLanguageChange={() => ({ status: "saved" })} submitting={false} languageHandoffText={{ pending: "", storage: "" }} />
-    <main id="main-content" tabIndex={-1} className="@container/portfolio mx-auto w-full max-w-[1600px] min-w-0 flex-1 px-4 py-8 focus-visible:outline-none sm:px-6 lg:px-8">
-      <header className="mb-7 border-b border-border-subtle pb-5">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{copy.title}</h1>
+    <main id="main-content" tabIndex={-1} className="@container/portfolio w-full min-w-0 flex-1 px-4 py-8 focus-visible:outline-none">
+      <header className="mb-7">
+        <h1 className="font-display text-heading-6 font-normal sm:text-heading-5">{copy.title}</h1>
       </header>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -348,13 +349,11 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
       </form> : null}
 
       {funds.length === 0 ? <TableEmpty>{copy.empty}</TableEmpty> : <>
-        <p id="portfolio-scroll-hint" className="mb-2 text-sm text-secondary-foreground @min-[80rem]/portfolio:hidden">{copy.scrollHint}</p>
         <DataTable
           table={table}
           id="portfolio"
-          label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"}
+          label={locale === "es" ? "Tabla de cartera" : "Portfolio table"}
           caption={locale === "es" ? "Cartera de fondos y objetivos de asignación" : "Fund portfolio and target allocations"}
-          describedBy="portfolio-scroll-hint"
           className="max-h-[70dvh]"
           tableClassName="min-w-[64rem]"
           headerLabel={(id) => groupLabels[id]}
@@ -394,5 +393,5 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
       {deleted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm">{fundLabel(deleted)} <Button onClick={() => { setFunds((current) => [...current, deleted]); setDeleted(null); }} size="xs" variant="outline">{copy.undo}</Button></p> : null}
     </main>
     <Footer label={locale === "es" ? "Diseñado por" : "Designed by"} />
-  </div>;
+  </PageShell>;
 }

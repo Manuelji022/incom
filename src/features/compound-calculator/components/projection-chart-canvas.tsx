@@ -141,7 +141,7 @@ export function ProjectionChartCanvas({
           foreground: "var(--primary-foreground)",
           muted: "var(--secondary-foreground)",
           grid: "var(--border-subtle)",
-          background: "var(--page)",
+          background: "var(--card)",
           palette: ["var(--brand-solid)"],
         },
         focus: "group-x",

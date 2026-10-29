@@ -73,7 +73,7 @@ export function ProjectionChart({
 
   return (
     <div
-      className={`border-b border-border-subtle ${horizontalInset} py-6 lg:py-8`}
+      className={`border-b border-border-strong ${horizontalInset} py-6 lg:py-8`}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-semibold text-primary-foreground">
@@ -83,7 +83,9 @@ export function ProjectionChart({
           {text.scenario}
         </span>
       </div>
-      <ProjectionChartCanvas points={points} locale={locale} currency={currency} text={text} />
+      <div className="rounded-sm border border-border-subtle bg-card p-2 sm:p-3">
+        <ProjectionChartCanvas points={points} locale={locale} currency={currency} text={text} />
+      </div>
       <ul
         aria-label={text.legend}
         className="mx-auto mt-3 grid max-w-2xl grid-cols-2 gap-x-4 gap-y-3 text-xs text-secondary-foreground sm:grid-cols-4 sm:gap-x-5"

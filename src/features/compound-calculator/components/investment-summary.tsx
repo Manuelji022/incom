@@ -38,8 +38,8 @@ function YearlyProjectionTable({
       >
         <table id="yearly-projection-table" className="w-full min-w-[660px] border-collapse text-start text-xs sm:text-sm">
           <caption className="sr-only">{text.caption}</caption>
-          <thead className="sticky top-0 z-10 bg-container">
-            <tr className="border-b border-border-subtle text-xs text-secondary-foreground">
+          <thead className="sticky top-0 z-10 bg-page">
+            <tr className="border-b border-primary-foreground text-xs text-secondary-foreground">
               <th className="w-12 py-2 ps-3 pe-3 text-start font-medium" scope="col">{text.year}</th>
               <th aria-label={`${text.portfolioShort}, ${text.portfolio}`} title={text.portfolio} className="px-3 py-2 text-end font-medium" scope="col">{text.portfolioShort}</th>
               <th aria-label={`${text.contributionsShort}, ${text.contributions}`} title={text.contributions} className="px-3 py-2 text-end font-medium" scope="col">{text.contributionsShort}</th>
@@ -81,7 +81,7 @@ export function InvestmentSummary({
   return (
     <section
       aria-labelledby="investment-summary-title"
-      className="border-b border-border-subtle px-4 py-6 lg:px-3 lg:py-8"
+      className="px-4 py-6 lg:px-3 lg:py-8"
     >
       <h2
         id="investment-summary-title"

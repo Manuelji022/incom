@@ -1,4 +1,4 @@
-# Incom
+# Olive Capital
 
 An investment projection app built with Next.js.
 

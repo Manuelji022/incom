@@ -43,6 +43,7 @@ export function ProjectionResults({
   return (
     <section className="projection-results-enter min-w-0 bg-page">
       <ProjectionHeader
+        initialPrincipal={selectedScenario.annual_points.at(-1)?.initial_principal}
         nominalBalance={selectedScenario.final_summary.nominal_balance}
         realBalance={selectedScenario.final_summary.inflation_adjusted_balance}
         realLabel={text.summary.real}

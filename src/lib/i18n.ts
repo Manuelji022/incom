@@ -4,7 +4,7 @@ import { type Locale } from "@/lib/locales";
 const dictionaries = {
   en: {
     metadata: {
-      title: "Incom",
+      title: "Olive Capital",
       description: "Investment projections made clear.",
     },
     footer: "Designed by",
@@ -63,6 +63,7 @@ const dictionaries = {
     header: {
       portfolio: "Portfolio value",
       unavailable: "Unavailable",
+      headline: "{initial} today could become",
       projected: "Projected value in {duration}",
     },
     unavailable:
@@ -169,7 +170,6 @@ const dictionaries = {
       distribution: "Portfolio allocation",
       currentAllocation: "Current",
       targetAllocation: "Target",
-      scrollHint: "Scroll horizontally to see all columns.",
       currentLabel: "Current {value}%",
       targetLabel: "Target {value}%",
       validation: "Enter a valid value.",
@@ -191,7 +191,7 @@ const dictionaries = {
   },
   es: {
     metadata: {
-      title: "Incom",
+      title: "Olive Capital",
       description: "Proyecciones de inversión con claridad.",
     },
     footer: "Diseñado por",
@@ -250,6 +250,7 @@ const dictionaries = {
     header: {
       portfolio: "Valor de la cartera",
       unavailable: "No disponible",
+      headline: "{initial} hoy podrían convertirse en",
       projected: "Valor proyectado dentro de {duration}",
     },
     unavailable:
@@ -358,7 +359,6 @@ const dictionaries = {
       distribution: "Distribución de la cartera",
       currentAllocation: "Actual",
       targetAllocation: "Objetivo",
-      scrollHint: "Desplázate horizontalmente para ver todas las columnas.",
       currentLabel: "Actual {value} %",
       targetLabel: "Objetivo {value} %",
       validation: "Introduce un valor válido.",

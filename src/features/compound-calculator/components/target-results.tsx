@@ -29,7 +29,7 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
     ],
   ] as const;
   return <>
-    <section aria-labelledby="target-contributions-title" className="space-y-4 border-b border-border-subtle p-4 sm:p-6">
+    <section aria-labelledby="target-contributions-title" className="space-y-4 border-b border-border-strong p-4 sm:p-6">
       <h2 id="target-contributions-title" className="text-lg font-semibold">{t.contribution}</h2>
       <dl className="text-sm"><dt className="text-secondary-foreground">{t.nominalTarget}</dt><dd className="font-medium tabular-nums text-primary-foreground">{money(inputs.nominal_target_amount)}</dd></dl>
       <div className="grid gap-3 sm:grid-cols-3">
@@ -59,13 +59,13 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
       </dl>
     </section>
     <ProjectionChart points={scenario.annual_points} locale={locale} currency={currency} inset="section" text={{ ...text.chart, scenario: text.chart.scenario.replace("{scenario}", text.scenarios[scenario.name]), aria: text.chart.aria.replace("{scenario}", text.scenarios[scenario.name]) }} />
-    <section aria-labelledby="target-schedule-title" className="space-y-3 border-b border-border-subtle p-4 sm:p-6">
+    <section aria-labelledby="target-schedule-title" className="space-y-3 border-b border-border-strong p-4 sm:p-6">
       <h2 id="target-schedule-title" className="text-lg font-semibold">{t.schedule} · {text.scenarios[scenario.name]}</h2>
       <p className="text-sm text-secondary-foreground">{t.scheduleHelp}</p>
       <div tabIndex={0} role="region" aria-labelledby="target-schedule-title" className="max-h-[32rem] overflow-auto rounded-md border border-border-subtle focus-visible:outline-2 focus-visible:outline-brand-border-focus">
         <table className="w-full min-w-[54rem] text-start text-sm tabular-nums">
           <caption className="sr-only">{t.schedule} · {text.scenarios[scenario.name]} · {period}</caption>
-          <thead className="sticky top-0 bg-container text-secondary-foreground"><tr>
+          <thead className="sticky top-0 bg-page text-secondary-foreground"><tr>
             {[text.summary.year, t.annualContributions, t.cumulativeContributions, t.nominalBalance, t.realBalance, t.annualFees].map((label) => <th key={label} scope="col" className="px-4 py-3 text-start font-medium">{label}</th>)}
           </tr></thead>
           <tbody>{scenario.annual_points.map((point) => <tr key={point.year} className="border-t border-border-subtle">

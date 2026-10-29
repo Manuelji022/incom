@@ -81,6 +81,35 @@ Also test a request with recurring contributions, and validation failures such a
 
 Interactive API documentation may be available at <https://incom-api.manuelji.dev/docs>; the OpenAPI document may be at <https://incom-api.manuelji.dev/openapi.json>.
 
+## Browser verification with Orca
+
+This repo is worked on inside Orca, which has an embedded browser scoped to each worktree. When a check needs a real browser (computed styles, wrapping, overflow, viewport behavior), drive that browser with the `orca` CLI instead of saying it can't be verified. Use `orca computer …` (desktop GUI control) only for native windows or external browsers; it does not drive the embedded browser.
+
+Before driving a tab, read the version-matched guide: `orca skills get orca-cli --reference browser`.
+
+Find the dev server for *this* worktree. `next dev` takes the next free port when 3000 is busy, and other worktrees may hold 3000:
+
+```bash
+ss -ltnp | grep next-server              # find the port and pid
+readlink /proc/<pid>/cwd                 # confirm it is this worktree
+```
+
+Typical loop:
+
+```bash
+orca tab create --url http://localhost:<port>/en --json
+orca wait --load networkidle --json
+orca snapshot --json                                        # refs like @e3 for click/fill
+orca exec --command "set viewport 320 900" --json           # 320px; 640px ≈ 200% zoom on a 1280px window
+orca eval --expression "<js returning a string>" --json     # measure getComputedStyle, line counts, scrollWidth
+```
+
+- `orca screenshot` returns a blank 1×1 image when the Orca desktop window is not visible. Use `eval` measurements as the evidence instead.
+- `orca eval` results are strings; wrap returned objects in `JSON.stringify`.
+- Re-run `snapshot` after any navigation; refs go stale.
+- Check both locales (`/en`, `/es`). Spanish strings are longer and wrap differently.
+- Avoid clicks that persist app state (such as adding a portfolio fund) unless the task requires them.
+
 ## Pull request descriptions
 
 Use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) when preparing PR descriptions. Keep its required section headings exactly as written: Summary, Why, Scope, Out of scope, How to test, and Risk. Fill each with meaningful content; use `None` for Out of scope or Risk only when appropriate. Add a meaningful Large PR justification when the PR exceeds the oversized LOC threshold.

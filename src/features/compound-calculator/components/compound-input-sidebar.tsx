@@ -100,7 +100,7 @@ export function CompoundInputSidebar({
         const key = summaryFieldKeys[target.name] ?? summaryFieldKeys[target.id];
         if (key) setSummaryValues((values) => ({ ...values, [key]: target.value }));
       }}
-      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-default bg-container lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
+      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-strong bg-page lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
     >
       <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle px-4 py-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
         <h2 id="compound-input-sidebar-title" className={`text-base font-semibold leading-6 text-primary-foreground ${collapsed ? "lg:hidden" : ""}`}>

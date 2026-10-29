@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { Footer } from "@/components/footer";
+import { PageShell } from "@/components/page-shell";
 import { Header } from "@/components/header";
 
 const copy = {
@@ -58,7 +59,7 @@ export function NotFoundScreen({
   }, [locale]);
 
   return (
-    <div className="flex min-h-svh flex-col bg-page text-primary-foreground">
+    <PageShell>
       {includeSkipLink ? (
         <a
           className="sr-only fixed start-4 top-4 z-50 rounded-md bg-container px-4 py-3 text-base text-primary-foreground focus:not-sr-only focus:outline-2 focus:outline-offset-2 focus:outline-brand-border-focus"
@@ -82,7 +83,7 @@ export function NotFoundScreen({
       />
 
       <main
-        className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-12 px-5 py-12 sm:px-8 md:py-16 lg:grid-cols-[1fr_0.95fr] lg:gap-20 lg:px-12"
+        className="grid w-full flex-1 items-center gap-12 px-4 py-12 md:py-16 lg:grid-cols-[1fr_0.95fr] lg:gap-20"
         id="main-content"
         tabIndex={-1}
       >
@@ -96,7 +97,7 @@ export function NotFoundScreen({
           >
             404
           </span>
-          <h1 className="mt-8 text-heading-3 font-semibold tracking-[-0.04em] sm:text-heading-2">
+          <h1 className="mt-8 font-display text-heading-3 font-normal sm:text-heading-2">
             {text.title}
           </h1>
           <p className="mt-4 max-w-lg text-body-sm text-secondary-foreground sm:text-body">
@@ -190,6 +191,6 @@ export function NotFoundScreen({
       </main>
 
       {footer ?? <Footer label={text.footer} />}
-    </div>
+    </PageShell>
   );
 }

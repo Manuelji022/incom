@@ -5,10 +5,12 @@ import { getIntlLocale } from "@/lib/locales";
 type ProjectionHeaderText = {
   portfolio: string;
   unavailable: string;
+  headline: string;
   projected: string;
 };
 
 type ProjectionHeaderProps = {
+  initialPrincipal?: string;
   nominalBalance?: string;
   realBalance?: string;
   realLabel: string;
@@ -19,6 +21,7 @@ type ProjectionHeaderProps = {
 };
 
 export function ProjectionHeader({
+  initialPrincipal,
   nominalBalance,
   realBalance,
   realLabel,
@@ -37,24 +40,26 @@ export function ProjectionHeader({
     unitDisplay: "long",
   }).format(durationYears);
   const balance = nominalBalance ? formatter.format(Number(nominalBalance)) : text.unavailable;
+  const initial = initialPrincipal ? formatter.format(Number(initialPrincipal)) : text.unavailable;
   const realValue = realBalance ? formatter.format(Number(realBalance)) : text.unavailable;
   return (
     <section
       aria-labelledby="portfolio-value-title"
-      className="[container-type:inline-size] border-b border-border-subtle px-4 py-6 lg:px-3"
+      className="[container-type:inline-size] border-b border-primary-foreground px-4 py-6 lg:px-3"
     >
       <div>
         <div className="min-w-0">
           <h2
             id="portfolio-value-title"
-            className="text-sm font-semibold leading-5 text-primary-foreground"
+            className="font-sans text-sm font-semibold leading-5 text-secondary-foreground"
           >
             {text.portfolio}
           </h2>
-          <p className={`mt-2 [overflow-wrap:anywhere] leading-[1.08] font-semibold tracking-[-0.06em] tabular-nums text-primary-foreground ${balance.length > 14 ? "text-[clamp(1.25rem,6cqi,3rem)]" : "text-[clamp(1.75rem,10cqi,5.5rem)] lg:text-[clamp(3rem,12cqi,5.5rem)]"}`}>
-            {balance}
+          <p className="mt-4 max-w-[22ch] font-display text-display font-normal text-balance text-primary-foreground [overflow-wrap:anywhere]">
+            {text.headline.replace("{initial}", initial)}{" "}
+            <span className="italic text-brand-foreground">{balance}</span>
           </p>
-          <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm leading-5 text-secondary-foreground">
+          <p className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm leading-5 text-secondary-foreground">
             <span>{realLabel}</span>
             <span className="text-lg font-semibold tabular-nums text-primary-foreground">{realValue}</span>
           </p>

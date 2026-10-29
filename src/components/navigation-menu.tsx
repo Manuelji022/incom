@@ -2,16 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { MenuIcon } from "@/components/primitives/menu-icon";
 import { calculatorModeSessionKey, type CalculatorMode } from "@/features/compound-calculator/lib/calculator-mode";
 import type { Locale } from "@/lib/locales";
-
-function MenuIcon() {
-  return (
-    <svg aria-hidden="true" className="menu-icon" viewBox="-10 -10 120 120" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
-      <path className="line" d="m 20 40 h 60 a 1 1 0 0 1 0 20 h -60 a 1 1 0 0 1 0 -40 h 30 v 70" />
-    </svg>
-  );
-}
 
 function CalculatorIcon() {
   return (
@@ -90,9 +83,20 @@ export function NavigationMenu({ locale }: { locale: Locale }) {
         aria-controls={menuId}
         aria-haspopup="dialog"
         className="navigation-trigger inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus"
-        onClick={() => {
+        onClick={(event) => {
+          const menu = menuRef.current;
+          if (!menu) return;
           setCurrentHref(getCurrentHref(locale));
-          menuRef.current?.showModal();
+          menu.showModal();
+          // The trigger sits in the centered page frame while the dialog hugs
+          // the viewport edge; place the close button exactly over the trigger
+          // so the icon morphs in place, but never outside the panel on very
+          // wide screens.
+          const trigger = event.currentTarget.getBoundingClientRect();
+          const dialog = menu.getBoundingClientRect();
+          const end = Math.min(dialog.right - trigger.right, dialog.width - trigger.width - 16);
+          menu.style.setProperty("--trigger-end", `${Math.max(0, end)}px`);
+          menu.style.setProperty("--trigger-top", `${trigger.top - dialog.top}px`);
           setMenuOpen(true);
         }}
       >
@@ -113,8 +117,7 @@ export function NavigationMenu({ locale }: { locale: Locale }) {
         <div className="flex min-h-full flex-col">
           {/* Keep the close button reachable while the cards scroll; the empty
               strip lets clicks through to the cards beneath it. */}
-          <div className="pointer-events-none sticky top-0 z-10 flex min-h-16 items-center justify-between gap-4 px-4 py-3 sm:min-h-[72px] sm:px-6">
-            <span aria-hidden="true" />
+          <div className="pointer-events-none sticky top-0 z-10 flex min-h-16 items-start justify-end pt-(--trigger-top) pe-(--trigger-end) sm:min-h-[72px]">
             <button type="button" aria-label={text.close} onClick={closeMenu} className="pointer-events-auto inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-border-focus">
               <MenuIcon />
             </button>
@@ -123,7 +126,7 @@ export function NavigationMenu({ locale }: { locale: Locale }) {
             {cards.map((card, index) => (
               <section key={card.title} aria-labelledby={`${menuId}-card-${index}`} style={{ "--i": index } as CSSProperties} className="navigation-card rounded-xl border border-border-default bg-container p-5 sm:p-6">
                 <div className="mb-8 flex items-start justify-between gap-4">
-                  <h3 id={`${menuId}-card-${index}`} className="text-[clamp(1.75rem,7vw,2.5rem)] leading-tight font-medium tracking-tight">{card.title}</h3>
+                  <h3 id={`${menuId}-card-${index}`} className="font-display text-heading-5 font-normal sm:text-heading-4">{card.title}</h3>
                   <span className="mt-1 text-tertiary-foreground">{card.icon}</span>
                 </div>
                 <ul>
