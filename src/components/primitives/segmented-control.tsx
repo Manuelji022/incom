@@ -72,7 +72,7 @@ function SegmentedControl<Value extends string = string>({
               required={required}
               className="peer sr-only"
             />
-            <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-transparent bg-component px-1 text-center text-sm font-medium text-primary-foreground group-hover/option:bg-component-hover peer-checked:bg-brand-solid peer-checked:text-on-brand-solid-foreground peer-checked:group-hover/option:bg-brand-solid-hover peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-border-focus peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
+            <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-transparent bg-component px-1 text-center text-sm font-medium text-primary-foreground group-hover/option:bg-component-hover peer-checked:bg-primary-foreground peer-checked:text-page peer-checked:group-hover/option:bg-primary-foreground/90 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-border-focus peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
               {option.label}
             </span>
           </label>
