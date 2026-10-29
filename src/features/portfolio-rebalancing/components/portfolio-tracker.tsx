@@ -348,13 +348,11 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
       </form> : null}
 
       {funds.length === 0 ? <TableEmpty>{copy.empty}</TableEmpty> : <>
-        <p id="portfolio-scroll-hint" className="mb-2 text-sm text-secondary-foreground @min-[80rem]/portfolio:hidden">{copy.scrollHint}</p>
         <DataTable
           table={table}
           id="portfolio"
-          label={locale === "es" ? "Tabla de cartera; desplázate horizontalmente para ver todas las columnas" : "Portfolio table; scroll horizontally to see all columns"}
+          label={locale === "es" ? "Tabla de cartera" : "Portfolio table"}
           caption={locale === "es" ? "Cartera de fondos y objetivos de asignación" : "Fund portfolio and target allocations"}
-          describedBy="portfolio-scroll-hint"
           className="max-h-[70dvh]"
           tableClassName="min-w-[64rem]"
           headerLabel={(id) => groupLabels[id]}

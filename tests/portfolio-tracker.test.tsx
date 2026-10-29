@@ -43,7 +43,6 @@ describe("portfolio tracker interactions", () => {
     expect(screen.queryByRole("button", { name: "Show allocation" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Hide allocation" })).toBeNull();
     expect(distribution.querySelectorAll("li")).toHaveLength(3);
-    expect(screen.getByText("Scroll horizontally to see all columns.")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Portfolio allocation" })).toBeTruthy();
   });
 
