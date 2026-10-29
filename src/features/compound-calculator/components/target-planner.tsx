@@ -160,7 +160,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
   }
   return <main id={active ? "main-content" : undefined} hidden={!active} tabIndex={-1} className={`grid flex-1 grid-cols-1 ${collapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)]"} ${className}`}>
       <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name && !target.name.endsWith("-display")) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-strong bg-page lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""}`}>
-        <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle p-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
+        <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle px-5 py-4 sm:px-8 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
           <h1 className={`text-base font-semibold ${collapsed ? "lg:hidden" : ""}`}>{t.title}</h1>
           <Button
             type="button"
@@ -177,17 +177,17 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
           </Button>
           <p className={`col-span-2 text-sm leading-5 text-secondary-foreground ${collapsed ? "lg:hidden" : ""}`}>{t.intro}</p>
         </header>
-        <fieldset id="target-planner-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`space-y-5 p-4 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
+        <fieldset id="target-planner-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`space-y-8 px-5 py-6 sm:space-y-10 sm:p-8 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
           <SidebarGroup as="h2" title={text.sidebar.startingPoint} className="space-y-5">
           <Field><FieldLabel htmlFor="target-currency">{text.sidebar.currency}</FieldLabel><Select id="target-currency" value={currency} onChange={(event) => { if (isCurrency(event.currentTarget.value)) setCurrency(event.currentTarget.value); }} aria-describedby="target-currency-help">{currencies.map((value) => <option key={value} value={value}>{value} ({getCurrencySymbol(value)})</option>)}</Select><FieldDescription id="target-currency-help">{t.currencyHelp}</FieldDescription></Field>
           <NumericField id="target-target_amount" name="target_amount" label={`${t.target} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.target_amount} onChange={(event) => update("target_amount", event.currentTarget.value)} error={errorFor("target_amount")} />
           {select("target_basis", t.basis, [{ value: "nominal", label: t.nominal }, { value: "real", label: t.real }], t.basisHelp)}
           <NumericField id="target-initial_principal" name="initial_principal" label={`${text.sidebar.initial} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.initial_principal} onChange={(event) => update("initial_principal", event.currentTarget.value)} error={errorFor("initial_principal")} />
           </SidebarGroup>
-          <SidebarGroup as="h2" title={text.sidebar.assumptions} className="space-y-5 border-t border-border-subtle pt-4">
+          <SidebarGroup as="h2" title={text.sidebar.assumptions} className="space-y-5 border-t border-border-subtle pt-8 sm:pt-10">
           <ProjectionSliderFields text={text.sidebar} locale={locale} initialValues={values} idPrefix="target" errors={Object.fromEntries(errors.map((error) => [error.field, error.reason]))} onValueChange={update} />
           </SidebarGroup>
-          <SidebarGroup as="h2" title={text.sidebar.contributions} className="space-y-5 border-t border-border-subtle pt-4">
+          <SidebarGroup as="h2" title={text.sidebar.contributions} className="space-y-5 border-t border-border-subtle pt-8 sm:pt-10">
           <SegmentedControl
             label={text.sidebar.frequency}
             name="contribution_plan.frequency"
@@ -202,7 +202,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
           />
           {errorFor("contribution_plan.frequency") ? <p id="target-contribution_plan-frequency-error" className="text-sm text-danger-foreground">{errorFor("contribution_plan.frequency")}</p> : null}
           </SidebarGroup>
-          <section className="border-t border-border-subtle pt-4">
+          <section className="border-t border-border-subtle pt-8 sm:pt-10">
             <button
               type="button"
               aria-expanded={advanced}

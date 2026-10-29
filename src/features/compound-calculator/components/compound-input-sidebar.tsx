@@ -124,7 +124,7 @@ export function CompoundInputSidebar({
       }}
       className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-strong bg-page lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
     >
-      <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle px-4 py-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
+      <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle px-5 py-4 sm:px-8 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
         <h2 id="compound-input-sidebar-title" className={`text-base font-semibold leading-6 text-primary-foreground ${collapsed ? "lg:hidden" : ""}`}>
           {text.title}
         </h2>
@@ -146,8 +146,8 @@ export function CompoundInputSidebar({
         </p>
       </header>
 
-      <fieldset id="compound-input-sidebar-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`m-0 min-h-0 min-w-0 flex-1 border-0 px-4 py-5 disabled:opacity-100 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
-        <div className="space-y-6">
+      <fieldset id="compound-input-sidebar-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`m-0 min-h-0 min-w-0 flex-1 border-0 px-5 py-6 sm:p-8 disabled:opacity-100 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
+        <div className="space-y-8 sm:space-y-10">
           <SidebarGroup title={text.startingPoint} className="space-y-4">
             <FieldGroup className="gap-4">
               <div className="flex flex-col gap-2.5">
@@ -182,7 +182,7 @@ export function CompoundInputSidebar({
             </FieldGroup>
           </SidebarGroup>
 
-          <SidebarGroup title={text.contributions} className="space-y-4 border-t border-border-subtle pt-5">
+          <SidebarGroup title={text.contributions} className="space-y-4 border-t border-border-subtle pt-8 sm:pt-10">
             <FieldGroup className="gap-4">
               <NumericField
                 id="recurring-contribution-amount"
@@ -215,19 +215,19 @@ export function CompoundInputSidebar({
             </FieldGroup>
           </SidebarGroup>
 
-          <SidebarGroup title={text.assumptions} className="space-y-4 border-t border-border-subtle pt-5">
+          <SidebarGroup title={text.assumptions} className="space-y-4 border-t border-border-subtle pt-8 sm:pt-10">
             <FieldGroup className="gap-4">
               <ProjectionSliderFields text={text} locale={locale} initialValues={initialValues} />
             </FieldGroup>
           </SidebarGroup>
 
-          <div className="pt-6">
+          <div>
             <Button type="submit" disabled={submitting || collapsed} className="min-h-12 w-full lg:min-h-10">
               {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 motion-safe:animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
             </Button>
           </div>
 
-          <section className="border-t border-border-subtle pt-5">
+          <section className="border-t border-border-subtle pt-8 sm:pt-10">
             <button
               type="button"
               aria-expanded={advancedOpen}
