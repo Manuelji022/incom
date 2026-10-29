@@ -78,24 +78,33 @@ export function Scenarios({
             );
             const returnLabel = text.return.replace("{percent}", annualReturn);
 
+            const isExpected = scenario.name === "expected";
+            const isSelected = scenario.name === selectedScenario;
+            const [nominalPrefix = "", nominalSuffix = ""] =
+              text.nominal.split("{amount}");
+
             return (
               <li key={scenario.name}>
                 <button
                   type="button"
                   aria-label={`${scenarioLabels[scenario.name]} · ${returnLabel} · ${text.nominal.replace("{amount}", nominalBalance)} · ${text.real.replace("{amount}", realBalance)}`}
-                  aria-pressed={scenario.name === selectedScenario}
+                  aria-pressed={isSelected}
                   onClick={() => onSelectScenario(scenario.name)}
-                  className={`flex min-h-16 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border px-3 py-2 text-start transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus sm:flex-col sm:items-start sm:justify-start ${
-                    scenario.name === selectedScenario
+                  className={`flex h-full w-full cursor-pointer flex-col items-start justify-between gap-2 rounded-lg border px-3 py-3 text-start transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-border-focus ${
+                    isExpected
+                      ? "shadow-[inset_0_-3px_0_var(--brand-border-default)]"
+                      : ""
+                  } ${
+                    isSelected
                       ? "border-2 border-brand-border-default bg-brand-subtle"
                       : "border-border-default bg-card hover:bg-component-hover"
                   }`}
                 >
-                  <span className="min-w-0 sm:w-full">
+                  <span className="min-w-0 max-w-full">
                     <span className="flex items-center gap-1.5 text-xs font-semibold leading-4 text-primary-foreground">
                       <span
                         aria-hidden="true"
-                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${scenario.name === selectedScenario ? "border-brand-border-default bg-brand-foreground text-page" : "border-control-border bg-page text-transparent"}`}
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${isSelected ? "border-brand-border-default bg-brand-foreground text-page" : "border-control-border bg-page text-transparent"}`}
                       >
                         <svg viewBox="0 0 12 12" className="h-2.5 w-2.5" fill="none">
                           <path d="m2.5 6 2.2 2.2L9.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -108,9 +117,21 @@ export function Scenarios({
                     </span>
                   </span>
 
-                  <span className="min-w-0 text-end tabular-nums sm:w-full sm:text-start">
-                    <span className="block text-xs font-semibold leading-4 text-primary-foreground [overflow-wrap:anywhere]">
-                      {text.nominal.replace("{amount}", nominalBalance)}
+                  <span className="min-w-0 max-w-full tabular-nums">
+                    <span
+                      className={`block font-display leading-tight [overflow-wrap:anywhere] ${
+                        isExpected
+                          ? "text-3xl font-medium text-brand-foreground sm:text-2xl xl:text-3xl"
+                          : "text-xl text-secondary-foreground"
+                      }`}
+                    >
+                      {nominalPrefix.trim() ? (
+                        <span className="mr-1.5 font-sans text-xs font-normal">
+                          {nominalPrefix.trim()}
+                        </span>
+                      ) : null}
+                      {nominalBalance}
+                      {nominalSuffix.trim() ? ` ${nominalSuffix.trim()}` : ""}
                     </span>
                     <span className="block text-xs leading-4 text-secondary-foreground [overflow-wrap:anywhere]">
                       {text.real.replace("{amount}", realBalance)}

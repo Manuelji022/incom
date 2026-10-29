@@ -15,7 +15,6 @@ type ProjectionChartProps = {
     reload: string;
     title: string;
     scenario: string;
-    legend: string;
     disclaimer: string;
     growth: string;
     balance: string;
@@ -86,36 +85,6 @@ export function ProjectionChart({
       <div className="rounded-sm border border-border-subtle bg-card p-2 sm:p-3">
         <ProjectionChartCanvas points={points} locale={locale} currency={currency} text={text} />
       </div>
-      <ul
-        aria-label={text.legend}
-        className="mx-auto mt-3 grid max-w-2xl grid-cols-2 gap-x-4 gap-y-3 text-xs text-secondary-foreground sm:grid-cols-4 sm:gap-x-5"
-      >
-        <li className="flex items-center gap-2">
-          <span
-            aria-hidden="true"
-            className="h-3 w-3 shrink-0 rounded-sm border border-brand-border-default bg-brand-subtle-hover"
-          />
-          {text.growth}
-        </li>
-        <li className="flex items-center gap-2">
-          <span aria-hidden="true" className="h-0 w-5 shrink-0 border-t-[3px] border-chart-balance" />
-          {text.balance}
-        </li>
-        <li className="flex items-center gap-2">
-          <span
-            aria-hidden="true"
-            className="w-5 shrink-0 border-t-2 border-dotted border-tertiary-foreground"
-          />
-          {text.invested}
-        </li>
-        <li className="flex items-center gap-2">
-          <span
-            aria-hidden="true"
-            className="w-5 shrink-0 border-t-2 border-dashed border-secondary-foreground"
-          />
-          {text.today}
-        </li>
-      </ul>
       <p className="mx-auto mt-4 max-w-2xl text-xs leading-5 text-secondary-foreground">
         {text.disclaimer}
       </p>
