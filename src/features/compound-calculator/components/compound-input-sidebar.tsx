@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentProps } from "react";
+import { useId, useState, type ComponentProps, type ReactNode } from "react";
 
 import { usePresence } from "@/hooks/use-presence";
 
@@ -45,6 +45,28 @@ const contributionTimings: { value: ContributionTiming; label: string }[] = [
   { value: "beginning", label: "Beginning" },
   { value: "end", label: "End of period" },
 ];
+
+export function SidebarGroup({
+  title,
+  as: Heading = "h3",
+  className = "",
+  children,
+}: {
+  title: string;
+  as?: "h2" | "h3";
+  className?: string;
+  children: ReactNode;
+}) {
+  const titleId = useId();
+  return (
+    <section aria-labelledby={titleId} className={className}>
+      <Heading id={titleId} className="text-xs font-medium uppercase leading-5 tracking-[0.08em] text-secondary-foreground">
+        {title}
+      </Heading>
+      {children}
+    </section>
+  );
+}
 
 export function CompoundInputSidebar({
   className = "",
@@ -126,16 +148,7 @@ export function CompoundInputSidebar({
 
       <fieldset id="compound-input-sidebar-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`m-0 min-h-0 min-w-0 flex-1 border-0 px-4 py-5 disabled:opacity-100 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
         <div className="space-y-6">
-          <section
-            aria-labelledby="contribution-fields-title"
-            className="space-y-4"
-          >
-            <h3
-              id="contribution-fields-title"
-              className="text-sm font-semibold leading-5 text-primary-foreground"
-            >
-              {text.contributions}
-            </h3>
+          <SidebarGroup title={text.startingPoint} className="space-y-4">
             <FieldGroup className="gap-4">
               <div className="flex flex-col gap-2.5">
                 <label htmlFor="display-currency" className="text-sm font-medium leading-5 text-primary-foreground">
@@ -166,6 +179,11 @@ export function CompoundInputSidebar({
                 step="0.01"
                 required
               />
+            </FieldGroup>
+          </SidebarGroup>
+
+          <SidebarGroup title={text.contributions} className="space-y-4 border-t border-border-subtle pt-5">
+            <FieldGroup className="gap-4">
               <NumericField
                 id="recurring-contribution-amount"
                 name="recurring_contribution.amount"
@@ -195,22 +213,13 @@ export function CompoundInputSidebar({
               /> : null}
 
             </FieldGroup>
-          </section>
+          </SidebarGroup>
 
-          <section
-            aria-labelledby="projection-fields-title"
-            className="space-y-4 border-t border-border-subtle pt-5"
-          >
-            <h3
-              id="projection-fields-title"
-              className="text-sm font-semibold leading-5 text-primary-foreground"
-            >
-              {text.projection}
-            </h3>
+          <SidebarGroup title={text.assumptions} className="space-y-4 border-t border-border-subtle pt-5">
             <FieldGroup className="gap-4">
               <ProjectionSliderFields text={text} locale={locale} initialValues={initialValues} />
             </FieldGroup>
-          </section>
+          </SidebarGroup>
 
           <div className="pt-6">
             <Button type="submit" disabled={submitting || collapsed} className="min-h-12 w-full lg:min-h-10">

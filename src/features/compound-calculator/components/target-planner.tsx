@@ -16,6 +16,7 @@ import type { getTargetText } from "@/features/compound-calculator/lib/target-i1
 import type { Locale } from "@/lib/locales";
 import type { ProblemDetail, TargetResponse } from "@/features/compound-calculator/types/compound-interest-target";
 import { ProjectionSliderFields, ScenarioRangeField } from "@/features/compound-calculator/components/slider-fields";
+import { SidebarGroup } from "@/features/compound-calculator/components/compound-input-sidebar";
 import { mockTarget } from "@/features/compound-calculator/lib/mock-target";
 import { usePresence } from "@/hooks/use-presence";
 
@@ -177,11 +178,16 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
           <p className={`col-span-2 text-sm leading-5 text-secondary-foreground ${collapsed ? "lg:hidden" : ""}`}>{t.intro}</p>
         </header>
         <fieldset id="target-planner-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`space-y-5 p-4 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
+          <SidebarGroup as="h2" title={text.sidebar.startingPoint} className="space-y-5">
           <Field><FieldLabel htmlFor="target-currency">{text.sidebar.currency}</FieldLabel><Select id="target-currency" value={currency} onChange={(event) => { if (isCurrency(event.currentTarget.value)) setCurrency(event.currentTarget.value); }} aria-describedby="target-currency-help">{currencies.map((value) => <option key={value} value={value}>{value} ({getCurrencySymbol(value)})</option>)}</Select><FieldDescription id="target-currency-help">{t.currencyHelp}</FieldDescription></Field>
           <NumericField id="target-target_amount" name="target_amount" label={`${t.target} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.target_amount} onChange={(event) => update("target_amount", event.currentTarget.value)} error={errorFor("target_amount")} />
           {select("target_basis", t.basis, [{ value: "nominal", label: t.nominal }, { value: "real", label: t.real }], t.basisHelp)}
           <NumericField id="target-initial_principal" name="initial_principal" label={`${text.sidebar.initial} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.initial_principal} onChange={(event) => update("initial_principal", event.currentTarget.value)} error={errorFor("initial_principal")} />
+          </SidebarGroup>
+          <SidebarGroup as="h2" title={text.sidebar.assumptions} className="space-y-5 border-t border-border-subtle pt-4">
           <ProjectionSliderFields text={text.sidebar} locale={locale} initialValues={values} idPrefix="target" errors={Object.fromEntries(errors.map((error) => [error.field, error.reason]))} onValueChange={update} />
+          </SidebarGroup>
+          <SidebarGroup as="h2" title={text.sidebar.contributions} className="space-y-5 border-t border-border-subtle pt-4">
           <SegmentedControl
             label={text.sidebar.frequency}
             name="contribution_plan.frequency"
@@ -195,6 +201,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
             aria-describedby={errorFor("contribution_plan.frequency") ? "target-contribution_plan-frequency-error" : undefined}
           />
           {errorFor("contribution_plan.frequency") ? <p id="target-contribution_plan-frequency-error" className="text-sm text-danger-foreground">{errorFor("contribution_plan.frequency")}</p> : null}
+          </SidebarGroup>
           <section className="border-t border-border-subtle pt-4">
             <button
               type="button"
