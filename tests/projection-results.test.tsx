@@ -62,10 +62,12 @@ describe("projection results", () => {
     expect(screen.getByTestId("projection-chart").textContent).toContain(dictionary.scenarios.low);
     const selectedScenarioButton = screen.getByRole("button", { name: new RegExp(dictionary.scenarios.low) });
     expect(selectedScenarioButton.getAttribute("aria-pressed")).toBe("true");
-    expect(selectedScenarioButton.className).toContain("sm:flex-col");
-    expect(selectedScenarioButton.className).toContain("sm:items-start");
-    expect(selectedScenarioButton.className).toContain("items-center");
-    expect(selectedScenarioButton.className).toContain("justify-between");
+    expect(selectedScenarioButton.className).toContain("flex-col");
+    expect(selectedScenarioButton.className).toContain("items-start");
+    const expectedButton = screen.getByRole("button", { name: new RegExp(dictionary.scenarios.expected) });
+    expect(expectedButton.className).toContain("inset_0_-3px_0");
+    expect(expectedButton.querySelector(".text-brand-foreground")).toBeTruthy();
+    expect(selectedScenarioButton.querySelector(".text-brand-foreground")).toBeNull();
     const scenarioList = screen.getByRole("list", { name: dictionary.scenarios.listLabel });
     expect(scenarioList.className).toContain("grid-cols-1");
     expect(scenarioList.className).toContain("sm:grid-cols-3");
