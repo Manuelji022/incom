@@ -3,7 +3,7 @@ import "./globals.css";
 import { NotFoundScreen } from "@/components/not-found-screen";
 
 export const metadata: Metadata = {
-  title: "404 | Incom",
+  title: "404 | Olive Capital",
   description: "The page you’re looking for could not be found.",
 };
 

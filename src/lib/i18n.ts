@@ -4,7 +4,7 @@ import { type Locale } from "@/lib/locales";
 const dictionaries = {
   en: {
     metadata: {
-      title: "Incom",
+      title: "Olive Capital",
       description: "Investment projections made clear.",
     },
     footer: "Designed by",
@@ -191,7 +191,7 @@ const dictionaries = {
   },
   es: {
     metadata: {
-      title: "Incom",
+      title: "Olive Capital",
       description: "Proyecciones de inversión con claridad.",
     },
     footer: "Diseñado por",
