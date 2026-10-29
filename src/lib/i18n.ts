@@ -63,6 +63,7 @@ const dictionaries = {
     header: {
       portfolio: "Portfolio value",
       unavailable: "Unavailable",
+      headline: "{initial} today could become",
       projected: "Projected value in {duration}",
     },
     unavailable:
@@ -249,6 +250,7 @@ const dictionaries = {
     header: {
       portfolio: "Valor de la cartera",
       unavailable: "No disponible",
+      headline: "{initial} hoy podrían convertirse en",
       projected: "Valor proyectado dentro de {duration}",
     },
     unavailable:
