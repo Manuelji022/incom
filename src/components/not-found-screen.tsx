@@ -96,7 +96,7 @@ export function NotFoundScreen({
           >
             404
           </span>
-          <h1 className="mt-8 text-heading-3 font-semibold tracking-[-0.04em] sm:text-heading-2">
+          <h1 className="mt-8 font-display text-heading-3 font-normal sm:text-heading-2">
             {text.title}
           </h1>
           <p className="mt-4 max-w-lg text-body-sm text-secondary-foreground sm:text-body">

@@ -126,7 +126,7 @@ export function NavigationMenu({ locale }: { locale: Locale }) {
             {cards.map((card, index) => (
               <section key={card.title} aria-labelledby={`${menuId}-card-${index}`} style={{ "--i": index } as CSSProperties} className="navigation-card rounded-xl border border-border-default bg-container p-5 sm:p-6">
                 <div className="mb-8 flex items-start justify-between gap-4">
-                  <h3 id={`${menuId}-card-${index}`} className="text-[clamp(1.75rem,7vw,2.5rem)] leading-tight font-medium tracking-tight">{card.title}</h3>
+                  <h3 id={`${menuId}-card-${index}`} className="font-display text-heading-5 font-normal sm:text-heading-4">{card.title}</h3>
                   <span className="mt-1 text-tertiary-foreground">{card.icon}</span>
                 </div>
                 <ul>
