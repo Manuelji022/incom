@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-table";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { PageShell } from "@/components/page-shell";
 import { DataTable, type DataTableColumnMeta } from "@/components/data-table";
 import { Button } from "@/components/primitives/button";
 import { DecimalInput } from "@/components/primitives/decimal-input";
@@ -323,7 +324,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
   const remainder = Math.abs(computed.targetDifferenceBps / 100);
   const differenceDirection = computed.targetDifferenceBps > 0 ? copy.below : copy.above;
 
-  return <div className="flex min-h-svh flex-col bg-page text-primary-foreground">
+  return <PageShell>
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={false} staleText="" onBeforeLanguageChange={() => ({ status: "saved" })} submitting={false} languageHandoffText={{ pending: "", storage: "" }} />
     <main id="main-content" tabIndex={-1} className="@container/portfolio w-full min-w-0 flex-1 px-4 py-8 focus-visible:outline-none">
       <header className="mb-7">
@@ -392,5 +393,5 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
       {deleted ? <p role="status" className="mt-3 flex items-center gap-2 text-sm">{fundLabel(deleted)} <Button onClick={() => { setFunds((current) => [...current, deleted]); setDeleted(null); }} size="xs" variant="outline">{copy.undo}</Button></p> : null}
     </main>
     <Footer label={locale === "es" ? "Diseñado por" : "Designed by"} />
-  </div>;
+  </PageShell>;
 }

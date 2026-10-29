@@ -1,4 +1,5 @@
 import { Footer } from "@/components/footer";
+import { PageShell } from "@/components/page-shell";
 import { ProjectionScenarioView } from "@/features/compound-calculator";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/i18n";
@@ -10,7 +11,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   if (!hasLocale(lang)) notFound();
   const text = getDictionary(lang);
   return (
-    <div className="flex min-h-svh flex-col bg-page">
+    <PageShell>
       <ProjectionScenarioView
         locale={lang}
         languageLabel={text.language}
@@ -37,6 +38,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         dictionary={text}
       />
       <Footer label={text.footer} />
-    </div>
+    </PageShell>
   );
 }
