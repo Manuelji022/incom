@@ -221,12 +221,6 @@ export function CompoundInputSidebar({
             </FieldGroup>
           </SidebarGroup>
 
-          <div>
-            <Button type="submit" disabled={submitting || collapsed} className="min-h-12 w-full lg:min-h-10">
-              {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 motion-safe:animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
-            </Button>
-          </div>
-
           <section className="border-t border-border-subtle pt-8 sm:pt-10">
             <button
               type="button"
@@ -310,6 +304,12 @@ export function CompoundInputSidebar({
           </section>
             </div>
           </section>
+
+          <div>
+            <Button type="submit" disabled={submitting || collapsed} className="min-h-12 w-full lg:min-h-10">
+              {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 motion-safe:animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
+            </Button>
+          </div>
         </div>
       </fieldset>
     </aside>

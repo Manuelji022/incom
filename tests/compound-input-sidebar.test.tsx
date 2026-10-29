@@ -62,7 +62,8 @@ describe("compound input sidebar", () => {
     expect(advancedFields?.hasAttribute("hidden")).toBe(true);
 
     const calculate = screen.getByRole("button", { name: text.calculate });
-    expect(calculate.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(calculate.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    expect(advancedFields && calculate.compareDocumentPosition(advancedFields) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
 
     fireEvent.click(toggle);
     expect(screen.getByRole("button", { name: text.closeAssumptions }).getAttribute("aria-expanded")).toBe("true");
