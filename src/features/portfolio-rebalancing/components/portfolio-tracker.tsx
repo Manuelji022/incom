@@ -326,7 +326,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
   return <div className="flex min-h-svh flex-col bg-page text-primary-foreground">
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={false} staleText="" onBeforeLanguageChange={() => ({ status: "saved" })} submitting={false} languageHandoffText={{ pending: "", storage: "" }} />
     <main id="main-content" tabIndex={-1} className="@container/portfolio mx-auto w-full max-w-[1600px] min-w-0 flex-1 px-4 py-8 focus-visible:outline-none sm:px-6 lg:px-8">
-      <header className="mb-7 border-b border-border-subtle pb-5">
+      <header className="mb-7 pb-5">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{copy.title}</h1>
       </header>
 
