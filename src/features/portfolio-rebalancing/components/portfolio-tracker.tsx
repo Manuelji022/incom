@@ -326,7 +326,7 @@ export function PortfolioTracker({ locale, copy, languageLabel, themeLabel }: { 
 
   return <PageShell>
     <Header locale={locale} languageLabel={languageLabel} themeLabel={themeLabel} stale={false} staleText="" onBeforeLanguageChange={() => ({ status: "saved" })} submitting={false} languageHandoffText={{ pending: "", storage: "" }} />
-    <main id="main-content" tabIndex={-1} className="@container/portfolio w-full min-w-0 flex-1 px-4 py-8 focus-visible:outline-none">
+    <main id="main-content" tabIndex={-1} className="@container/portfolio w-full min-w-0 flex-1 px-5 py-8 focus-visible:outline-none sm:px-8">
       <header className="mb-7">
         <h1 className="font-display text-heading-6 font-normal sm:text-heading-5">{copy.title}</h1>
       </header>

@@ -83,7 +83,7 @@ export function NotFoundScreen({
       />
 
       <main
-        className="grid w-full flex-1 items-center gap-12 px-4 py-12 md:py-16 lg:grid-cols-[1fr_0.95fr] lg:gap-20"
+        className="grid w-full flex-1 items-center gap-12 px-5 py-12 sm:px-8 md:py-16 lg:grid-cols-[1fr_0.95fr] lg:gap-20"
         id="main-content"
         tabIndex={-1}
       >
