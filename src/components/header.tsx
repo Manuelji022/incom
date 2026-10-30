@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NavigationMenu } from "@/components/navigation-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -31,10 +32,10 @@ export function Header({
   return (
     <header className="sticky top-0 z-40 grid min-h-16 w-full grid-cols-[1fr_auto] items-center gap-3 border-b border-border-strong bg-page px-4 py-3 text-primary-foreground sm:min-h-[72px] sm:grid-cols-[1fr_auto_1fr]">
       <Link
-        className="rounded-xs font-display text-[1.625rem] leading-none font-normal tracking-[-0.01em] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-border-focus"
+        className="justify-self-start rounded-xs focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-border-focus"
         href={`/${locale}`}
       >
-        Olive Capital
+        <BrandLogo />
       </Link>
       {stale ? (
         <p
