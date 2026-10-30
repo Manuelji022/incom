@@ -30,7 +30,7 @@ export function Header({
   languageHandoffText,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-40 grid min-h-16 w-full grid-cols-[1fr_auto] items-center gap-3 border-b border-border-strong bg-page px-4 py-3 text-primary-foreground sm:min-h-[72px] sm:grid-cols-[1fr_auto_1fr]">
+    <header className="sticky top-0 z-40 grid min-h-16 w-full grid-cols-[1fr_auto] items-center gap-3 border-b border-border-strong bg-page px-5 py-3 text-primary-foreground sm:px-8 sm:min-h-[72px] sm:grid-cols-[1fr_auto_1fr]">
       <Link
         className="justify-self-start rounded-xs focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-border-focus"
         href={`/${locale}`}
