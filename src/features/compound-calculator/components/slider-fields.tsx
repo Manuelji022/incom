@@ -60,13 +60,36 @@ export function SliderField({
 
   return (
     <Field invalid={!!error}>
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-          <FieldLabel id={labelId} htmlFor={id}>
-            {label}
-          </FieldLabel>
+      <FieldLabel id={labelId} htmlFor={id}>
+        {label}
+      </FieldLabel>
+      <div className="flex items-start gap-4">
+        <div className="min-w-0 flex-1">
+          <Slider
+            id={`${id}-slider`}
+            aria-label={`${label} (${unit})`}
+            aria-labelledby={labelId}
+            aria-describedby={describedBy}
+            min={min}
+            max={max}
+            step={step}
+            value={value}
+            onValueChange={(next) => {
+              setValue(next);
+              setDraft(String(next));
+              onValueChange?.(name, String(next));
+              const field = document.getElementById(id);
+              if (field instanceof HTMLInputElement) clearFieldValidation(field);
+            }}
+            aria-valuetext={valueText ? valueText(value) : undefined}
+            className="h-10 w-full"
+          />
+          <div aria-hidden="true" className="flex justify-between text-xs tabular-nums text-tertiary-foreground">
+            <span>{min}</span>
+            <span>{max}</span>
+          </div>
         </div>
-        <div className="relative w-28 shrink-0">
+        <div className="relative w-[6.5rem] shrink-0">
           <DecimalInput
             id={id}
             name={name}
@@ -99,29 +122,6 @@ export function SliderField({
             {unit}
           </span>
         </div>
-      </div>
-      <Slider
-        id={`${id}-slider`}
-        aria-label={`${label} (${unit})`}
-        aria-labelledby={labelId}
-        aria-describedby={describedBy}
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onValueChange={(next) => {
-          setValue(next);
-          setDraft(String(next));
-          onValueChange?.(name, String(next));
-          const field = document.getElementById(id);
-          if (field instanceof HTMLInputElement) clearFieldValidation(field);
-        }}
-        aria-valuetext={valueText ? valueText(value) : undefined}
-        className="mt-2 w-full"
-      />
-      <div className="flex justify-between text-xs text-tertiary-foreground">
-        <span>{min}</span>
-        <span>{max}</span>
       </div>
       {description ? (
         <FieldDescription id={descriptionId}>{description}</FieldDescription>
@@ -193,9 +193,32 @@ export function ScenarioRangeField({
 
   return (
     <Field invalid={!!error}>
-      <div className="flex items-center justify-between gap-3">
-        <FieldLabel id={labelId} htmlFor={controlId}>{label}</FieldLabel>
-        <div className="relative w-28 shrink-0">
+      <FieldLabel id={labelId} htmlFor={controlId}>{label}</FieldLabel>
+      <div className="flex items-center gap-4">
+        <Slider
+          id={`${controlId}-slider`}
+          aria-label={label}
+          min={0}
+          max={maxSpread}
+          step={step}
+          value={spread}
+          aria-valuetext={text.rangePreview
+            .replace("{low}", format(expectedReturn - spread))
+            .replace("{expected}", format(expectedReturn))
+            .replace("{high}", format(expectedReturn + spread))}
+          aria-describedby={[descriptionId, errorId].filter(Boolean).join(" ") || undefined}
+          aria-invalid={!!error}
+          onValueChange={(next) => {
+            const nextSpread = Number(next.toFixed(6));
+            setSpread(nextSpread);
+            setDraft(String(nextSpread));
+            onValueChange?.(name, String(nextSpread));
+            const field = document.getElementById(controlId);
+            if (field instanceof HTMLInputElement) clearFieldValidation(field);
+          }}
+          className="h-10 min-w-0 flex-1"
+        />
+        <div className="relative w-[6.5rem] shrink-0">
           <DecimalInput
             id={controlId}
             name={name}
@@ -217,49 +240,22 @@ export function ScenarioRangeField({
           <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-tertiary-foreground">pp</span>
         </div>
       </div>
-      <div className="mt-2 grid gap-2">
-        <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-2">
-          <label htmlFor={`${controlId}-slider`} className="text-xs text-tertiary-foreground">{text.lowShort} / {text.highShort}</label>
-          <Slider
-            id={`${controlId}-slider`}
-            aria-label={label}
-            min={0}
-            max={maxSpread}
-            step={step}
-            value={spread}
-            aria-valuetext={text.rangePreview
-              .replace("{low}", format(expectedReturn - spread))
-              .replace("{expected}", format(expectedReturn))
-              .replace("{high}", format(expectedReturn + spread))}
-            aria-describedby={[descriptionId, errorId].filter(Boolean).join(" ") || undefined}
-            aria-invalid={!!error}
-            onValueChange={(next) => {
-              const nextSpread = Number(next.toFixed(6));
-              setSpread(nextSpread);
-              setDraft(String(nextSpread));
-              onValueChange?.(name, String(nextSpread));
-              const field = document.getElementById(controlId);
-              if (field instanceof HTMLInputElement) clearFieldValidation(field);
-            }}
-          />
-        </div>
-      </div>
-      <div className="grid grid-cols-3 text-xs tabular-nums text-tertiary-foreground">
+      <div className="grid grid-cols-3 rounded-md bg-component px-3 py-2 text-xs tabular-nums text-secondary-foreground">
         <span className="text-start">
-          {text.lowShort}{" "}
-          <strong className="font-medium text-secondary-foreground">
+          {text.lowShort}
+          <strong className="block text-sm font-medium text-primary-foreground">
             {format(expectedReturn - spread)}
           </strong>
         </span>
         <span className="text-center">
-          {text.expectedShort}{" "}
-          <strong className="font-medium text-secondary-foreground">
+          {text.expectedShort}
+          <strong className="block text-sm font-medium text-primary-foreground">
             {format(expectedReturn)}
           </strong>
         </span>
         <span className="text-end">
-          {text.highShort}{" "}
-          <strong className="font-medium text-secondary-foreground">
+          {text.highShort}
+          <strong className="block text-sm font-medium text-primary-foreground">
             {format(expectedReturn + spread)}
           </strong>
         </span>
@@ -319,39 +315,33 @@ export function ProjectionSliderFields({
         }
       />
       <Field>
-        <div className="flex items-center justify-between gap-3">
-          <FieldLabel
-            className="min-w-0 flex-1"
-            id={returnLabelId}
-            htmlFor={returnId}
+        <FieldLabel id={returnLabelId} htmlFor={returnId}>
+          {text.return}
+        </FieldLabel>
+        <div className="relative">
+          <DecimalInput
+            id={returnId}
+            name="expected_annual_return_percent"
+            value={returnDraft}
+            step="0.1"
+            required
+            aria-label={`${text.return} (%)`}
+            min="-100"
+            max="100"
+            aria-describedby={[returnDescriptionId, errors.expected_annual_return_percent ? `${returnId}-error` : ""].filter(Boolean).join(" ") || undefined}
+            aria-invalid={!!errors.expected_annual_return_percent}
+            onChange={(event) => {
+              const draft = event.currentTarget.value;
+              setReturnDraft(draft);
+            }}
+            className="pe-14 tabular-nums"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-tertiary-foreground"
           >
-            {text.return}
-          </FieldLabel>
-          <div className="relative w-28 shrink-0">
-            <DecimalInput
-              id={returnId}
-              name="expected_annual_return_percent"
-              value={returnDraft}
-              step="0.1"
-              required
-              aria-label={`${text.return} (%)`}
-              min="-100"
-              max="100"
-              aria-describedby={[returnDescriptionId, errors.expected_annual_return_percent ? `${returnId}-error` : ""].filter(Boolean).join(" ") || undefined}
-              aria-invalid={!!errors.expected_annual_return_percent}
-              onChange={(event) => {
-                const draft = event.currentTarget.value;
-                setReturnDraft(draft);
-              }}
-              className="pe-14 tabular-nums"
-            />
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-tertiary-foreground"
-            >
-              %
-            </span>
-          </div>
+            %
+          </span>
         </div>
         <FieldDescription id={returnDescriptionId}>
           {text.beforeFees}

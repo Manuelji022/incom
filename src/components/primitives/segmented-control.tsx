@@ -46,7 +46,7 @@ function SegmentedControl<Value extends string = string>({
       data-slot="segmented-control"
       className={`min-w-0 ${className}`.trim()}
     >
-      <legend className="mb-2.5 w-full text-sm font-medium leading-5 text-primary-foreground">
+      <legend className="mb-2 w-full text-sm font-medium leading-5 text-primary-foreground">
         <span className="flex items-center justify-between gap-3">
           <span>{label}</span>
           {optional ? (
@@ -56,7 +56,7 @@ function SegmentedControl<Value extends string = string>({
           ) : null}
         </span>
       </legend>
-      <div className="grid auto-cols-fr grid-flow-col gap-2">
+      <div className="grid auto-cols-fr grid-flow-col gap-1 rounded-lg border border-border-subtle bg-sunken p-1">
         {options.map((option) => (
           <label key={option.value} className="group/option relative min-w-0">
             <input
@@ -72,7 +72,7 @@ function SegmentedControl<Value extends string = string>({
               required={required}
               className="peer sr-only"
             />
-            <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-transparent bg-component px-1 text-center text-sm font-medium text-primary-foreground group-hover/option:bg-component-hover peer-checked:bg-primary-foreground peer-checked:text-page peer-checked:group-hover/option:bg-primary-foreground/90 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-border-focus peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
+            <span className="flex min-h-9 cursor-pointer items-center justify-center rounded-md px-1.5 text-center text-sm font-medium leading-tight text-secondary-foreground transition-colors group-hover/option:text-primary-foreground peer-checked:bg-container peer-checked:text-primary-foreground peer-checked:shadow-default peer-checked:ring-1 peer-checked:ring-border-default peer-focus-visible:outline-2 peer-focus-visible:outline-offset-1 peer-focus-visible:outline-brand-border-focus peer-disabled:cursor-not-allowed peer-disabled:opacity-50 forced-colors:peer-checked:outline forced-colors:peer-checked:outline-2">
               {option.label}
             </span>
           </label>
