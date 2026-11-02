@@ -184,10 +184,10 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
           {select("target_basis", t.basis, [{ value: "nominal", label: t.nominal }, { value: "real", label: t.real }], t.basisHelp)}
           <NumericField id="target-initial_principal" name="initial_principal" label={`${text.sidebar.initial} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.initial_principal} onChange={(event) => update("initial_principal", event.currentTarget.value)} error={errorFor("initial_principal")} />
           </SidebarGroup>
-          <SidebarGroup as="h2" title={text.sidebar.assumptions} className="space-y-5 border-t border-border-subtle pt-8 sm:pt-10">
+          <SidebarGroup as="h2" title={text.sidebar.assumptions} className="space-y-5">
           <ProjectionSliderFields text={text.sidebar} locale={locale} initialValues={values} idPrefix="target" errors={Object.fromEntries(errors.map((error) => [error.field, error.reason]))} onValueChange={update} />
           </SidebarGroup>
-          <SidebarGroup as="h2" title={text.sidebar.contributions} className="space-y-5 border-t border-border-subtle pt-8 sm:pt-10">
+          <SidebarGroup as="h2" title={text.sidebar.contributions} className="space-y-5">
           <SegmentedControl
             label={text.sidebar.frequency}
             name="contribution_plan.frequency"
