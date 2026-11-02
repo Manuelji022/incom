@@ -81,7 +81,7 @@ export function InvestmentSummary({
   return (
     <section
       aria-labelledby="investment-summary-title"
-      className="px-4 py-6 lg:px-3 lg:py-8"
+      className="results-pad py-6 lg:py-8"
     >
       <h2
         id="investment-summary-title"

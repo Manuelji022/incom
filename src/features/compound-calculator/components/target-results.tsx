@@ -29,7 +29,7 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
     ],
   ] as const;
   return <>
-    <section aria-labelledby="target-contributions-title" className="space-y-4 border-b border-border-strong p-4 sm:p-6">
+    <section aria-labelledby="target-contributions-title" className="space-y-4 results-pad border-b border-border-strong py-4 sm:py-6">
       <h2 id="target-contributions-title" className="text-lg font-semibold">{t.contribution}</h2>
       <dl className="text-sm"><dt className="text-secondary-foreground">{t.nominalTarget}</dt><dd className="font-medium tabular-nums text-primary-foreground">{money(inputs.nominal_target_amount)}</dd></dl>
       <div className="grid gap-3 sm:grid-cols-3">
@@ -58,8 +58,8 @@ export function TargetResults({ result, locale, currency, text, targetText: t }:
         ))}
       </dl>
     </section>
-    <ProjectionChart points={scenario.annual_points} locale={locale} currency={currency} inset="section" text={{ ...text.chart, scenario: text.chart.scenario.replace("{scenario}", text.scenarios[scenario.name]), aria: text.chart.aria.replace("{scenario}", text.scenarios[scenario.name]) }} />
-    <section aria-labelledby="target-schedule-title" className="space-y-3 border-b border-border-strong p-4 sm:p-6">
+    <ProjectionChart points={scenario.annual_points} locale={locale} currency={currency} text={{ ...text.chart, scenario: text.chart.scenario.replace("{scenario}", text.scenarios[scenario.name]), aria: text.chart.aria.replace("{scenario}", text.scenarios[scenario.name]) }} />
+    <section aria-labelledby="target-schedule-title" className="space-y-3 results-pad border-b border-border-strong py-4 sm:py-6">
       <h2 id="target-schedule-title" className="text-lg font-semibold">{t.schedule} · {text.scenarios[scenario.name]}</h2>
       <p className="text-sm text-secondary-foreground">{t.scheduleHelp}</p>
       <div tabIndex={0} role="region" aria-labelledby="target-schedule-title" className="max-h-[32rem] overflow-auto rounded-md border border-border-subtle focus-visible:outline-2 focus-visible:outline-brand-border-focus">

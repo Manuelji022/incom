@@ -59,7 +59,7 @@ export function InvestmentSummaryCards({ point, cumulativeFeesPaid, locale, curr
       className="grid grid-cols-1 gap-px border-y border-border-subtle bg-border-subtle sm:grid-cols-3"
     >
       {cards.map((card) => (
-        <div key={card.label} className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,50%)] items-baseline gap-x-3 gap-y-0 bg-page px-4 py-3 sm:flex sm:flex-col sm:items-start sm:gap-0 lg:px-3 lg:py-3">
+        <div key={card.label} className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,50%)] items-baseline gap-x-3 gap-y-0 bg-page px-(--page-gutter) py-3 sm:flex sm:flex-col sm:items-start sm:gap-0 sm:px-4 sm:first:ps-(--page-gutter) sm:last:pe-(--page-gutter) lg:px-3 lg:py-3 lg:first:ps-8 lg:last:pe-(--frame-pad)">
           <dt className="min-w-0 text-xs leading-normal text-secondary-foreground">{card.label}</dt>
           <dd className="min-w-0 text-end [overflow-wrap:anywhere] text-base font-semibold leading-7 tracking-[-0.025em] tabular-nums text-primary-foreground sm:text-start lg:text-lg">
             {card.value}

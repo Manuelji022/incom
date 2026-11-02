@@ -9,7 +9,6 @@ type ProjectionChartProps = {
   points: readonly ProjectionPoint[];
   locale: Locale;
   currency: Currency;
-  inset?: "default" | "section";
   text: {
     none: string;
     reload: string;
@@ -51,7 +50,6 @@ export function ProjectionChart({
   points,
   locale,
   currency,
-  inset = "default",
   text,
 }: ProjectionChartProps) {
   if (points.length === 0) {
@@ -65,14 +63,9 @@ export function ProjectionChart({
     );
   }
 
-  const horizontalInset =
-    inset === "section"
-      ? "px-4 sm:px-6 lg:px-6"
-      : "px-4 lg:px-3";
-
   return (
     <div
-      className={`border-b border-border-strong ${horizontalInset} py-6 lg:py-8`}
+      className={`border-b border-border-strong results-pad py-6 lg:py-8`}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-semibold text-primary-foreground">

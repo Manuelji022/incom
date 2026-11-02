@@ -1,7 +1,49 @@
 @import "tailwindcss";
 
+/*
+ * Page margin system. Every full-width band (header, footer, page body) pads
+ * itself with --frame-pad: at least one gutter, growing symmetrically once the
+ * viewport is wider than --page-max. Borders stay full-bleed while content
+ * keeps a single, shared left/right edge at any screen size.
+ */
+@utility page-frame {
+  padding-inline: var(--frame-pad);
+}
+
+/* Calculator input panel: content starts at the frame edge, 2rem toward the divider. */
+@utility sidebar-pad {
+  padding-inline: var(--page-gutter);
+  @media (width >= 64rem) {
+    padding-inline-start: var(--frame-pad);
+    padding-inline-end: 2rem;
+  }
+}
+
+@utility sidebar-bleed {
+  margin-inline: calc(-1 * var(--page-gutter));
+  @media (width >= 64rem) {
+    margin-inline-start: calc(-1 * var(--frame-pad));
+    margin-inline-end: -2rem;
+  }
+}
+
+/* Results column: 2rem after the divider, frame edge on the far side. */
+@utility results-pad {
+  padding-inline: var(--page-gutter);
+  @media (width >= 64rem) {
+    padding-inline-start: 2rem;
+    padding-inline-end: var(--frame-pad);
+  }
+}
+
 :root {
   color-scheme: light dark;
+
+  /* Page margins */
+  --page-gutter: clamp(1.25rem, 0.5rem + 2.5vw, 3rem);
+  --page-max: 90rem;
+  /* 100vw (not %) so the value resolves identically in any container. */
+  --frame-pad: max(var(--page-gutter), calc((100vw - var(--page-max)) / 2));
 
   /* Reference palette primitives */
   --cream: #fbf7f0;

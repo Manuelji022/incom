@@ -126,9 +126,9 @@ export function CompoundInputSidebar({
         const value = isDisplay ? target.value.replaceAll(",", "") : target.value;
         if (key) setSummaryValues((values) => ({ ...values, [key]: value }));
       }}
-      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-strong bg-page lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
+      className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-strong bg-page ${collapsed ? "lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
     >
-      <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 border-b border-border-subtle px-5 py-4 sm:px-8 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
+      <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 border-b border-border-subtle sidebar-pad py-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
         <h2 id="compound-input-sidebar-title" className={`text-base font-semibold leading-6 text-primary-foreground ${collapsed ? "lg:hidden" : ""}`}>
           {text.title}
         </h2>
@@ -140,7 +140,7 @@ export function CompoundInputSidebar({
           aria-expanded={!collapsed}
           aria-controls="compound-input-sidebar-fields"
           onClick={onToggleCollapsed}
-          className={`min-h-11 shrink-0 lg:min-h-8 lg:px-2 ${collapsed ? "lg:absolute lg:start-0 lg:top-5 lg:z-20" : ""}`}
+          className={`min-h-11 shrink-0 lg:min-h-8 lg:px-2 ${collapsed ? "lg:absolute lg:start-(--frame-pad) lg:top-5 lg:z-20" : ""}`}
         >
           <span className="lg:hidden">{collapsed ? text.edit : text.hide}</span>
           <span aria-hidden="true" className={`panel-collapse-icon size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
@@ -148,7 +148,7 @@ export function CompoundInputSidebar({
       </header>
 
       <fieldset id="compound-input-sidebar-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`m-0 flex min-h-0 min-w-0 flex-1 flex-col border-0 p-0 disabled:opacity-100 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
-        <div className="space-y-8 px-5 pt-6 sm:px-8">
+        <div className="sidebar-pad space-y-8 pt-6">
           <SidebarGroup
             title={text.startingPoint}
             className="space-y-3"
@@ -224,13 +224,13 @@ export function CompoundInputSidebar({
             </FieldGroup>
           </SidebarGroup>
 
-          <section className="-mx-5 border-t border-border-subtle sm:-mx-8">
+          <section className="sidebar-bleed border-t border-border-subtle">
             <button
               type="button"
               aria-expanded={advancedOpen}
               aria-controls="advanced-assumption-fields"
               onClick={onToggleAdvanced}
-              className="group/disclosure flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 px-5 py-3 text-start text-sm font-medium text-primary-foreground sm:px-8"
+              className="group/disclosure flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 sidebar-pad py-3 text-start text-sm font-medium text-primary-foreground"
             >
               <span>{advancedOpen ? text.closeAssumptions : text.openAssumptions}</span>
               <span
@@ -238,7 +238,7 @@ export function CompoundInputSidebar({
                 className={`panel-collapse-icon size-4 shrink-0 bg-current text-secondary-foreground group-hover/disclosure:text-primary-foreground [mask-image:url('/assets/svgs/chevron-down.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${advancedOpen ? "rotate-180" : ""}`}
               />
             </button>
-            <p className={`-mt-2 px-5 pb-4 text-xs leading-5 text-secondary-foreground tabular-nums sm:px-8 ${advancedOpen ? "sr-only" : ""}`}>
+            <p className={`sidebar-pad -mt-2 pb-4 text-xs leading-5 text-secondary-foreground tabular-nums ${advancedOpen ? "sr-only" : ""}`}>
               {advancedSummary.map((item, index) => (
                 <Fragment key={item}>
                   {index > 0 ? " · " : null}
@@ -246,7 +246,7 @@ export function CompoundInputSidebar({
                 </Fragment>
               ))}
             </p>
-            <div id="advanced-assumption-fields" hidden={!advancedOpen} className="px-5 pb-6 pt-2 sm:px-8">
+            <div id="advanced-assumption-fields" hidden={!advancedOpen} className="sidebar-pad pb-6 pt-2">
               <FieldGroup className="gap-5">
                 <NumericField
                   id="annual-fee"
@@ -308,7 +308,7 @@ export function CompoundInputSidebar({
           </section>
         </div>
 
-        <div className="sticky bottom-0 z-10 mt-auto border-t border-border-subtle bg-page px-5 py-4 sm:px-8">
+        <div className="sticky bottom-0 z-10 mt-auto border-t border-border-subtle bg-page sidebar-pad py-4">
           <Button type="submit" disabled={submitting || collapsed} className="min-h-12 w-full lg:min-h-10">
             {submitting ? <><span aria-hidden="true" className="me-2 inline-block size-3 motion-safe:animate-spin rounded-full border-2 border-current border-e-transparent" />{text.calculate}<span className="sr-only"> {calculatingLabel}</span></> : text.calculate}
           </Button>

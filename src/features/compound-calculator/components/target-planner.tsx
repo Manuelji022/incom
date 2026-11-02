@@ -158,9 +158,9 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
       {error ? <p id={`${id}-error`} className="text-sm text-danger-foreground">{error}</p> : null}
     </Field>;
   }
-  return <main id={active ? "main-content" : undefined} hidden={!active} tabIndex={-1} className={`grid flex-1 grid-cols-1 ${collapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)]"} ${className}`}>
-      <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name && !target.name.endsWith("-display")) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-strong bg-page lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""}`}>
-        <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 border-b border-border-subtle px-5 py-4 sm:px-8 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
+  return <main id={active ? "main-content" : undefined} hidden={!active} tabIndex={-1} className={`grid flex-1 grid-cols-1 ${collapsed ? "lg:grid-cols-[calc(var(--frame-pad)+2.5rem)_minmax(0,1fr)]" : "lg:grid-cols-[calc(var(--frame-pad)+16.25rem)_minmax(0,1fr)]"} ${className}`}>
+      <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name && !target.name.endsWith("-display")) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-strong bg-page ${collapsed ? "lg:overflow-visible lg:border-e-0" : ""}`}>
+        <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 border-b border-border-subtle sidebar-pad py-4 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
           <h1 className={`text-base font-semibold ${collapsed ? "lg:hidden" : ""}`}>{t.title}</h1>
           <Button
             type="button"
@@ -170,13 +170,13 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
             aria-expanded={!collapsed}
             aria-controls="target-planner-fields"
             onClick={() => setCollapsed((value) => !value)}
-            className={`min-h-11 shrink-0 lg:min-h-8 lg:px-2 ${collapsed ? "lg:absolute lg:start-0 lg:top-5 lg:z-20" : ""}`}
+            className={`min-h-11 shrink-0 lg:min-h-8 lg:px-2 ${collapsed ? "lg:absolute lg:start-(--frame-pad) lg:top-5 lg:z-20" : ""}`}
           >
             <span className="lg:hidden">{collapsed ? text.sidebar.edit : text.sidebar.hide}</span>
             <span aria-hidden="true" className={`panel-collapse-icon size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
           </Button>
         </header>
-        <fieldset id="target-planner-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`space-y-8 px-5 py-6 sm:space-y-10 sm:p-8 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
+        <fieldset id="target-planner-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`sidebar-pad space-y-8 py-6 sm:space-y-10 sm:py-8 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
           <SidebarGroup as="h2" title={text.sidebar.startingPoint} className="space-y-5">
           <Field><FieldLabel htmlFor="target-currency">{text.sidebar.currency}</FieldLabel><Select id="target-currency" value={currency} onChange={(event) => { if (isCurrency(event.currentTarget.value)) setCurrency(event.currentTarget.value); }} aria-describedby="target-currency-help">{currencies.map((value) => <option key={value} value={value}>{value} ({getCurrencySymbol(value)})</option>)}</Select><FieldDescription id="target-currency-help">{t.currencyHelp}</FieldDescription></Field>
           <NumericField id="target-target_amount" name="target_amount" label={`${t.target} (${getCurrencySymbol(currency)})`} unit={getCurrencySymbol(currency)} value={values.target_amount} onChange={(event) => update("target_amount", event.currentTarget.value)} error={errorFor("target_amount")} />
@@ -225,13 +225,13 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
         </fieldset>
       </form>
       <section ref={resultRef} tabIndex={-1} aria-label={t.title} aria-busy={submitting} className="min-w-0 bg-page focus-visible:outline-2 focus-visible:outline-brand-border-focus">
-        <p role="status" aria-atomic="true" className={status ? "p-4 text-sm text-secondary-foreground" : "sr-only"}>{status}</p>
-        <AnimatedAlert visible={!!failure} className="m-4 space-y-2 rounded-md border border-danger-border-default p-4 text-sm">
+        <p role="status" aria-atomic="true" className={status ? "results-pad py-4 text-sm text-secondary-foreground" : "sr-only"}>{status}</p>
+        <AnimatedAlert visible={!!failure} className="mx-(--page-gutter) lg:ms-8 lg:me-(--frame-pad) my-4 space-y-2 rounded-md border border-danger-border-default p-4 text-sm">
           <p>{failure}</p>
           {errors.length ? <ul className="list-disc ps-5">{errors.map((error, index) => <li key={`${error.field}-${index}`}>{fieldLabels[error.field] ? `${fieldLabels[error.field]}: ` : ""}{error.reason}</li>)}</ul> : null}
           <Button type="button" variant="outline" onClick={() => formRef.current?.requestSubmit()}>{text.retry}</Button>
         </AnimatedAlert>
-        {sample ? <p className="px-4 pt-3 text-xs text-secondary-foreground">{t.sampleData}</p> : null}
+        {sample ? <p className="results-pad pt-3 text-xs text-secondary-foreground">{t.sampleData}</p> : null}
         {result ? <div key={result.metadata.calculated_at} className="projection-results-enter"><TargetResults result={result} locale={locale} currency={currency} text={text} targetText={t} /></div> : <div className="mx-auto flex min-h-80 max-w-xl flex-col justify-center gap-4 p-6"><h2 className="text-xl font-semibold">{t.title}</h2><p className="text-secondary-foreground">{t.empty}</p><p className="text-sm text-secondary-foreground">{t.caveat}</p></div>}
       </section>
     </main>;

@@ -49,7 +49,7 @@ export function Scenarios({
   return (
     <section
       aria-labelledby="scenarios-at-a-glance-title"
-      className="px-4 py-4 lg:px-3"
+      className="results-pad py-4"
     >
       <h2
         id="scenarios-at-a-glance-title"

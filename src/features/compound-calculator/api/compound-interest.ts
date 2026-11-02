@@ -7,7 +7,7 @@ import type {
 
 const projectionEndpoint =
   typeof window === "undefined"
-    ? "https://incom-api.manuelji.dev/api/v1/compound-interest/projections"
+    ? process.env.COMPOUND_INTEREST_PROJECTION_URL
     : "/api/compound-interest/projections";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -78,6 +78,8 @@ export function parseProjectionResponse(value: unknown): CompoundInterestProject
 export async function fetchProjection(
   input: CompoundInterestProjectionInput,
 ): Promise<CompoundInterestProjectionResponse> {
+  if (!projectionEndpoint) throw new Error("projection-endpoint-not-configured");
+
   const response = await fetch(projectionEndpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
