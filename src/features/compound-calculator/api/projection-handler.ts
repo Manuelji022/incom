@@ -1,4 +1,5 @@
 import { fetchProjection } from "@/features/compound-calculator/api/compound-interest";
+import { getCompoundInterestEndpoint } from "@/features/compound-calculator/api/compound-interest-endpoint";
 import type { CompoundInterestProjectionInput, ContributionFrequency, ContributionTiming } from "@/features/compound-calculator/types/compound-interest";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -47,7 +48,7 @@ export async function handleProjectionRequest(request: Request) {
   if (!input) return Response.json({ error: "invalid-request" }, { status: 400 });
 
   try {
-    return Response.json(await fetchProjection(input));
+    return Response.json(await fetchProjection(input, getCompoundInterestEndpoint("projections")));
   } catch (error) {
     if (error instanceof Error && error.message === "invalid-input") {
       return Response.json({ error: "invalid-input" }, { status: 422 });

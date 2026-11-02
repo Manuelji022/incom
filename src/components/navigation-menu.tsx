@@ -88,10 +88,10 @@ export function NavigationMenu({ locale }: { locale: Locale }) {
           if (!menu) return;
           setCurrentHref(getCurrentHref(locale));
           menu.showModal();
-          // The trigger sits in the centered page frame while the dialog hugs
-          // the viewport edge; place the close button exactly over the trigger
-          // so the icon morphs in place, but never outside the panel on very
-          // wide screens.
+          // The trigger sits at the page frame's edge (inset by --frame-pad)
+          // while the dialog hugs the viewport edge; place the close button
+          // exactly over the trigger so the icon morphs in place, but never
+          // outside the panel on very wide screens.
           const trigger = event.currentTarget.getBoundingClientRect();
           const dialog = menu.getBoundingClientRect();
           const end = Math.min(dialog.right - trigger.right, dialog.width - trigger.width - 16);

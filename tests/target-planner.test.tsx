@@ -91,8 +91,8 @@ describe("target planner", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json(fixture)));
     change(/Target amount/, "120000");
     submit();
-    await screen.findByText(targetText.ready);
-    expect(screen.getByRole("status").textContent).toBe(targetText.ready);
+    await screen.findByRole("table");
+    expect(screen.getByRole("status").textContent).toBe("");
     change(/Target amount/, "125000");
     const resultsStatus = screen.getByRole("status");
     expect(resultsStatus.textContent).toBe(targetText.stale);
@@ -116,7 +116,7 @@ describe("target planner", () => {
     expect(screen.getByRole("status").textContent).toBe("Calculating…");
     expect(JSON.parse(mock.mock.calls[0][1].body)).toEqual({ target_amount: "100000.001234567890123456", initial_principal: "10000", duration_years: 2, expected_annual_return_percent: "7", contribution_plan: { frequency: "monthly", annual_increase_percent: "0" }, annual_fee_percent: "0.08", expected_annual_inflation_percent: "2.5", scenario_range_percentage_points: "2" });
     await act(async () => resolve(Response.json(fixture)));
-    expect(await screen.findByText("Target results are ready.")).toBeTruthy();
+    expect(await screen.findByRole("table")).toBeTruthy();
     expect(screen.getByRole("button", { name: /Expected · 7%.*3,902.11.*per month/ }).getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByText("Annual contribution schedule · Expected")).toBeTruthy();
     expect(screen.getAllByRole("row")).toHaveLength(4); // Header, year 0, year 1, year 2.
@@ -149,7 +149,7 @@ describe("target planner", () => {
     expect(inflation.getAttribute("aria-invalid")).toBe("true");
     await waitFor(() => expect(document.activeElement).toBe(inflation));
     fireEvent.change(inflation, { target: { value: "2.5000" } }); submit();
-    await screen.findByText("Target results are ready.");
+    await screen.findByRole("table");
     const body = JSON.parse(mock.mock.calls[0][1].body);
     expect(body.target_basis).toBe("real"); expect(body.expected_annual_inflation_percent).toBe("2.5000");
     expect(screen.getByText(/105,062.50/)).toBeTruthy();
@@ -171,7 +171,7 @@ describe("target planner", () => {
     expect(screen.getByText("The target cannot be reached. Try a longer horizon.")).toBeTruthy();
     expect(screen.getByLabelText(/Target amount/).getAttribute("aria-invalid")).toBe("true");
     change(/Target amount/, "50000"); submit();
-    await screen.findByText("Target results are ready.");
+    await screen.findByRole("table");
     expect(mock).toHaveBeenCalledTimes(2);
     expect(screen.queryByRole("alert")).toBeNull();
   });
@@ -220,7 +220,7 @@ describe("target planner", () => {
     const saveRef = { current: () => false };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json(fixture)));
     render(<TargetPlanner {...props} saveRef={saveRef} />);
-    change(/Target amount/, "123456.78900"); submit(); await screen.findByText("Target results are ready.");
+    change(/Target amount/, "123456.78900"); submit(); await screen.findByRole("table");
     expect(saveRef.current()).toBe(true);
     expect(JSON.parse(sessionStorage.getItem("incom:target-session:v2")!).values.target_amount).toBe("123456.78900");
     cleanup(); mount();

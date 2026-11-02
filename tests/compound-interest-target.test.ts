@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchTarget, parseTargetResponse, serializeTargetInput, targetInputFromForm, TargetApiError, validateTargetInput } from "@/features/compound-calculator/lib/compound-interest-target";
 import { POST } from "@/app/api/compound-interest/targets/route";
 import fixture from "./fixtures/target-response.json";
@@ -8,7 +8,8 @@ import type { TargetInput } from "@/features/compound-calculator/types/compound-
 const input: TargetInput = { target_amount: "100000.00", initial_principal: "0", duration_years: 2, expected_annual_return_percent: "7", contribution_plan: { frequency: "monthly" } };
 const problem = (status: number) => ({ type: "about:blank", title: "Cannot calculate target", status, detail: "This target cannot be reached with these assumptions.", instance: "/api/v1/compound-interest/targets", code: "UNREACHABLE_TARGET", errors: [{ field: "target_amount", reason: "Try a longer horizon or a smaller target." }] });
 const request = (body: unknown) => new Request("http://localhost/api/compound-interest/targets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-afterEach(() => vi.unstubAllGlobals());
+beforeEach(() => vi.stubEnv("OLIVE_CAP_API_URL", "https://incom-api.manuelji.dev/api/v1"));
+afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
 describe("target input serialization and validation", () => {
   it("preserves decimal strings exactly and omits unused optional defaults", () => {
@@ -89,6 +90,7 @@ describe("client request and proxy", () => {
     await expect(fetchTarget(input)).rejects.toBeInstanceOf(TargetApiError);
   });
   it("returns the raw backend 200 through the same-origin POST proxy without changing decimals", async () => {
+    vi.stubEnv("OLIVE_CAP_API_URL", "https://incom-api.manuelji.dev/api/v1/");
     const mock = vi.fn().mockResolvedValue(Response.json(fixture)); vi.stubGlobal("fetch", mock);
     const response = await POST(request(input));
     expect(response.status).toBe(200); expect(await response.json()).toEqual(fixture);

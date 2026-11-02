@@ -132,7 +132,7 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
       return targetSaveRef.current() ? { status: "saved" } : { status: "storage" };
     }} submitting={mode === "target" ? targetStatus.submitting : submitting} languageHandoffText={{ pending: text.languageHandoffPending, storage: text.languageHandoffStorage }} />
     <TargetPlanner locale={locale} text={dictionary} targetText={targetText} saveRef={targetSaveRef} onStatusChange={setTargetStatus} active={mode === "target"} />
-    <main id={mode === "projection" ? "main-content" : undefined} hidden={mode !== "projection"} tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)]"}`}>
+    <main id={mode === "projection" ? "main-content" : undefined} hidden={mode !== "projection"} tabIndex={-1} className={`grid flex-1 grid-cols-1 lg:min-h-[65.125rem] ${sidebarCollapsed ? "lg:grid-cols-[calc(var(--frame-pad)+2.5rem)_minmax(0,1fr)]" : "lg:grid-cols-[calc(var(--frame-pad)+16.25rem)_minmax(0,1fr)]"}`}>
     <form key={formVersion} ref={formRef} noValidate onSubmit={handleSubmit} onInput={(event) => {
       const target = event.target;
       clearValidation(event);
@@ -142,11 +142,11 @@ export function ProjectionScenarioView({ locale, languageLabel, themeLabel, text
       <CompoundInputSidebar advancedOpen={advancedOpen} onToggleAdvanced={() => setAdvancedOpen((value) => !value)} text={text.sidebar} locale={locale} submitting={submitting} calculatingLabel={text.sidebar.calculating} collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed((value) => !value)} currency={currency} onCurrencyChange={setCurrency} initialValues={restoredValues} />
       <section ref={resultsRef} tabIndex={-1} aria-label={text.header.portfolio} className={`min-w-0 bg-page focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${sidebarCollapsed ? "lg:border-s lg:border-border-subtle" : ""}`}>
         <p aria-live="polite" aria-atomic="true" className="sr-only">{status}</p>
-        {sample ? <p role="status" className="mx-4 mt-3 flex items-start gap-2 rounded-md border border-brand-border-subtle bg-brand-subtle px-3 py-2.5 text-sm leading-5 text-on-brand-subtle-foreground">
+        {sample ? <p role="status" className="mx-(--page-gutter) lg:ms-8 lg:me-(--frame-pad) mt-3 flex items-start gap-2 rounded-md border border-brand-border-subtle bg-brand-subtle px-3 py-2.5 text-sm leading-5 text-on-brand-subtle-foreground">
           <span aria-hidden="true" className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border border-current text-[0.625rem] font-bold leading-none">i</span>
           <span>{text.sampleData}</span>
         </p> : null}
-        <AnimatedAlert visible={error} className="mx-4 mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">
+        <AnimatedAlert visible={error} className="mx-(--page-gutter) lg:ms-8 lg:me-(--frame-pad) mt-3 rounded-md border border-border-subtle px-3 py-2 text-sm">
           {status} <button type="submit" className="ms-2 underline">{text.retry}</button>
         </AnimatedAlert>
         <Suspense fallback={<ProjectionSkeleton />}>

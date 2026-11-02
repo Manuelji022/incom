@@ -5,11 +5,6 @@ import type {
   ProjectionScenario,
 } from "@/features/compound-calculator/types/compound-interest";
 
-const projectionEndpoint =
-  typeof window === "undefined"
-    ? "https://incom-api.manuelji.dev/api/v1/compound-interest/projections"
-    : "/api/compound-interest/projections";
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -77,8 +72,9 @@ export function parseProjectionResponse(value: unknown): CompoundInterestProject
 
 export async function fetchProjection(
   input: CompoundInterestProjectionInput,
+  endpoint = "/api/compound-interest/projections",
 ): Promise<CompoundInterestProjectionResponse> {
-  const response = await fetch(projectionEndpoint, {
+  const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),

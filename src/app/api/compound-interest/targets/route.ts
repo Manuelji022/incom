@@ -1,4 +1,5 @@
 import { fetchTarget, TargetApiError, targetProblem, validateTargetInput } from "@/features/compound-calculator/lib/compound-interest-target";
+import { getCompoundInterestEndpoint } from "@/features/compound-calculator/api/compound-interest-endpoint";
 import type { ProblemDetail, TargetInput } from "@/features/compound-calculator/types/compound-interest-target";
 
 function problemResponse(problem: ProblemDetail) {
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   const errors = validateTargetInput(body);
   if (errors.length) return problemResponse(targetProblem(422, "Check the highlighted target assumptions.", errors));
   try {
-    const result = await fetchTarget(body as TargetInput, "https://incom-api.manuelji.dev/api/v1/compound-interest/targets");
+    const result = await fetchTarget(body as TargetInput, getCompoundInterestEndpoint("targets"));
     return Response.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof TargetApiError && (error.problem.status === 400 || error.problem.status === 422)) return problemResponse(error.problem);

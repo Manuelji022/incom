@@ -45,7 +45,7 @@ export function ProjectionHeader({
   return (
     <section
       aria-labelledby="portfolio-value-title"
-      className="[container-type:inline-size] border-b border-primary-foreground px-4 py-6 lg:px-3"
+      className="[container-type:inline-size] border-b border-primary-foreground results-pad py-6"
     >
       <div>
         <div className="min-w-0">
