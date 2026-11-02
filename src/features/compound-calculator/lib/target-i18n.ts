@@ -2,7 +2,6 @@ import type { Locale } from "@/lib/locales";
 
 const en = {
   title: "Plan a target",
-  intro: "Find the starting contribution needed to reach your goal.",
   target: "Target amount",
   basis: "Target basis",
   nominal: "Future nominal amount",
@@ -52,7 +51,6 @@ const en = {
 type TargetText = { [Key in keyof typeof en]: string };
 const es: TargetText = {
   title: "Planificar un objetivo",
-  intro: "Calcula la aportación inicial necesaria para alcanzar tu objetivo.",
   target: "Importe objetivo",
   basis: "Base del objetivo",
   nominal: "Importe nominal futuro",
