@@ -10,7 +10,7 @@ import { NumericField } from "@/components/primitives/numeric-field";
 import { Select } from "@/components/primitives/select";
 import { SegmentedControl } from "@/components/primitives/segmented-control";
 import { ProjectionSliderFields, ScenarioRangeField } from "@/features/compound-calculator/components/slider-fields";
-import { getCurrencyFormatter, currencies, getCurrencySymbol, isCurrency, type Currency } from "@/lib/currency";
+import { currencies, getCurrencySymbol, isCurrency, type Currency } from "@/lib/currency";
 import { normalizeDecimalInput } from "@/features/compound-calculator/lib/decimal-input";
 import { getIntlLocale } from "@/lib/locales";
 import type {
@@ -88,22 +88,15 @@ export function CompoundInputSidebar({
   onToggleAdvanced,
 }: CompoundInputSidebarProps) {
   const [summaryValues, setSummaryValues] = useState({
-    principal: initialValues?.initial_principal ?? "40000",
     recurring: initialValues?.["recurring_contribution.amount"] ?? "1000",
-    frequency: initialValues?.["recurring_contribution.frequency"] ?? "monthly",
-    years: initialValues?.duration_years ?? "25",
     expectedReturn: initialValues?.expected_annual_return_percent ?? "8",
     fee: initialValues?.annual_fee_percent ?? "0.05",
     inflation: initialValues?.expected_annual_inflation_percent ?? "2",
     range: initialValues?.scenario_range_percentage_points ?? "2",
   });
-  const format = getCurrencyFormatter(locale, currency, { maximumFractionDigits: 0 });
   const number = new Intl.NumberFormat(getIntlLocale(locale), { maximumFractionDigits: 2 });
   const parsed = (value: string) => Number(normalizeDecimalInput(value));
   const hasContribution = parsed(summaryValues.recurring) > 0;
-  const frequencyLabel = summaryValues.frequency === "annual" ? text.annual : summaryValues.frequency === "quarterly" ? text.quarterly : text.monthly;
-  const contributionSummary = parsed(summaryValues.recurring) > 0 ? ` · ${format.format(parsed(summaryValues.recurring))} ${frequencyLabel.toLocaleLowerCase(locale)}` : "";
-  const summary = `${format.format(parsed(summaryValues.principal))}${contributionSummary} · ${summaryValues.years} ${text.years} · ${number.format(parsed(summaryValues.expectedReturn))}%`;
   const advancedSummary = [
     `${text.fee} ${number.format(parsed(summaryValues.fee))}%`,
     `${text.inflation} ${number.format(parsed(summaryValues.inflation || "2"))}%`,
@@ -112,11 +105,7 @@ export function CompoundInputSidebar({
   const { rendered: panelContentRendered, present: panelContentPresent } = usePresence(!collapsed);
   const panelContentClass = `panel-collapse-content ${panelContentPresent ? "" : "panel-collapse-content--hidden"}`.trim();
   const summaryFieldKeys: Record<string, keyof typeof summaryValues> = {
-    initial_principal: "principal",
     "recurring_contribution.amount": "recurring",
-    "recurring_contribution.frequency": "frequency",
-    duration_years: "years",
-    "duration-years-slider": "years",
     expected_annual_return_percent: "expectedReturn",
     annual_fee_percent: "fee",
     expected_annual_inflation_percent: "inflation",
@@ -139,7 +128,7 @@ export function CompoundInputSidebar({
       }}
       className={`relative flex min-h-0 w-full shrink-0 flex-col border-e border-border-strong bg-page lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""} ${className}`.trim()}
     >
-      <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle px-5 py-4 sm:px-8 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
+      <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 border-b border-border-subtle px-5 py-4 sm:px-8 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
         <h2 id="compound-input-sidebar-title" className={`text-base font-semibold leading-6 text-primary-foreground ${collapsed ? "lg:hidden" : ""}`}>
           {text.title}
         </h2>
@@ -156,9 +145,6 @@ export function CompoundInputSidebar({
           <span className="lg:hidden">{collapsed ? text.edit : text.hide}</span>
           <span aria-hidden="true" className={`panel-collapse-icon size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
         </Button>
-        <p className={`col-span-2 text-sm leading-5 text-secondary-foreground ${collapsed ? "lg:hidden" : ""}`}>
-          {collapsed ? summary : text.intro}
-        </p>
       </header>
 
       <fieldset id="compound-input-sidebar-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`m-0 flex min-h-0 min-w-0 flex-1 flex-col border-0 p-0 disabled:opacity-100 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
