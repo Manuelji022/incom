@@ -160,7 +160,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
   }
   return <main id={active ? "main-content" : undefined} hidden={!active} tabIndex={-1} className={`grid flex-1 grid-cols-1 ${collapsed ? "lg:grid-cols-[2.5rem_minmax(0,1fr)]" : "lg:grid-cols-[18.25rem_minmax(0,1fr)]"} ${className}`}>
       <form key={formVersion} ref={formRef} onSubmit={submit} onInput={(event) => { const target = event.target; if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && target.name && !target.name.endsWith("-display")) update(target.name, target.value); }} noValidate className={`relative min-w-0 border-e border-border-strong bg-page lg:max-w-[18.25rem] ${collapsed ? "lg:w-10 lg:min-w-10 lg:overflow-visible lg:border-e-0" : ""}`}>
-        <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-b border-border-subtle px-5 py-4 sm:px-8 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
+        <header className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 border-b border-border-subtle px-5 py-4 sm:px-8 ${collapsed ? "lg:min-w-0 lg:border-0 lg:p-0" : ""}`}>
           <h1 className={`text-base font-semibold ${collapsed ? "lg:hidden" : ""}`}>{t.title}</h1>
           <Button
             type="button"
@@ -175,7 +175,6 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
             <span className="lg:hidden">{collapsed ? text.sidebar.edit : text.sidebar.hide}</span>
             <span aria-hidden="true" className={`panel-collapse-icon size-4 bg-current [mask-image:url('/assets/svgs/panel-left.svg')] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] ${collapsed ? "rotate-180" : ""}`} />
           </Button>
-          <p className={`col-span-2 text-sm leading-5 text-secondary-foreground ${collapsed ? "lg:hidden" : ""}`}>{t.intro}</p>
         </header>
         <fieldset id="target-planner-fields" disabled={submitting} inert={collapsed} aria-hidden={collapsed} className={`space-y-8 px-5 py-6 sm:space-y-10 sm:p-8 ${panelContentClass} ${panelContentRendered ? "" : "hidden"}`}>
           <SidebarGroup as="h2" title={text.sidebar.startingPoint} className="space-y-5">
