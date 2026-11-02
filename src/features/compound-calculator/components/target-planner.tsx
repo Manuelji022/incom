@@ -115,7 +115,7 @@ export function TargetPlanner({ locale, text, targetText: t, saveRef, onStatusCh
       setResult(next);
       setSample(false);
       setStale(false);
-      setStatus(t.ready);
+      setStatus("");
       window.requestAnimationFrame(() => { resultRef.current?.focus(); });
     } catch (error) {
       const problem = error instanceof TargetApiError ? error.problem : null;
