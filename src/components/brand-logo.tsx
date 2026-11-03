@@ -4,7 +4,7 @@ export function BrandLogo() {
       Olive Capital
       <svg
         aria-hidden="true"
-        className="h-10 w-10 shrink-0 -translate-y-0.5 rotate-[13deg] text-brand-solid"
+        className="hidden h-10 w-10 shrink-0 -translate-y-0.5 rotate-[13deg] text-brand-solid sm:block"
         viewBox="0 0 82 88"
         fill="currentColor"
       >
