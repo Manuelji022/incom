@@ -56,9 +56,9 @@
   --raised: #24211f;
 
   /* Surfaces */
-  --page: light-dark(var(--cream), var(--charcoal));
+  --page: light-dark(white, var(--charcoal));
   --shell: light-dark(color-mix(in srgb, var(--cream) 97%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 95%, black));
-  --container: light-dark(white, var(--raised));
+  --container: light-dark(var(--cream), var(--raised));
   --card: var(--container);
   --sunken: light-dark(color-mix(in srgb, var(--cream) 94%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 95%, black));
   --modal: light-dark(color-mix(in srgb, var(--cream) 88%, white), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
