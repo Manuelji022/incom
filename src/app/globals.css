@@ -46,32 +46,63 @@
   --frame-pad: max(var(--page-gutter), calc((100vw - var(--page-max)) / 2));
 
   /* Reference palette primitives */
-  --cream: #fbf7f0;
+  --cream: #e9e9e9;
+  --paper: #dddddd;
   --charcoal: #1b1917;
   --stone: #aeada9;
   --green: #007354;
   /* Lighter green for dark mode; #007354 is only 3:1 on charcoal. */
   --green-bright: #3dbd96;
-  /* Dark-mode panel surface: lifted from the charcoal page so panels read as separate, as white does on cream. */
+  /* Dark-mode panel surface: lifted from the charcoal page so panels read as separate. */
   --raised: #24211f;
 
   /* Surfaces */
-  --page: light-dark(white, var(--charcoal));
-  --shell: light-dark(color-mix(in srgb, var(--cream) 97%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 95%, black));
-  --container: light-dark(var(--cream), var(--raised));
+  --page: light-dark(var(--cream), var(--charcoal));
+  --shell: light-dark(
+    color-mix(in srgb, var(--cream) 97%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 95%, black)
+  );
+  --container: light-dark(var(--paper), var(--raised));
   --card: var(--container);
-  --sunken: light-dark(color-mix(in srgb, var(--cream) 94%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 95%, black));
-  --modal: light-dark(color-mix(in srgb, var(--cream) 88%, white), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
+  --sunken: light-dark(
+    color-mix(in srgb, var(--cream) 94%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 95%, black)
+  );
+  --modal: light-dark(
+    color-mix(in srgb, var(--cream) 88%, var(--paper)),
+    color-mix(in srgb, var(--charcoal) 92%, var(--cream))
+  );
   --standout: light-dark(var(--charcoal), var(--cream));
 
   /* Components */
-  --component: light-dark(color-mix(in srgb, var(--cream) 92%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
-  --component-hover: light-dark(color-mix(in srgb, var(--cream) 88%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 88%, var(--cream)));
-  --component-active: light-dark(color-mix(in srgb, var(--cream) 84%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 84%, var(--cream)));
-  --component-on-sunken: light-dark(color-mix(in srgb, var(--cream) 88%, white), color-mix(in srgb, var(--charcoal) 76%, white));
-  --component-on-inverted: light-dark(color-mix(in srgb, var(--cream) 90%, white), color-mix(in srgb, var(--charcoal) 90%, black));
-  --component-on-container-subtle: light-dark(color-mix(in srgb, var(--cream) 90%, white), color-mix(in srgb, var(--charcoal) 90%, white));
-  --component-on-container-strong: light-dark(color-mix(in srgb, var(--cream) 86%, white), color-mix(in srgb, var(--charcoal) 84%, white));
+  --component: light-dark(
+    color-mix(in srgb, var(--cream) 92%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 92%, var(--cream))
+  );
+  --component-hover: light-dark(
+    color-mix(in srgb, var(--cream) 88%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 88%, var(--cream))
+  );
+  --component-active: light-dark(
+    color-mix(in srgb, var(--cream) 84%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 84%, var(--cream))
+  );
+  --component-on-sunken: light-dark(
+    var(--cream),
+    color-mix(in srgb, var(--charcoal) 76%, var(--cream))
+  );
+  --component-on-inverted: light-dark(
+    var(--cream),
+    color-mix(in srgb, var(--charcoal) 90%, black)
+  );
+  --component-on-container-subtle: light-dark(
+    var(--cream),
+    color-mix(in srgb, var(--charcoal) 90%, var(--cream))
+  );
+  --component-on-container-strong: light-dark(
+    var(--cream),
+    color-mix(in srgb, var(--charcoal) 84%, var(--cream))
+  );
 
   /* Transparent component states */
   --transparent-hover: light-dark(rgb(0 0 0 / 4%), rgb(255 255 255 / 6%));
@@ -79,21 +110,45 @@
 
   /* Foreground */
   --primary-foreground: light-dark(var(--charcoal), var(--cream));
-  --secondary-foreground: light-dark(color-mix(in srgb, var(--charcoal) 84%, var(--cream)), color-mix(in srgb, var(--cream) 80%, var(--charcoal)));
-  --tertiary-foreground: light-dark(color-mix(in srgb, var(--charcoal) 76%, var(--cream)), color-mix(in srgb, var(--cream) 72%, var(--charcoal)));
-  --disabled-foreground: light-dark(color-mix(in srgb, var(--charcoal) 38%, var(--cream)), color-mix(in srgb, var(--cream) 42%, var(--charcoal)));
+  --secondary-foreground: light-dark(
+    color-mix(in srgb, var(--charcoal) 84%, var(--cream)),
+    color-mix(in srgb, var(--cream) 80%, var(--charcoal))
+  );
+  --tertiary-foreground: light-dark(
+    color-mix(in srgb, var(--charcoal) 76%, var(--cream)),
+    color-mix(in srgb, var(--cream) 72%, var(--charcoal))
+  );
+  --disabled-foreground: light-dark(
+    color-mix(in srgb, var(--charcoal) 38%, var(--cream)),
+    color-mix(in srgb, var(--cream) 42%, var(--charcoal))
+  );
 
   /* Brand */
   --brand-solid: light-dark(var(--green), var(--green-bright));
-  --brand-solid-hover: light-dark(color-mix(in srgb, var(--green) 85%, var(--charcoal)), color-mix(in srgb, var(--green-bright) 85%, var(--cream)));
-  --brand-solid-active: light-dark(color-mix(in srgb, var(--green) 74%, var(--charcoal)), color-mix(in srgb, var(--green-bright) 74%, var(--cream)));
+  --brand-solid-hover: light-dark(
+    color-mix(in srgb, var(--green) 85%, var(--charcoal)),
+    color-mix(in srgb, var(--green-bright) 85%, var(--cream))
+  );
+  --brand-solid-active: light-dark(
+    color-mix(in srgb, var(--green) 74%, var(--charcoal)),
+    color-mix(in srgb, var(--green-bright) 74%, var(--cream))
+  );
   --chart-balance: light-dark(var(--green), var(--green-bright));
-  --brand-subtle: light-dark(color-mix(in srgb, var(--cream) 90%, var(--green)), color-mix(in srgb, var(--charcoal) 80%, var(--green-bright)));
-  --brand-subtle-hover: light-dark(color-mix(in srgb, var(--cream) 82%, var(--green)), color-mix(in srgb, var(--charcoal) 70%, var(--green-bright)));
+  --brand-subtle: light-dark(
+    color-mix(in srgb, var(--cream) 90%, var(--green)),
+    color-mix(in srgb, var(--charcoal) 80%, var(--green-bright))
+  );
+  --brand-subtle-hover: light-dark(
+    color-mix(in srgb, var(--cream) 82%, var(--green)),
+    color-mix(in srgb, var(--charcoal) 70%, var(--green-bright))
+  );
   --brand-foreground: light-dark(var(--green), var(--green-bright));
-  /* White on green is 5.9:1; charcoal on green would be 3:1. */
-  --on-brand-solid-foreground: light-dark(white, var(--charcoal));
-  --on-brand-subtle-foreground: light-dark(color-mix(in srgb, var(--green) 90%, var(--charcoal)), color-mix(in srgb, var(--green-bright) 50%, var(--cream)));
+  /* Cream on green is 4.83:1; charcoal on green is 2.99:1. */
+  --on-brand-solid-foreground: light-dark(var(--cream), var(--charcoal));
+  --on-brand-subtle-foreground: light-dark(
+    color-mix(in srgb, var(--green) 90%, var(--charcoal)),
+    color-mix(in srgb, var(--green-bright) 50%, var(--cream))
+  );
 
   /* Positive shares the brand green so gains don't introduce a second, near-identical green. */
   --positive-solid: var(--brand-solid);
@@ -117,27 +172,54 @@
   --danger-solid-active: #fa987d;
   --danger-subtle: light-dark(#fff0ec, #301b18);
   --danger-subtle-hover: light-dark(#ffe3dc, #45231d);
-  --danger-foreground: light-dark(color-mix(in srgb, #c84d34 88%, var(--charcoal)), color-mix(in srgb, #df6952 90%, var(--cream)));
+  --danger-foreground: light-dark(
+    color-mix(in srgb, #c84d34 88%, var(--charcoal)),
+    color-mix(in srgb, #df6952 90%, var(--cream))
+  );
   --on-danger-solid-foreground: #ffffff;
   --on-danger-subtle-foreground: light-dark(#b6402b, #ff9e84);
 
   /* Inverted */
   --inverted-solid: light-dark(var(--charcoal), var(--cream));
-  --inverted-solid-hover: light-dark(color-mix(in srgb, var(--charcoal) 88%, var(--cream)), color-mix(in srgb, var(--cream) 88%, var(--charcoal)));
-  --inverted-solid-active: light-dark(color-mix(in srgb, var(--charcoal) 78%, var(--cream)), color-mix(in srgb, var(--cream) 78%, var(--charcoal)));
+  --inverted-solid-hover: light-dark(
+    color-mix(in srgb, var(--charcoal) 88%, var(--cream)),
+    color-mix(in srgb, var(--cream) 88%, var(--charcoal))
+  );
+  --inverted-solid-active: light-dark(
+    color-mix(in srgb, var(--charcoal) 78%, var(--cream)),
+    color-mix(in srgb, var(--cream) 78%, var(--charcoal))
+  );
   --on-inverted-foreground: light-dark(var(--cream), var(--charcoal));
   --on-standout-primary-foreground: light-dark(var(--cream), var(--charcoal));
-  --on-standout-secondary-foreground: light-dark(color-mix(in srgb, var(--cream) 72%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 72%, var(--cream)));
+  --on-standout-secondary-foreground: light-dark(
+    color-mix(in srgb, var(--cream) 72%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 72%, var(--cream))
+  );
 
   /* Borders */
-  --border-default: light-dark(color-mix(in srgb, var(--cream) 86%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 86%, var(--cream)));
-  --control-border: light-dark(color-mix(in srgb, var(--cream) 38%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 42%, var(--cream)));
-  --border-subtle: light-dark(color-mix(in srgb, var(--cream) 92%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
-  /* Stone is for dividers only: 2.1:1 on cream is too low for text or control borders. */
-  --border-strong: light-dark(var(--stone), color-mix(in srgb, var(--charcoal) 76%, var(--cream)));
+  --border-default: light-dark(
+    color-mix(in srgb, var(--cream) 86%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 86%, var(--cream))
+  );
+  --control-border: light-dark(
+    color-mix(in srgb, var(--cream) 38%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 42%, var(--cream))
+  );
+  --border-subtle: light-dark(
+    color-mix(in srgb, var(--cream) 92%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 92%, var(--cream))
+  );
+  /* Stone is for dividers only: 1.85:1 on cream is too low for text or control borders. */
+  --border-strong: light-dark(
+    var(--stone),
+    color-mix(in srgb, var(--charcoal) 76%, var(--cream))
+  );
   --border-inverted: light-dark(var(--cream), var(--charcoal));
   --brand-border-default: light-dark(var(--green), var(--green-bright));
-  --brand-border-subtle: light-dark(color-mix(in srgb, var(--cream) 62%, var(--green)), color-mix(in srgb, var(--charcoal) 58%, var(--green-bright)));
+  --brand-border-subtle: light-dark(
+    color-mix(in srgb, var(--cream) 62%, var(--green)),
+    color-mix(in srgb, var(--charcoal) 58%, var(--green-bright))
+  );
   --brand-border-focus: light-dark(var(--green), var(--green-bright));
   --positive-border-default: var(--brand-border-subtle);
   --warning-border-default: light-dark(#f2b47e, #694321);
@@ -145,7 +227,10 @@
   --danger-border-subtle: light-dark(#f2d2c9, #472922);
 
   /* Disabled */
-  --disabled: light-dark(color-mix(in srgb, var(--cream) 92%, var(--charcoal)), color-mix(in srgb, var(--charcoal) 92%, var(--cream)));
+  --disabled: light-dark(
+    color-mix(in srgb, var(--cream) 92%, var(--charcoal)),
+    color-mix(in srgb, var(--charcoal) 92%, var(--cream))
+  );
 
   /* Compatibility aliases for existing utility classes */
   --background: var(--page);
@@ -171,7 +256,9 @@ html.theme-changing *::after {
 /* Keep the dialog and its backdrop rendered until the cards finish fading out. */
 .navigation-dialog {
   display: none;
-  transition: display 200ms allow-discrete, overlay 200ms allow-discrete;
+  transition:
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
 }
 
 .navigation-dialog[open] {
@@ -256,18 +343,23 @@ html.theme-changing *::after {
   rotate: 0.125turn;
 }
 
-:is([aria-expanded="true"] > .menu-icon, .navigation-dialog[open] .menu-icon) .line {
+:is([aria-expanded="true"] > .menu-icon, .navigation-dialog[open] .menu-icon)
+  .line {
   stroke-dasharray: 60 105 60 300;
   stroke-dashoffset: -90;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .menu-icon {
-    transition: translate 400ms var(--ease-in-out), rotate 400ms var(--ease-in-out);
+    transition:
+      translate 400ms var(--ease-in-out),
+      rotate 400ms var(--ease-in-out);
   }
 
   .menu-icon .line {
-    transition: stroke-dasharray 400ms var(--ease-in-out), stroke-dashoffset 400ms var(--ease-in-out);
+    transition:
+      stroke-dasharray 400ms var(--ease-in-out),
+      stroke-dashoffset 400ms var(--ease-in-out);
   }
 
   /* The close button mounts already open, so morph it in from the hamburger. */
@@ -398,11 +490,19 @@ html.theme-changing *::after {
 .native-slider::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 9999px;
-  background: linear-gradient(to right, var(--brand-solid) var(--slider-fill, 0%), var(--border-strong) var(--slider-fill, 0%));
+  background: linear-gradient(
+    to right,
+    var(--brand-solid) var(--slider-fill, 0%),
+    var(--border-strong) var(--slider-fill, 0%)
+  );
 }
 
 .native-slider:dir(rtl)::-webkit-slider-runnable-track {
-  background: linear-gradient(to left, var(--brand-solid) var(--slider-fill, 0%), var(--border-strong) var(--slider-fill, 0%));
+  background: linear-gradient(
+    to left,
+    var(--brand-solid) var(--slider-fill, 0%),
+    var(--border-strong) var(--slider-fill, 0%)
+  );
 }
 
 .native-slider::-moz-range-track {
@@ -542,7 +642,9 @@ html.light .theme-toggle__icon--sun {
   --color-inverted-solid-active: var(--inverted-solid-active);
   --color-on-inverted-foreground: var(--on-inverted-foreground);
   --color-on-standout-primary-foreground: var(--on-standout-primary-foreground);
-  --color-on-standout-secondary-foreground: var(--on-standout-secondary-foreground);
+  --color-on-standout-secondary-foreground: var(
+    --on-standout-secondary-foreground
+  );
 
   /* Border and focus colors */
   --color-border-default: var(--border-default);
@@ -568,7 +670,8 @@ html.light .theme-toggle__icon--sun {
 
   /* Font families */
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-newsreader), ui-serif, Georgia, "Times New Roman", serif;
+  --font-display:
+    var(--font-newsreader), ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, SFMono-Regular, monospace;
   --font-weight-regular: 400;
   --font-weight-semimedium: 450;
@@ -641,13 +744,17 @@ html.light .theme-toggle__icon--sun {
 
   /* Box shadows */
   --shadow-border: 0 0 0 1px var(--border-default);
-  --shadow-default: 0 1px 2px 0 color-mix(in srgb, var(--primary-foreground) 8%, transparent);
+  --shadow-default: 0 1px 2px 0
+    color-mix(in srgb, var(--primary-foreground) 8%, transparent);
   --shadow-large:
-    0 8px 18px -6px color-mix(in srgb, var(--primary-foreground) 14%, transparent),
+    0 8px 18px -6px
+      color-mix(in srgb, var(--primary-foreground) 14%, transparent),
     0 4px 8px -4px color-mix(in srgb, var(--primary-foreground) 8%, transparent);
   --shadow-extra-large:
-    0 18px 44px -10px color-mix(in srgb, var(--primary-foreground) 20%, transparent),
-    0 8px 16px -8px color-mix(in srgb, var(--primary-foreground) 12%, transparent);
+    0 18px 44px -10px
+      color-mix(in srgb, var(--primary-foreground) 20%, transparent),
+    0 8px 16px -8px
+      color-mix(in srgb, var(--primary-foreground) 12%, transparent);
 }
 
 @layer base {
