@@ -72,7 +72,7 @@ function SegmentedControl<Value extends string = string>({
               required={required}
               className="peer sr-only"
             />
-            <span className="flex min-h-9 cursor-pointer items-center justify-center rounded-md px-1.5 text-center text-sm font-medium leading-tight text-secondary-foreground transition-colors group-hover/option:bg-component-hover group-hover/option:text-primary-foreground peer-checked:bg-container peer-checked:text-primary-foreground peer-checked:shadow-default peer-checked:ring-1 peer-checked:ring-border-default peer-focus-visible:outline-2 peer-focus-visible:outline-offset-1 peer-focus-visible:outline-brand-border-focus peer-disabled:cursor-not-allowed peer-disabled:opacity-50 forced-colors:peer-checked:outline forced-colors:peer-checked:outline-2">
+            <span className="flex min-h-9 cursor-pointer items-center justify-center rounded-md px-1.5 text-center text-sm font-medium leading-tight text-secondary-foreground transition-colors group-hover/option:bg-component-hover group-hover/option:text-primary-foreground peer-checked:bg-brand-subtle peer-checked:text-on-brand-subtle-foreground peer-checked:font-semibold peer-checked:shadow-default peer-checked:ring-1 peer-checked:ring-brand-border-default peer-checked:group-hover/option:bg-brand-subtle peer-checked:group-hover/option:text-on-brand-subtle-foreground peer-focus-visible:outline-2 peer-focus-visible:outline-offset-1 peer-focus-visible:outline-brand-border-focus peer-disabled:cursor-not-allowed peer-disabled:opacity-50 forced-colors:peer-checked:outline forced-colors:peer-checked:outline-2">
               {option.label}
             </span>
           </label>
