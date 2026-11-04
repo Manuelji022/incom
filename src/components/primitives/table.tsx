@@ -58,7 +58,7 @@ function TableHeader({ sticky = true, className = "", ...props }: ComponentProps
   return (
     <thead
       data-slot="table-header"
-      className={cx(sticky && "sticky top-0 z-20", "[&_th]:bg-sunken", className)}
+      className={cx(sticky && "sticky top-0 z-20", "[&_th]:bg-component-active [&_th]:border-b-border-strong", className)}
       {...props}
     />
   );
@@ -80,7 +80,7 @@ function TableFooter({ sticky = true, className = "", ...props }: ComponentProps
       data-slot="table-footer"
       className={cx(
         sticky && "sticky bottom-0 z-20",
-        "[&_td]:bg-sunken [&_th]:bg-sunken [&_tr>*]:border-t [&_tr>*]:border-b-0 [&_tr>*]:border-t-border-strong [&_tr>*]:font-semibold",
+        "[&_td]:bg-component-active [&_th]:bg-component-active [&_tr>*]:border-t-2 [&_tr>*]:border-b-0 [&_tr>*]:border-t-border-strong [&_tr>*]:font-semibold [&_tr>*]:text-primary-foreground",
         className,
       )}
       {...props}
@@ -95,7 +95,7 @@ function TableRow({ className = "", ...props }: ComponentProps<"tr">) {
       className={cx(
         "group/row align-middle",
         // Cells own the background so sticky cells follow the row hover state.
-        "[&>td]:bg-container [&>th]:bg-container hover:[&>td]:bg-card hover:[&>th]:bg-card",
+        "[&>td]:bg-container [&>th]:bg-container hover:[&>td]:bg-component hover:[&>th]:bg-component",
         className,
       )}
       {...props}
@@ -116,7 +116,7 @@ function cellLayoutClasses({ align = "start", sticky, divider, numeric }: TableC
   return cx(
     alignClasses[align],
     numeric && "tabular-nums whitespace-nowrap",
-    divider && "border-s border-s-border-subtle",
+    divider && "border-s border-s-border-default",
     sticky && stickyStartClasses,
   );
 }
@@ -143,8 +143,8 @@ function TableHead({
       className={cx(
         "border-b border-b-border-default px-3 align-bottom whitespace-nowrap",
         variant === "group"
-          ? "pt-2.5 pb-1.5 text-[0.6875rem] font-semibold tracking-[0.08em] text-tertiary-foreground uppercase"
-          : "py-2 text-xs font-medium text-secondary-foreground",
+          ? "pt-2.5 pb-1.5 text-[0.6875rem] font-semibold tracking-[0.08em] text-secondary-foreground uppercase"
+          : "py-2 text-xs font-semibold text-primary-foreground",
         cellLayoutClasses({ align, sticky, divider, numeric }),
         sticky && "z-10",
         className,
@@ -161,7 +161,7 @@ function TableCell({ align = "start", sticky, divider, numeric, className = "", 
     <td
       data-slot="table-cell"
       className={cx(
-        "border-b border-b-border-subtle px-3 py-2.5 transition-colors",
+        "border-b border-b-border-default px-3 py-2.5 transition-colors",
         cellLayoutClasses({ align, sticky, divider, numeric }),
         sticky && "z-10",
         className,
@@ -178,7 +178,7 @@ function TableRowHeader({ align = "start", sticky, divider, numeric, className =
       data-slot="table-row-header"
       scope="row"
       className={cx(
-        "border-b border-b-border-subtle px-3 py-2.5 font-medium transition-colors",
+        "border-b border-b-border-default px-3 py-2.5 font-medium transition-colors",
         cellLayoutClasses({ align, sticky, divider, numeric }),
         sticky && "z-10",
         className,
